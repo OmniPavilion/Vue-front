@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]  // 匹配 Vite 的别名
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.js"]  // 包含 JS 文件
+}
