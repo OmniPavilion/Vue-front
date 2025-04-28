@@ -17,10 +17,12 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@element-plus/theme-chalk": "^2.2.16",
     "@types/node": "^22.15.2",
     "@types/vue-router": "^2.0.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
+    "sass-embedded": "^1.87.0",
     "typescript": "~5.7.2",
     "unplugin-auto-import": "^19.1.2",
     "unplugin-vue-components": "^28.5.0",

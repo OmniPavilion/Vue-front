@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import type {RouteRecordRaw} from 'vue-router';
-import textRoutes from './router/text.ts';
+import textRoutes from './router/system.ts';
 
 const routes: RouteRecordRaw[] = [
     ...textRoutes

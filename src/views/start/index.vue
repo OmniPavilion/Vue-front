@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import Container from '@/views/container/index.vue'
+
 </script>
 
 <template>
-    <Container></Container>
+开始
 </template>
 
 <style scoped>
+
 </style>
