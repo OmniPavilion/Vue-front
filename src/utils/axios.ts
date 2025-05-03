@@ -35,7 +35,10 @@ myAxios.interceptors.request.use(
 // 响应拦截器
 myAxios.interceptors.response.use(
     <T>(response: AxiosResponse<BaseResponse<T>>): T => {
-        if (response.data.code !== 200) {
+        if (response.status !== 200) {
+            throw new Error(response.data.message || 'Request failed');
+        }
+        if (response.data.code != 1) {
             throw new Error(response.data.message || 'Request failed');
         }
         return response.data.data;
