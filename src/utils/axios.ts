@@ -41,7 +41,7 @@ myAxios.interceptors.response.use(
         if (response.data.code != 1) {
             throw new Error(response.data.message || 'Request failed');
         }
-        return response.data.data;
+        return response.data;
     },
     (error: AxiosError): Promise<AxiosError> => {
         // 统一错误处理
