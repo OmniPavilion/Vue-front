@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: diary
+  datasource:
+    diary_db:
+      driver-class-name: com.mysql.cj.jdbc.Driver # 数据库驱动
+      url: jdbc:mysql://${MYSQL-URL}final_assignment # 数据库地址
+      username: ${MYSQL-USERNAME} #   用户
+      password: ${MYSQL-PASSWORD} # 密码
+
+

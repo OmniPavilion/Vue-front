@@ -1,0 +1,32 @@
+spring:
+  config:
+    import:
+      - optional:classpath:application-diary.yml  # 加载所有模块配置
+      - optional:classpath:application-common.yml  # 加载所有模块配置
+      - optional:file:./args.yaml  # 使用相对路径
+      - optional:classpath:args.yaml  # 同时检查类路径
+  servlet:
+    multipart:
+      max-file-size: 1024MB #  设置上传文件大小
+      max-request-size: 1024MB # 设置上传文件大小
+  application:
+    name: java-final-assignment # 应用名称
+  ai:
+    openai: # openai
+      base-url: "https://dashscope.aliyuncs.com/compatible-mode" # 默认地址
+      api-key:  ${A_LI_YUN-API-KEY} # 阿里云百炼Api key
+      chat: # 对话模型
+        options:
+          model: "qwen-plus" # ·模型名称
+          temperature: 0.8 # ·温度系数，取值范围[0,1]，越小越随机
+      embedding: # 向量模型
+        options:
+          model: "text-embedding-v3" # ·模型名称
+          dimensions: 1024 # ·模型维度
+
+mybatis:
+  configuration:
+#    驼峰命名与下划线命名互相转换
+    map-underscore-to-camel-case: true
+
+

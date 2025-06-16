@@ -1,0 +1,9 @@
+rootProject.name = 'OmniPavilion'
+
+
+include(
+        "application",
+        "common",
+        "diary",
+)
+
