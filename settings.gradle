@@ -1,9 +1,17 @@
-rootProject.name = 'OmniPavilion'
+pluginManagement {
+    repositories {
+        // 阿里云插件镜像
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        gradlePluginPortal()
+    }
+}
 
+rootProject.name = 'OmniPavilion'
 
 include(
         "application",
         "common",
         "diary",
+        "music"
 )
 

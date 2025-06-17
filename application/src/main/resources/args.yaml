@@ -5,7 +5,7 @@
 A_LI_YUN-API-KEY: sk-1ff40835f4a14e39970c2bbfacde8156
 
 # 数据库地址
-MYSQL-URL: localhost:3306/
+MYSQL-URL: localhost:3306
 # 用户
 MYSQL-USERNAME: root
 
