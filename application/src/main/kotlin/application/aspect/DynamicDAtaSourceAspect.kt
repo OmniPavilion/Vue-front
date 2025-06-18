@@ -1,6 +1,6 @@
 package application.aspect
 
-import application.annotation.Datasource
+import common.annotation.Datasource
 import application.bean.DynamicDataSource
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before

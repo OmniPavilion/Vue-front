@@ -1,6 +1,6 @@
-package application.annotation
+package common.annotation
 
-import application.enumerate.DataSourceType
+import common.enumerate.DataSourceType
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)

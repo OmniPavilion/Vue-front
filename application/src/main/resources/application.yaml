@@ -1,3 +1,5 @@
+
+
 spring:
   config:
     import:
@@ -26,8 +28,8 @@ spring:
           dimensions: 1024 # ·模型维度
 
 mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启 SQL 日志
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启 SQL 日志
   global-config:
     db-config:
       id-type: auto # 主键策略
@@ -36,5 +38,6 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值
       logic-not-delete-value: 0 # 逻辑未删除值
   mapper-locations: classpath*:/mapper/**/*.xml
-
+server:
+  port: 8016
 

@@ -1,14 +1,18 @@
+package diary.pojo.po
+
+
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
-import java.util.Date
+import java.time.LocalDate
+
 
 @TableName
 data class PlanTask(
     @TableId
-    val id: Int? = null,
+    val id: Int,
     val planId: Int,
     val title: String,
-    val description: String? = null,
-    val dueDate: Date? = null,
-    val status: String = "pending"
+    val description: String,
+    val dueDate: LocalDate,
+    val status: Status
 )

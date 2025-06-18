@@ -1,4 +1,4 @@
-package application.enumerate
+package common.enumerate
 
 enum class DataSourceType {
     DIARY,
