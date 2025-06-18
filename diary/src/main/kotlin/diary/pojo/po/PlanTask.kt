@@ -13,6 +13,5 @@ data class PlanTask(
     val planId: Int,
     val title: String,
     val description: String,
-    val dueDate: LocalDate,
     val status: Status
 )

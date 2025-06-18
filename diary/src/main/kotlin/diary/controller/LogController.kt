@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 class LogController(private val logService: LogService) {
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("/insert")
+    @PostMapping
     fun createLog(@RequestBody dailyLogVO: DailyLogVO): Result<out Any> {
         log.info { "创建日志：${JSON.toJSONString(dailyLogVO, SerializerFeature.PrettyFormat)}" }
         val id = logService.createLog(dailyLogVO)
@@ -32,7 +32,7 @@ class LogController(private val logService: LogService) {
 
     }
 
-    @PutMapping("/update")
+    @PutMapping
     fun updateLog(@RequestBody dailyLogVO: DailyLogVO): Result<Unit> {
         log.info { "更新日志：${JSON.toJSONString(dailyLogVO, SerializerFeature.PrettyFormat)}" }
         logService.updateLog(dailyLogVO)

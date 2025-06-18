@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 class NoteController(private val noteService: NoteService) {
     private var logger = KotlinLogging.logger {}
 
-    @PostMapping("/insert")
+    @PostMapping
     fun createNote(@RequestBody note: NoteVO): Result<Unit> {
         logger.info { "添加代办事项: ${JSON.toJSONString(note, SerializerFeature.PrettyFormat)}" }
         noteService.createNote(note)
@@ -34,7 +34,7 @@ class NoteController(private val noteService: NoteService) {
 
     }
 
-    @PutMapping("/update")
+    @PutMapping
     fun updateNote(@RequestBody note: NoteVO): Result<Unit> {
         logger.info { "更新代办事项: $note" }
         noteService.updateNote(note)
