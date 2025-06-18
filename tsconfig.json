@@ -1,14 +1,37 @@
 {
-  "files": [],
+  /* ================= 基础配置 ================= */
+  "files": [], // 显式文件列表（空数组表示使用 include）
+
+  /* ================= 项目引用配置 ================= */
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    { "path": "./tsconfig.app.json" },  // 前端应用配置
+    { "path": "./tsconfig.node.json" }  // Node环境配置
   ],
+
+  /* ================= 编译器选项 ================= */
   "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]  // 匹配 Vite 的别名
-    }
+    // 编译过程配置
+    "incremental": true,                // 启用增量编译
+
+    // 模块解析配置
+    "baseUrl": "./",                    // 非相对模块解析基准路径
+    "paths": {                          // 路径别名映射
+      "@/*": ["src/*"]                  // @/ → src/ 路径别名
+    },
+    "typeRoots": [                      // 类型定义搜索路径
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "allowSyntheticDefaultImports": true // 允许合成默认导入
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.js"]  // 包含 JS 文件
+
+  /* ================= 文件范围配置 ================= */
+  "include": [
+    "src/**/*.tsx"  // 包含所有TSX文件
+  ],
+  "exclude": [
+    "node_modules",  // 排除依赖目录
+    "dist",         // 排除构建输出
+    "src/**/__tests__/*" // 排除测试文件
+  ]
 }

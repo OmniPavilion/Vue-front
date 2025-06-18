@@ -8,7 +8,7 @@ import 'element-plus/dist/index.css'
 
 import App from './App.vue'
 import { createPinia } from 'pinia'
-import router from './router/index.ts' ; // 导入路由配置
+import router from './router/index' ; // 导入路由配置
 
 
 const app: ReturnType<typeof createApp> = createApp(App);

@@ -1,1 +1,1 @@
-export {textStore} from '@/stores/stores/text.ts'
+export {textStore} from '@/stores/stores/text'
