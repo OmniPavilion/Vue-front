@@ -39,8 +39,8 @@ CREATE TABLE t_daily_time
     id          INT PRIMARY KEY AUTO_INCREMENT,
     record_date DATE      NOT NULL UNIQUE COMMENT '记录日期',
     weather     TINYINT   NOT NULL DEFAULT 1 COMMENT '天气ID',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     FOREIGN KEY (weather) REFERENCES t_weather (id),
     INDEX idx_record_date (record_date), -- 日期索引
     INDEX idx_weather (weather)          -- 天气索引
@@ -50,16 +50,16 @@ CREATE TABLE t_daily_time
 -- 创建日志表（活动详情，关联日期表）
 CREATE TABLE t_daily_activity
 (
-    id          INT PRIMARY KEY AUTO_INCREMENT,
-    date_id     INT          NOT NULL COMMENT '日期表ID',
-    activity    VARCHAR(100) NOT NULL COMMENT '活动内容',
-    category    TINYINT      NOT NULL COMMENT '分类ID',
+    id         INT PRIMARY KEY AUTO_INCREMENT,
+    date_id    INT          NOT NULL COMMENT '日期表ID',
+    activity   VARCHAR(100) NOT NULL COMMENT '活动内容',
+    category   TINYINT      NOT NULL COMMENT '分类ID',
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     FOREIGN KEY (date_id) REFERENCES t_daily_time (id),
     FOREIGN KEY (category) REFERENCES t_category (id),
-    INDEX idx_date_id (date_id),        -- 日期ID索引
-    INDEX idx_category (category),      -- 分类索引
+    INDEX idx_date_id (date_id),       -- 日期ID索引
+    INDEX idx_category (category),     -- 分类索引
     INDEX idx_create_time (created_at) -- 创建时间索引
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT '日志表（存储活动详情，关联日期表）';
@@ -69,17 +69,17 @@ CREATE TABLE t_note
 (
     id         INT PRIMARY KEY AUTO_INCREMENT,
     content    VARCHAR(255) NOT NULL COMMENT '记事内容',
-    due_date   DATE COMMENT '截止日期',
-    due_time   TIME COMMENT '截止时间',
+    due_date   DATE         NOT NULL COMMENT '截止日期（必填）',
+    due_time   TIME         NOT NULL COMMENT '截止时间（必填，默认设为全天）',
     status     TINYINT      NOT NULL DEFAULT 2 COMMENT '状态ID，默认待办',
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    notes      TEXT COMMENT '备注信息',
+    notes      TEXT COMMENT '备注信息（可选）',
     FOREIGN KEY (status) REFERENCES t_status (id),
-    INDEX idx_due_date (due_date), -- 按截止日期查询索引
-    INDEX idx_status (status)      -- 按状态查询索引
+    INDEX idx_due_datetime (due_date, due_time), -- 联合索引提高日期时间查询效率
+    INDEX idx_status (status)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT '待办记事表';
+  DEFAULT CHARSET = utf8mb4 COMMENT '待办记事表（强制时间约束）';
 
 -- 创建计划表（使用状态枚举）
 CREATE TABLE t_plan
@@ -198,28 +198,38 @@ VALUES (1, '学习了SQL数据库设计', 1),
 -- -------------------------
 -- 插入记事数据（20条）
 -- -------------------------
+-- 插入记事数据
 INSERT INTO t_note (content, due_date, due_time, status, notes)
-VALUES ('完成季度报告', '2023-05-15', '17:00:00', 2, '需要包含市场分析部分'),
-       ('购买生日礼物', '2023-05-10', NULL, 4, '已购买书籍作为礼物'),
-       ('预约牙医', NULL, NULL, 2, '需要确认诊所营业时间'),
-       ('准备项目演示', '2023-05-20', '14:30:00', 3, '制作PPT和演讲稿'),
-       ('缴纳水电费', '2023-05-08', NULL, 4, NULL),
-       ('学习React框架', NULL, NULL, 2, '计划每天学习2小时'),
-       ('提交年度总结', '2023-06-30', '18:00:00', 2, '包含工作成果和未来计划'),
-       ('预订度假酒店', '2023-07-15', NULL, 2, '选择海滨度假村'),
-       ('车辆保养', '2023-06-20', '09:00:00', 3, '已预约4S店'),
-       ('办理签证', '2023-06-10', NULL, 2, '准备护照和照片'),
-       ('参加线上培训', '2023-06-05', '20:00:00', 1, 'Java高级特性课程'),
-       ('修剪花园草坪', '2023-06-07', '10:00:00', 4, '已完成'),
-       ('申请信用卡', NULL, NULL, 2, '比较不同银行优惠'),
-       ('报名马拉松比赛', '2023-09-01', NULL, 3, '半程马拉松项目'),
-       ('整理个人简历', '2023-06-15', NULL, 2, '更新工作经历'),
-       ('购买办公家具', '2023-06-25', NULL, 2, '书桌和椅子'),
-       ('观看教育讲座', '2023-06-09', '19:30:00', 1, '人工智能发展趋势'),
-       ('维修厨房电器', '2023-06-12', NULL, 3, '联系维修师傅'),
-       ('参加行业会议', '2023-06-22', NULL, 2, '准备演讲内容'),
-       ('预订餐厅聚餐', '2023-06-18', '19:00:00', 4, '已预订包间');
+VALUES
+    -- 明确指定日期和时间
+    ('完成季度报告', '2023-05-15', '17:00:00', 2, '需要包含市场分析部分'),
+    ('购买生日礼物', '2023-05-10', '00:00:00', 4, '已购买书籍作为礼物'),
+    ('预约牙医', '2023-05-31', '00:00:00', 2, '需要确认诊所营业时间'),
+    ('准备项目演示', '2023-05-20', '14:30:00', 3, '制作PPT和演讲稿'),
+    ('缴纳水电费', '2023-05-08', '00:00:00', 4, NULL),
 
+    -- 学习计划设置默认日期和时间
+    ('学习React框架', '2023-06-30', '00:00:00', 2, '计划每天学习2小时'),
+    ('提交年度总结', '2023-06-30', '18:00:00', 2, '包含工作成果和未来计划'),
+    ('预订度假酒店', '2023-07-15', '00:00:00', 2, '选择海滨度假村'),
+    ('车辆保养', '2023-06-20', '09:00:00', 3, '已预约4S店'),
+    ('办理签证', '2023-06-10', '00:00:00', 2, '准备护照和照片'),
+
+    -- 培训课程指定具体时间
+    ('参加线上培训', '2023-06-05', '20:00:00', 1, 'Java高级特性课程'),
+    ('修剪花园草坪', '2023-06-07', '10:00:00', 4, '已完成'),
+    ('申请信用卡', '2023-06-30', '00:00:00', 2, '比较不同银行优惠'),
+    ('报名马拉松比赛', '2023-09-01', '00:00:00', 3, '半程马拉松项目'),
+
+    -- 职业相关事项
+    ('整理个人简历', '2023-06-15', '00:00:00', 2, '更新工作经历'),
+    ('购买办公家具', '2023-06-25', '00:00:00', 2, '书桌和椅子'),
+    ('观看教育讲座', '2023-06-09', '19:30:00', 1, '人工智能发展趋势'),
+
+    -- 家庭维护
+    ('维修厨房电器', '2023-06-12', '00:00:00', 3, '联系维修师傅'),
+    ('参加行业会议', '2023-06-22', '00:00:00', 2, '准备演讲内容'),
+    ('预订餐厅聚餐', '2023-06-18', '19:00:00', 4, '已预订包间');
 -- -------------------------
 -- 插入计划数据（10条）
 -- -------------------------

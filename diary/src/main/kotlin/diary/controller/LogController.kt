@@ -47,7 +47,7 @@ class LogController(private val logService: LogService) {
 
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     fun getLogsByPage(@RequestBody pageDTO: PageDTO<LogQuery>): Result<out Any> {
         log.info { "分页查询日志：${JSON.toJSONString(pageDTO, SerializerFeature.PrettyFormat)}" }
         val pageVO = logService.getLogsByPage(pageDTO)

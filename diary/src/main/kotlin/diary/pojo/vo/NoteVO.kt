@@ -1,19 +1,17 @@
-package diary.pojo.po
-
+package diary.pojo.vo
 
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
+import diary.pojo.po.Status
 import java.time.LocalDateTime
 
 @TableName
-data class Note(
+data class NoteVO(
     @TableId
-    val id: Int = 0,
+    val id: Int?,
     val content: String,
     val dueDate: LocalDateTime,
     val dueTime: String,
-    val status: Status = Status.DRAFT,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    val status: Status,
     val notes: String?
 )

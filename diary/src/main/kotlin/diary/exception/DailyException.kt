@@ -1,3 +1,5 @@
 package diary.exception
 
-open class DailyException(message: String) :  RuntimeException(message)
+import common.exception.BusinessException
+
+open class DailyException(message: String) :  BusinessException(message)
