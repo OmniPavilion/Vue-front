@@ -20,7 +20,7 @@
     },
     "typeRoots": [                      // 类型定义搜索路径
       "./node_modules/@types",
-      "./src/types"
+      "./src/application/types"
     ],
     "allowSyntheticDefaultImports": true // 允许合成默认导入
   },
