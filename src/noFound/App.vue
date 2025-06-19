@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import HomeView from '@/application/views/HomeView.vue'
+import NoFound from '@/common/components/404/index.vue'
 </script>
 
 <template>
-  <HomeView></HomeView>
+  <NoFound />
 </template>
 
 <style scoped>

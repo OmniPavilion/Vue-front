@@ -3,9 +3,37 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import {fileURLToPath} from "node:url";
+import { fileURLToPath, URL } from 'node:url'
+import { readdirSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 
-// https://vite.dev/config/
+// 自动查找 src 子目录中的 index.html 文件
+function findHtmlEntries(dir: string): Record<string, string> {
+    const entries: Record<string, string> = {}
+    const srcPath = fileURLToPath(new URL('./src', import.meta.url))
+
+    const scanDirectory = (currentDir: string, basePath = '') => {
+        const files = readdirSync(currentDir)
+
+        files.forEach(file => {
+            const fullPath = join(currentDir, file)
+            const stat = statSync(fullPath)
+
+            if (stat.isDirectory()) {
+                scanDirectory(fullPath, basePath ? `${basePath}/${file}` : file)
+            } else if (file === 'index.html') {
+                const relativePath = fullPath.replace(srcPath, '').replace(/\\/g, '/')
+                const entryName = basePath || relativePath.split('/')[1] || 'main'
+                entries[entryName] = fileURLToPath(new URL(`./src${relativePath}`, import.meta.url))
+            }
+        })
+    }
+
+    scanDirectory(dir)
+    console.log('入口列表:', entries)
+    return entries
+}
+
 export default defineConfig({
     server: {
         port: 8050,
@@ -13,64 +41,66 @@ export default defineConfig({
     },
     build: {
         rollupOptions: {
-            input: {
-                application: fileURLToPath(new URL('./src/application/index.html', import.meta.url)),
-                sokoban: fileURLToPath(new URL('./src/diary/index.html', import.meta.url)),
-                sudoku: fileURLToPath(new URL('./src/music/index.html', import.meta.url))
-            }
+            input: findHtmlEntries(fileURLToPath(new URL('./src', import.meta.url)))
         }
     },
     plugins: [
         vue(),
-        // 配置ele-plus按需导入
-        AutoImport({ // 配置自动导入插件，指定   ElementPlusResolver   解析器
+        AutoImport({
             resolvers: [ElementPlusResolver()],
         }),
         Components({
-            resolvers: [ // 配置自动导入组件，指定   ElementPlusResolver   解析器，
-                // 并设置   importStyle   为   "sass"  ，以支持 SCSS 预处理器。
-                ElementPlusResolver({ importStyle: "sass"})],
+            resolvers: [ElementPlusResolver({ importStyle: "sass"})],
         }),
         {
             name: 'rewrite-routes',
             configureServer(server) {
+                const entries = findHtmlEntries(fileURLToPath(new URL('./src', import.meta.url)))
+
                 server.middlewares.use((req, res, next) => {
-                    if (req.url == null) {
-                        return next()
-                    }
+                    if (!req.url) return next()
 
+                    // 处理根路径重定向
                     if (req.url === '/') {
-                        res.writeHead(302, {
-                            Location: '/application' // 重定向到目标路径
-                        })
-                        return res.end() // ← 显式 return 终止流程
+                        const defaultEntry = Object.keys(entries)[0] || 'application'
+                        return res.writeHead(302, {
+                            Location: `/${defaultEntry}/`
+                        }).end()
                     }
 
-                    if(req.url === '/application') {
-                        req.url = './src/application/index.html'
-                    } else if (req.url.startsWith('/music')) {
-                        req.url = './src/music/index.html'
+                    // 处理带斜杠的路径
+                    const [_, route] = req.url.match(/^\/([^\/]+)/) || []
+
+                    if (route && entries[route]) {
+                        // 确保路径以斜杠结尾，避免相对路径问题
+                        if (!req.url.endsWith('/')) {
+                            return res.writeHead(302, {
+                                Location: `${req.url}/`
+                            }).end()
+                        }
+
+                        // 重写为实际文件路径
+                        req.url = `/src/${route}/index.html`
+                    } else if (!req.url.startsWith('/@') && !req.url.startsWith('/src/') && !req.url.includes('.')) {
+                        // 未匹配到入口且不是静态资源，直接返回 404
+                        req.url = `/src/noFound/index.html`
                     }
+
                     next()
                 })
             }
         }
     ],
     resolve: {
-        alias: { // 定义路径别名
-            // 路径转化，把@转化成src路径
+        alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))
         },
     },
     css: {
-        preprocessorOptions: { // 配置预处理器选项
+        preprocessorOptions: {
             scss: {
-                // 自动导入定制化样式文件进行样式覆盖
-                additionalData: //  自动导入   scss   文件，以便进行样式覆盖
-                    `
-        `,
+                additionalData: ``
             }
         }
     }
 })
-

@@ -1,0 +1,19 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/*取消a的下划线*/
+a {
+    text-decoration: none;
+}
+
+#app {
+    margin: 0;
+    padding: 0; /* 添加这行 */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* 防止内容溢出 */
+}
