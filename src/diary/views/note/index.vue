@@ -1,8 +1,9 @@
-<script setup>
+<script setup lang="ts">
+
 </script>
 
 <template>
-  <RouterView></RouterView>
+待办事项
 </template>
 
 <style scoped>

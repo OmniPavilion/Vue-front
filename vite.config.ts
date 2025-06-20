@@ -30,7 +30,6 @@ function findHtmlEntries(dir: string): Record<string, string> {
     }
 
     scanDirectory(dir)
-    console.log('入口列表:', entries)
     return entries
 }
 

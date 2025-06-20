@@ -1,1 +1,1 @@
-export {textStore} from '@/application/stores/stores/text'
+export { useLogStore } from '@/diary/stores/stores/logStore'

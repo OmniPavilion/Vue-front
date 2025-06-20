@@ -14,6 +14,7 @@ import AstronautIllustration from './com/AstronautIllustration.vue';
 
 <style scoped>
 .not-found-container {
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;

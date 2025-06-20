@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import '@/common/styles/gobal.css'
+// 在main.js或main.ts中添加
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import App from './App.vue'
 import { createPinia } from 'pinia'

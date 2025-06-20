@@ -1,1 +1,1 @@
-export {textStore} from '@/application/stores/stores/text'
+export {textStore} from '@/common/stores/stores/text'

@@ -7,34 +7,59 @@
     </div>
     <h1 class="title">页面未找到</h1>
     <p class="message">您访问的页面不存在或已被移除</p>
-    <button
-        @click="goHome"
-        @mouseenter="isHovered = true"
-        @mouseleave="isHovered = false"
-        class="home-button"
-        :class="{ 'hovered': isHovered }"
-    >
-      返回首页
-      <svg
-          class="arrow-icon"
-          :class="{ 'animate': isHovered }"
-          viewBox="0 0 24 24"
-          width="24"
-          height="24"
+    <div class="button-group">
+      <button
+          @click="goBack"
+          @mouseenter="isBackHovered = true"
+          @mouseleave="isBackHovered = false"
+          class="back-button"
+          :class="{ 'hovered': isBackHovered }"
       >
-        <path d="M5 12H19M19 12L12 5M19 12L12 19" />
-      </svg>
-    </button>
+        <svg
+            class="arrow-icon"
+            :class="{ 'animate': isBackHovered }"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+        >
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" />
+        </svg>
+        返回上一页
+      </button>
+      <button
+          @click="goHome"
+          @mouseenter="isHomeHovered = true"
+          @mouseleave="isHomeHovered = false"
+          class="home-button"
+          :class="{ 'hovered': isHomeHovered }"
+      >
+        返回首页
+        <svg
+            class="arrow-icon"
+            :class="{ 'animate': isHomeHovered }"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+        >
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import {ref} from 'vue';
 
-const isHovered = ref(false);
+const isHomeHovered = ref(false);
+const isBackHovered = ref(false);
 
 const goHome = () => {
-  window.location.href = "/";
+  window.location.href = '/'
+};
+
+const goBack = () => {
+  window.history.back();
 };
 </script>
 
@@ -80,11 +105,16 @@ const goHome = () => {
   opacity: 0.8;
 }
 
-.home-button {
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.home-button, .back-button {
   display: inline-flex;
   align-items: center;
   padding: 0.8rem 1.5rem;
-  background: #e94560;
   color: white;
   border: none;
   border-radius: 50px;
@@ -96,14 +126,28 @@ const goHome = () => {
   overflow: hidden;
 }
 
+.home-button {
+  background: #e94560;
+}
+
+.back-button {
+  background: #3a3a3a;
+}
+
 .home-button:hover {
   background: #ff6b81;
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(233, 69, 96, 0.3);
 }
 
+.back-button:hover {
+  background: #5a5a5a;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
 .arrow-icon {
-  margin-left: 0.5rem;
+  margin: 0 0.5rem;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
@@ -112,8 +156,16 @@ const goHome = () => {
   transition: transform 0.3s ease;
 }
 
+.back-button .arrow-icon {
+  transform: rotate(180deg);
+}
+
 .animate {
   transform: translateX(5px);
+}
+
+.back-button .animate {
+  transform: rotate(180deg) translateX(5px);
 }
 
 @keyframes float {
