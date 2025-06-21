@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLogStore } from "@/diary/stores";
 import { onMounted, computed } from "vue";
-import LogCard from "@/diary/views/log/coms/LogCard.vue";
+import LogCard from "@/diary/views/log/com/LogCard.vue";
 
 const logStore = useLogStore();
 

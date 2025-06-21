@@ -5,7 +5,7 @@ import {Category, CategoryInfo} from "@/diary/types/vo/Category";
 import type {DailyLogVO} from "@/diary/types/vo/DailyLogVO";
 import {useLogStore} from "@/diary/stores";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {Plus, Delete, Edit} from '@element-plus/icons-vue'
+import {Plus, Delete, Edit, CloseBold} from '@element-plus/icons-vue'
 
 
 const logStore = useLogStore();
@@ -128,6 +128,20 @@ const handleEditLog = (index: number) => {
   editText.value = props.dailyLog.logs[index].activity
 }
 
+const handleDelete = async (index: number) => {
+  await ElMessageBox.confirm(
+      '确定要删除这条日志吗？',
+      '警告',
+      {
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true,
+      }
+  )
+  props.dailyLog.logs.splice(index, 1)
+}
+
 // 打开分类选择对话框
 const openCategoryDialog = (index: number) => {
   selectedLogIndex.value = index;
@@ -168,112 +182,143 @@ const changeCategory = (category: Category) => {
   </el-card>
 
   <!-- 详细信息弹窗 -->
-  <el-dialog
-      v-model="dialogVisible"
-      :title="formatDate(dailyLog.date)"
-      width="80%"
-      custom-class="log-detail-dialog"
-  >
-    <template #header>
-      <div class="dialog-header">
-        <span>{{ formatDate(dailyLog.date) }}</span>
-        <div class="dialog-actions">
-          <el-button type="primary" size="small" @click="handleAddLog" round>
-            <el-icon>
-              <Plus/>
-            </el-icon>
-            日志
-          </el-button>
-          <el-button type="danger" size="small" @click="handleDeleteLog" round>
-            <el-icon>
-              <Delete/>
-            </el-icon>
-            删除
-          </el-button>
-        </div>
-      </div>
-    </template>
-
-    <div class="log-detail-content">
-      <!-- 天气信息 -->
-      <div class="weather-info">
-        <el-tag type="info" class="weather-tag">
-          <i :class="weatherIcon" class="weather-icon-dialog"></i>
-          {{ weatherName }}
-        </el-tag>
-      </div>
-
-      <!-- 日志条目 -->
-      <div class="log-entries">
-        <div v-if="logCount === 0" class="empty-logs">
-          <el-empty description="这一天没有记录日志"/>
-        </div>
-
-        <!-- 优化对齐的日志条目 -->
-        <div
-            v-for="(log, index) in dailyLog.logs"
-            :key="index"
-            class="log-entry"
-        >
-          <el-tag
-              :color="getCategoryColor(log.category)"
-              effect="dark"
-              class="category-tag"
-              @click.stop="openCategoryDialog(index)"
-          >
-            {{ getCategoryName(log.category) }}
-          </el-tag>
-
-          <div v-if="editingIndex !== index" class="activity-text">
-            {{ log.activity }}
-          </div>
-
-          <!-- 编辑模式 -->
-          <el-input
-              v-else
-              v-model="editText"
-              class="edit-input"
-              @keyup.enter="handleEditLog(index)"
-          />
-
-          <div class="log-actions">
-            <el-button
-                type="text"
-                size="small"
-                @click.stop="handleEditLog(index)"
-                class="edit-btn"
-            >
-              <el-icon :style="{ color: editingIndex === index ? 'blue' : '#666' }">
-                <Edit/>
+  <div>
+    <el-dialog
+        v-model="dialogVisible"
+        :title="formatDate(dailyLog.date)"
+        width="80%"
+        custom-class="log-detail-dialog"
+    >
+      <template #header>
+        <div class="dialog-header">
+          <span>{{ formatDate(dailyLog.date) }}</span>
+          <div class="dialog-actions">
+            <el-button type="primary" size="small" @click="handleAddLog" round>
+              <el-icon>
+                <Plus/>
               </el-icon>
+              日志
+            </el-button>
+            <el-button type="danger" size="small" @click="handleDeleteLog" round>
+              <el-icon>
+                <Delete/>
+              </el-icon>
+              删除
             </el-button>
           </div>
         </div>
+      </template>
+
+      <div class="log-detail-content">
+        <!-- 天气信息 -->
+        <div class="weather-info">
+          <el-tag type="info" class="weather-tag">
+            <i :class="weatherIcon" class="weather-icon-dialog"></i>
+            {{ weatherName }}
+          </el-tag>
+        </div>
+
+        <!-- 日志条目 -->
+        <div class="log-entries">
+          <div v-if="logCount === 0" class="empty-logs">
+            <el-empty description="这一天没有记录日志"/>
+          </div>
+
+          <!-- 优化对齐的日志条目 -->
+          <div
+              v-for="(log, index) in dailyLog.logs"
+              :key="index"
+              class="log-entry"
+          >
+            <el-tag
+                :color="getCategoryColor(log.category)"
+                effect="dark"
+                class="category-tag"
+                @click.stop="openCategoryDialog(index)"
+            >
+              {{ getCategoryName(log.category) }}
+            </el-tag>
+
+            <div v-if="editingIndex !== index" class="activity-text">
+              {{ log.activity }}
+            </div>
+
+            <!-- 编辑模式 -->
+            <el-input
+                v-else
+                v-model="editText"
+                class="edit-input"
+                @keyup.enter="handleEditLog(index)"
+            />
+
+            <div class="log-actions">
+              <el-button
+                  type="text"
+                  size="small"
+                  @click.stop="handleDelete(index)"
+                  class="btn delete-btn"
+              >
+                <el-icon class="delete-btn">
+                  <CloseBold/>
+                </el-icon>
+              </el-button>
+              <el-button
+                  type="text"
+                  size="small"
+                  @click.stop="handleEditLog(index)"
+                  class="btn edit-btn"
+              >
+                <el-icon :style="{ color: editingIndex === index ? 'blue' : '#666' }">
+                  <Edit/>
+                </el-icon>
+              </el-button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </el-dialog>
+    </el-dialog>
+  </div>
 
   <!-- 分类选择对话框 -->
-  <el-dialog
-      v-model="categoryDialogVisible"
-      title="选择分类"
-      width="60%"
-      center
-  >
-    <div class="category-options">
-      <el-button
-          v-for="(info, category) in CategoryInfo"
-          :key="category"
-          :style="{ backgroundColor: info.color, color: '#fff', border: 'none' }"
-          @click="changeCategory(category as Category)"
-      >
-        {{ info.name }}
-      </el-button>
-    </div>
-  </el-dialog>
+  <div>
+    <el-dialog
+        v-model="categoryDialogVisible"
+        title="选择分类"
+        width="60%"
+        center
+    >
+      <div class="category-options">
+        <el-button
+            v-for="(info, category) in CategoryInfo"
+            :key="category"
+            :style="{ backgroundColor: info.color, color: '#fff', border: 'none' }"
+            @click="changeCategory(category as Category)"
+        >
+          {{ info.name }}
+        </el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <style scoped>
+.log-actions {
+  width: 100px;
+}
+
+.btn {
+  float: right;
+  width: 10px;
+}
+
+.delete-btn {
+  color: #666;
+}
+
+.delete-btn:hover {
+  color: red;
+}
+
 .dialog-header {
   display: flex;
   justify-content: space-between;

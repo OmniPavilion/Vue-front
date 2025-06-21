@@ -72,16 +72,13 @@ export const useLogStore = defineStore('log', () => {
     const fetchLogsByPage = async () => {
         console.log('分页查询日志参数', pageQuery.value);
         loading.value = true;
-        try {
-            const res: AxiosResponse<Result<PageVO<DailyLogVO>>> = await logApi.getLogsByPage(pageQuery.value);
-            logList.value = res.data.data.rows || [];
-            total.value = res.data.data.total || 0;
-            console.log('分页查询日志', logList.value);
-            console.log('分页查询日志总数', total.value);
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
+        const res: AxiosResponse<Result<PageVO<DailyLogVO>>> = await logApi.getLogsByPage(pageQuery.value);
+        logList.value = res.data.data.rows || [];
+        total.value = res.data.data.total || 0;
+        console.log('分页查询日志', logList.value);
+        console.log('分页查询日志总数', total.value);
+        loading.value = false;
+        return res.data;
     };
 
     const isTodayHasLog = async () => {
@@ -94,8 +91,11 @@ export const useLogStore = defineStore('log', () => {
                 endDate: new Date().toISOString().split('T')[0],
             }
         });
-        console.log('今天是否有日志', res.data.data.total)
-        return res.data.data.total > 0;
+        const total = res.data.data.total;
+        const count = res.data.data.rows[0]?.logs.length;
+        console.log('今天是否创建日志', total)
+        console.log('今天日志条数', count)
+        return total > 0 && count > 0;
     }
 
     return {

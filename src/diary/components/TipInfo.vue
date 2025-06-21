@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {ElNotification} from "element-plus";
 import {onMounted} from "vue";
-import {useLogStore} from "@/diary/stores";
+import {useLogStore, useNoteStore} from "@/diary/stores";
 
 const logStore = useLogStore();
+const noteStore = useNoteStore();
 
-const init = async () => {
+const initLog = async () => {
   const isTodayHasLog = await logStore.isTodayHasLog();
   if (!isTodayHasLog) {
     ElNotification({
@@ -16,8 +17,30 @@ const init = async () => {
   }
 }
 
+const initNote = async () => {
+  const notes = await noteStore.theNoteToDo()
+  if (notes.length > 0) {
+    ElNotification({
+      title: '提示' as any,
+      message: '今天有' + notes.length + '个待办事项未完成哦！' as any,
+      type: 'warning' as any,
+    })
+  }
+
+  notes.forEach((note, index) => {
+    setTimeout(() => {
+      ElNotification({
+        title: '提示' as any,
+        message: `${note.content} 未完成哦！-- ${note.dueTime}` as any,
+        type: 'warning' as any,
+      });
+    }, index * 1000); // 每隔1秒显示一个通知
+  });
+}
+
 onMounted(() => {
-  init()
+  initLog()
+  initNote()
 })
 </script>
 

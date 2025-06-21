@@ -16,3 +16,11 @@ export const CategoryInfo = {
     [Category.ENTERTAINMENT]: { name: '娱乐', color: '#B5EAD7' },
     [Category.SOCIAL]: { name: '社交', color: '#C7CEEA' }
 };
+
+// 分类选项
+export const CategoryOptions = (Object.keys(Category) as Array<keyof typeof Category>)
+    .filter(key => isNaN(Number(key)))
+    .map(key => ({
+        value: key,
+        label: CategoryInfo[Category[key]].name,
+    }));

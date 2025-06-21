@@ -22,3 +22,10 @@ export const WeatherInfo = {
     [Weather.FOG]: { name: '雾天', icon: 'bi bi-cloud-fog2' },
     [Weather.Lightning]: { name: '雷雨', icon: 'bi bi-cloud-lightning-rain' }
 };
+
+// 天气选项
+export const WeatherOptions = Object.values(Weather)
+    .map(value => ({
+        value,
+        label: WeatherInfo[value as Weather].name,
+    }));
