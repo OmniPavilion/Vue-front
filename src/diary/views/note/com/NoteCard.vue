@@ -587,4 +587,5 @@ onMounted(async () => {
 .dark .status-name {
   color: #f0f0f0;
 }
+
 </style>

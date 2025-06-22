@@ -13,7 +13,14 @@ const logStore = useLogStore();
 const props = defineProps<{
   dailyLog: DailyLogVO;
   class?: string;
+  theme?: 'classic' | 'modern' | 'dark' | 'vintage';
+
 }>();
+
+// 根据主题获取Dialog样式
+const dialogClass = computed(() => {
+  return `note-dialog ${props.theme || 'vintage'}`;
+});
 
 const dialogVisible = ref(false);
 const categoryDialogVisible = ref(false);
@@ -184,6 +191,7 @@ const changeCategory = (category: Category) => {
   <!-- 详细信息弹窗 -->
   <div>
     <el-dialog
+        :class="dialogClass"
         v-model="dialogVisible"
         :title="formatDate(dailyLog.date)"
         width="80%"
@@ -282,6 +290,7 @@ const changeCategory = (category: Category) => {
   <!-- 分类选择对话框 -->
   <div>
     <el-dialog
+        :class="dialogClass"
         v-model="categoryDialogVisible"
         title="选择分类"
         width="60%"
@@ -566,5 +575,209 @@ const changeCategory = (category: Category) => {
   .category-options {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* 主题样式 */
+:deep(.note-dialog.classic) {
+  background: #f9f5e9;
+}
+
+:deep(.note-dialog.classic .el-dialog__header),
+:deep(.note-dialog.classic .el-dialog__footer) {
+  border-color: #d4c9a8;
+}
+
+:deep(.note-dialog.modern) {
+  background: #ffffff;
+}
+
+:deep(.note-dialog.modern .el-dialog__header),
+:deep(.note-dialog.modern .el-dialog__footer) {
+  border-color: #e0e0e0;
+}
+
+:deep(.note-dialog.dark) {
+  background: #1a1a1a;
+}
+
+:deep(.note-dialog.dark .el-dialog__title),
+:deep(.note-dialog.dark .value) {
+  color: #f0f0f0;
+}
+
+:deep(.note-dialog.dark .label),
+:deep(.note-dialog.dark .progress-label),
+:deep(.note-dialog.dark .progress-percentage) {
+  color: #aaa;
+}
+
+:deep(.note-dialog.dark .el-dialog__header),
+:deep(.note-dialog.dark .el-dialog__footer) {
+  border-color: #333333;
+}
+
+:deep(.note-dialog.dark .notes-row .value) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:deep(.note-dialog.vintage) {
+  background: #f5e8d0;
+}
+
+:deep(.note-dialog.vintage .el-dialog__header),
+:deep(.note-dialog.vintage .el-dialog__footer) {
+  border-color: #b8a07a;
+}
+
+/* 暗色主题适配 */
+.dark .note-card {
+  background: rgba(30, 30, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .due-time .date,
+.dark .content {
+  color: #f0f0f0;
+}
+
+.dark .due-time .time,
+.dark .notes {
+  color: #aaa;
+}
+
+.dark .progress-indicator {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 暗色主题适配 */
+.dark .status-option:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .status-name {
+  color: #f0f0f0;
+}
+
+/* 暗色主题输入框样式 */
+:deep(.note-dialog.dark .theme-input .el-input__wrapper),
+:deep(.note-dialog.dark .theme-input .el-textarea__inner),
+:deep(.note-dialog.dark .theme-select .el-input__wrapper),
+:deep(.note-dialog.dark .theme-date-picker .el-input__wrapper),
+:deep(.note-dialog.dark .theme-time-picker .el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #f0f0f0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+:deep(.note-dialog.dark .theme-input .el-textarea__inner) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #f0f0f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:deep(.note-dialog.dark .theme-input .el-input__wrapper:hover),
+:deep(.note-dialog.dark .theme-input .el-textarea__inner:hover),
+:deep(.note-dialog.dark .theme-select .el-input__wrapper:hover),
+:deep(.note-dialog.dark .theme-date-picker .el-input__wrapper:hover),
+:deep(.note-dialog.dark .theme-time-picker .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+:deep(.note-dialog.dark .theme-input .el-input__wrapper.is-focus),
+:deep(.note-dialog.dark .theme-input .el-textarea__inner:focus),
+:deep(.note-dialog.dark .theme-select .el-input__wrapper.is-focus),
+:deep(.note-dialog.dark .theme-date-picker .el-input__wrapper.is-focus),
+:deep(.note-dialog.dark .theme-time-picker .el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+:deep(.note-dialog.dark .el-input__inner::placeholder),
+:deep(.note-dialog.dark .el-textarea__inner::placeholder) {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* 输入框样式 */
+:deep(.theme-input .el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(184, 160, 122, 0.3);
+  transition: all 0.3s ease;
+}
+
+:deep(.theme-input .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #b8a07a;
+}
+
+:deep(.theme-input .el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #b8a07a;
+}
+
+:deep(.theme-input .el-textarea__inner) {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  border: 1px solid rgba(184, 160, 122, 0.3);
+  transition: all 0.3s ease;
+  padding: 10px;
+  color: #5a4a3a;
+}
+
+:deep(.theme-input .el-textarea__inner:hover) {
+  border-color: #b8a07a;
+}
+
+:deep(.theme-input .el-textarea__inner:focus) {
+  border-color: #b8a07a;
+  box-shadow: 0 0 0 1px #b8a07a;
+}
+
+/* 选择器样式 */
+:deep(.theme-select .el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  border: 1px solid rgba(184, 160, 122, 0.5); /* 明确设置边框样式 */
+  box-shadow: none; /* 移除默认阴影 */
+  transition: all 0.3s ease;
+}
+
+:deep(.theme-select .el-input__wrapper:hover) {
+  border-color: #b8a07a;
+  box-shadow: none; /* 确保悬停时也没有阴影 */
+}
+
+:deep(.theme-select .el-input__wrapper.is-focus) {
+  border-color: #b8a07a;
+  box-shadow: 0 0 0 1px #b8a07a; /* 聚焦时添加轻微外发光 */
+}
+
+/* 日期选择器样式 */
+:deep(.theme-date-picker .el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(184, 160, 122, 0.3);
+  transition: all 0.3s ease;
+}
+
+:deep(.theme-date-picker .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #b8a07a;
+}
+
+:deep(.theme-date-picker .el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #b8a07a;
+}
+
+/* 时间选择器样式 */
+:deep(.theme-time-picker .el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(184, 160, 122, 0.3);
+  transition: all 0.3s ease;
+}
+
+:deep(.theme-time-picker .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #b8a07a;
+}
+
+:deep(.theme-time-picker .el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #b8a07a;
 }
 </style>

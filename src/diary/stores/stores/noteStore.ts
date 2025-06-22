@@ -104,11 +104,6 @@ export const useNoteStore = defineStore('note', () => {
                 if (isNaN(dueDate.getTime())) return false;
 
                 const timeDiff = dueDate.getTime() - now.getTime();
-                console.log(dateTimeStr);
-                console.log(now)
-                console.log(timeDiff)
-                console.log(timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000)
-
                 // 返回24小时内的未过期项目
                 return timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000;
             } catch (e) {
@@ -117,7 +112,7 @@ export const useNoteStore = defineStore('note', () => {
             }
         });
 
-        console.log("今天的待办事项：" + notes.length)
+        console.log("今天的待办事项数：" + notes.length)
         return notes
     }
 

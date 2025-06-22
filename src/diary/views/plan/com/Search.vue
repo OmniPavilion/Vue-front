@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {ref, watch, onMounted, computed} from 'vue';
-import {Category, CategoryOptions} from '@/diary/types/vo/Category';
-import {useLogStore} from "@/diary/stores";
-import { debounce } from 'lodash-es';
-import {Weather, WeatherOptions} from "@/diary/types/vo/Weather";
+import {usePlanStore} from "@/diary/stores";
+import {debounce} from 'lodash-es';
 import {ElMessage} from "element-plus";
+import {Status, StatusOptions} from "@/diary/types/vo/Status";
+import type {PlanVO} from "@/diary/types/vo/PlanVO";
 
-const logStore = useLogStore();
+const planStore = usePlanStore();
 
 const props = defineProps<{
   theme?: 'classic' | 'modern' | 'dark' | 'vintage';
@@ -17,98 +17,104 @@ const dialogClass = computed(() => {
   return `note-dialog ${props.theme || 'vintage'}`;
 });
 
-
-// 表单数据
-const formData = ref({
-  pageSize: 100,
-  category: undefined as Category | undefined,
-  selectedMonth: '' as string | undefined,
-});
-
 // 添加日志对话框相关
 const dialogVisible = ref(false);
-const newLogData = ref({
-  date: new Date().toISOString().slice(0, 10),
-  weather: Weather.SUNNY,
+const newPlanData = ref<PlanVO>({
+  content: '',
+  title: '默认标题',
+  status: Status.PENDING,
+  startDate: new Date().toISOString().slice(0, 10),
+  endDate: new Date().toISOString().slice(0, 10),
+  tasks: []
 });
 
-
+// 获取表单引用
+const formRef = ref();
 
 // 防抖自动查询函数
 const autoSearch = debounce(() => {
-  const month = formData.value.selectedMonth;
-  let query: any = {
-    category: formData.value.category,
-  };
-
-  if (month) {
-    const [year, monthNum] = month.split('-');
-    query.startDate = `${year}-${monthNum}-01`;
-    query.endDate = `${year}-${monthNum}-${new Date(parseInt(year), parseInt(monthNum), 0).getDate()}`;
-  }
-
-  logStore.pageQuery = {
-    ...logStore.pageQuery,
-    query,
-    pageNum: 1,
-    pageSize: formData.value.pageSize,
-  };
-
-  logStore.fetchLogsByPage();
+  planStore.fetchPlansByPage();
 }, 300);
 
 const addLog = async () => {
   dialogVisible.value = true;
 };
 
-const confirmAddLog = async () => {
-  const res = await logStore.createLog({
-    id: 0,
-    date: newLogData.value.date,
-    weather: newLogData.value.weather,
-    logs: [],
-  });
+const confirmAddNote = async () => {
+  // 表单验证
+  try {
+    await formRef.value.validate();
 
-  if (res.code === -1) {
-    ElMessage.error(res.message as any);
-    return;
+    const res = await planStore.createPlan(newPlanData.value);
+
+    if (res.code === -1) {
+      ElMessage.error(res.message as any);
+      return;
+    }
+
+    ElMessage.success('添加成功' as any);
+    dialogVisible.value = false;
+    await planStore.fetchPlansByPage();
+
+    // 重置表单
+    newPlanData.value = {
+      content: '',
+      title: '默认标题',
+      status: Status.PENDING,
+      startDate: new Date().toISOString().slice(0, 10),
+      endDate: new Date().toISOString().slice(0, 10),
+      tasks: []
+    };
+
+  } catch (error) {
+    // 验证失败会自动显示错误信息
+    console.error('表单验证失败:', error);
   }
-  ElMessage.success('添加成功' as any);
+};
 
-  dialogVisible.value = false;
-  await logStore.fetchLogsByPage();
+// 表单验证规则
+const rules = {
+  startDate: [
+    {required: true, message: '请选择开始日期', trigger: 'change'}
+  ],
+  endDate: [
+    {required: true, message: '请选择截止日期', trigger: 'change'}
+  ],
 };
 
 // 监听表单变化自动查询
 watch(
-    () => [formData.value.category, formData.value.selectedMonth],
+    () => [planStore.pageQuery.query],
     () => {
       autoSearch();
     },
-    { deep: true }
+    {deep: true}
 );
 
 // 初始化加载数据
 onMounted(() => {
-  logStore.fetchLogsByPage();
+  planStore.fetchPlansByPage()
 });
 </script>
 
 <template>
   <div class="log-search-container">
     <div class="log-search">
-      <el-form :inline="true" :model="formData" class="search-form">
-        <el-form-item label="分类" class="form-item">
+      <el-form
+          :inline="true"
+          :model="planStore.pageQuery"
+          class="search-form">
+        <el-form-item label="状态" class="form-item" prop="status">
           <el-select
-              v-model="formData.category"
+              v-model="planStore.pageQuery.query"
               style="width: 75px;"
-              placeholder="分类"
+              placeholder="状态"
               clearable
               @change="autoSearch"
               class="theme-select"
           >
             <el-option
-                v-for="category in CategoryOptions"
+                v-for="category in StatusOptions"
                 :key="category.value"
                 :label="category.label"
                 :value="category.value"
@@ -118,7 +124,7 @@ onMounted(() => {
 
         <el-form-item label="数据量" class="form-item">
           <el-select
-              v-model="formData.pageSize"
+              v-model="planStore.pageQuery.pageSize"
               style="width: 90px;"
               placeholder="数据量"
               clearable
@@ -134,20 +140,9 @@ onMounted(() => {
           </el-select>
         </el-form-item>
 
-        <el-form-item label="选择月份" class="form-item">
-          <el-date-picker
-              v-model="formData.selectedMonth"
-              type="month"
-              placeholder="选择月份"
-              value-format="YYYY-MM"
-              @change="autoSearch"
-              class="theme-date-picker"
-          />
-        </el-form-item>
-
         <el-form-item class="form-item">
           <el-button type="primary" @click="addLog" class="add-button theme-button">
-            添加日志
+            添加计划
           </el-button>
         </el-form-item>
       </el-form>
@@ -155,32 +150,71 @@ onMounted(() => {
 
     <!-- 添加日志对话框 -->
     <el-dialog
+        v-model="dialogVisible"
         :class="dialogClass"
-        v-model="dialogVisible" title="添加新日志" width="500px" class="theme-dialog">
-      <el-form :model="newLogData" label-width="80px">
-        <el-form-item label="日期">
+        title="添加新计划"
+        width="500px"
+        class="theme-dialog">
+      <el-form :rules="rules"
+               ref="formRef"
+               :model="newPlanData"
+               label-width="80px">
+        <el-form-item label="标题" required prop="title">
+          <el-input
+              v-model="newPlanData.title"
+              type="textarea"
+              :rows="3"
+              placeholder="请输入内容"
+              class="theme-input"
+          />
+        </el-form-item>
+        <el-form-item label="描述" prop="content">
+          <el-input
+              v-model="newPlanData.content"
+              type="textarea"
+              :rows="2"
+              placeholder="添加描述信息"
+              class="theme-input"
+          />
+        </el-form-item>
+
+        <el-form-item label="状态" prop="status">
+          <el-select
+              v-model="newPlanData.status"
+              placeholder="请选择状态"
+              class="theme-select"
+          >
+            <el-option
+                v-for="category in StatusOptions"
+                :key="category.value"
+                :label="category.label"
+                :value="category.value"
+                class="theme-select"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="开始日期" prop="startDate">
           <el-date-picker
-              v-model="newLogData.date"
+              v-model="newPlanData.startDate"
               type="date"
               placeholder="选择日期"
               value-format="YYYY-MM-DD"
               class="theme-date-picker"
           />
         </el-form-item>
-        <el-form-item label="天气">
-          <el-select v-model="newLogData.weather" placeholder="选择天气" class="theme-select">
-            <el-option
-                v-for="weather in WeatherOptions"
-                :key="weather.value"
-                :label="weather.label"
-                :value="weather.value"
-            />
-          </el-select>
+        <el-form-item label="截至日期" prop="endDate">
+          <el-date-picker
+              v-model="newPlanData.endDate"
+              type="date"
+              placeholder="选择日期"
+              value-format="YYYY-MM-DD"
+              class="theme-date-picker"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false" class="theme-button">取消</el-button>
-        <el-button type="primary" @click="confirmAddLog" class="theme-button">确认</el-button>
+        <el-button type="primary" @click="confirmAddNote" class="theme-button">确认</el-button>
       </template>
     </el-dialog>
   </div>

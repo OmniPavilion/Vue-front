@@ -6,8 +6,10 @@ import Search from "@/diary/views/note/com/Search.vue";
 </script>
 
 <template>
-  <Search></Search>
- <ListCard></ListCard>
+  <div>
+    <Search></Search>
+    <ListCard></ListCard>
+  </div>
 </template>
 
 <style scoped>
