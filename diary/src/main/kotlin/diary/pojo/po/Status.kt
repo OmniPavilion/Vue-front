@@ -10,5 +10,6 @@ enum class Status(
     PENDING(2, "pending"),
     IN_PROGRESS(3, "in-progress"),
     COMPLETED(4, "completed"),
-    CANCELLED(5, "cancelled");
+    CANCELLED(5, "cancelled"),
+    EXPIRED(6, "expired");
 }

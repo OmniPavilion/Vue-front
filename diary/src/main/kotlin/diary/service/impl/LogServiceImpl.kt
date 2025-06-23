@@ -24,6 +24,7 @@ import diary.service.LogService
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -39,6 +40,10 @@ class LogServiceImpl(
 
     @Transactional
     override fun createLog(dailyLogVO: DailyLogVO): Int {
+        //  判断日期是否是未来
+        if (dailyLogVO.date.isAfter(LocalDate.now())) {
+            throw DailyException("日期不能是未来")
+        }
         // 检查日志是否已存在
         val exists = dailyTimeMapper.selectCount(
             KtQueryWrapper(DailyTime::class.java)
@@ -149,7 +154,7 @@ class LogServiceImpl(
         val queryWrapper = KtQueryWrapper(DailyTime::class.java).apply {
             pageDTO.query?.let { query ->
                 query.startDate?.let { ge(DailyTime::recordDate, it) }
-                query.endDate?.let { le(DailyTime::recordDate, it) }
+                query.endDate?.let { le(DailyTime::recordDate, it.plusDays(1)) }
 
                 when (pageDTO.order) {
                     SortDirection.ASC -> orderByAsc(DailyTime::recordDate)
@@ -165,7 +170,10 @@ class LogServiceImpl(
         val dailyTimePage = dailyTimeMapper.selectPage(page, queryWrapper)
 
         val dailyLogVOs = dailyTimePage.records.map { dailyTime ->
-            val activityQueryWrapper = KtQueryWrapper(DailyActivity::class.java).eq(DailyActivity::dateId, dailyTime.id)
+            val activityQueryWrapper = KtQueryWrapper(DailyActivity::class.java).apply {
+                eq(DailyActivity::dateId, dailyTime.id)
+                pageDTO.query?.category?.let { eq(DailyActivity::category, it) }
+            }
             val activities = dailyActivityMapper.selectList(activityQueryWrapper)
 
             val logEntries = activities.map {

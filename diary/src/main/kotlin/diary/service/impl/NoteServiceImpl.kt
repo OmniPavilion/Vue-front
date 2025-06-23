@@ -109,8 +109,6 @@ class NoteServiceImpl(private val noteMapper: NoteMapper) : NoteService {
             }
         }
 
-        logger.info { "查询条件: ${JSON.toJSONString(queryWrapper, SerializerFeature.PrettyFormat)}" }
-
         val result = noteMapper.selectPage(page, queryWrapper)
         return PageVO(result.total, result.records)
     }

@@ -12,5 +12,6 @@ enum class Weather(
     LIGHT_RAIN(4, "Light Rain"),
     HEAVY_RAIN(5, "Heavy Rain"),
     SNOW(6, "Snow"),
-    FOG(7, "Fog");
+    FOG(7, "Fog"),
+    Lightning(8, "Lightning");
 }
