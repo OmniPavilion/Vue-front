@@ -1,5 +1,6 @@
 package music.pojo.po
 
+import com.baomidou.mybatisplus.annotation.TableField
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import java.time.LocalDateTime
@@ -7,8 +8,8 @@ import java.time.LocalDateTime
 @TableName
 data class Category(
     @TableId
-    val categoryId: Long = 0,
-    val name: String,
-    val createTime: LocalDateTime = LocalDateTime.now(),
-    val updateTime: LocalDateTime = LocalDateTime.now()
+    val id: Long = 0,
+    var name: String,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 )

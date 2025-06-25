@@ -94,6 +94,15 @@ subprojects {
         // 运行时依赖
         runtimeOnly 'com.mysql:mysql-connector-j' // MySQL数据库驱动
 
+        // Redis
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Spring Data Redis核心依赖
+        implementation 'org.apache.commons:commons-pool2'  // 如果需要连接池（推荐）
+
+        // AOP
+        implementation("org.springframework.boot:spring-boot-starter-aop")  // Spring AOP核心支持
+        implementation("org.aspectj:aspectjweaver:1.9.7") // 如果使用AspectJ注解（如@Aspect）
+
+
         // 测试依赖
         testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot测试工具集
         testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5' // Kotlin JUnit5测试库

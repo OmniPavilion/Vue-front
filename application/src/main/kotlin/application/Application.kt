@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 
 
 @SpringBootApplication(scanBasePackages = ["application", "diary",  "common", "music"])
-@MapperScan("diary.mapper")
+@MapperScan(value = ["diary.mapper", "music.mapper"])
 class Application
 
 fun main(args: Array<String>) {

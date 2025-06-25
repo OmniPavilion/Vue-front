@@ -1,13 +1,8 @@
-
-
 spring:
   config:
     import:
-#      - optional:classpath:application-common.yaml
       - optional:classpath:application-diary.yaml
       - optional:classpath:application-music.yaml
-#      - optional:file:./args.yaml  # 使用相对路径
-#      - optional:classpath:args.yaml  # 同时检查类路径
   servlet:
     multipart:
       max-file-size: 1024MB #  设置上传文件大小
@@ -26,6 +21,17 @@ spring:
         options:
           model: "text-embedding-v3" # ·模型名称
           dimensions: 1024 # ·模型维度
+  data:
+    redis:
+      host: "127.0.0.1"
+      port: 6379
+      dataBase: 0
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 5000ms
 
 mybatis-plus:
 #  configuration:

@@ -19,7 +19,6 @@ import java.time.LocalDateTime
 
 @Service
 class NoteServiceImpl(private val noteMapper: NoteMapper) : NoteService {
-    private val logger = KotlinLogging.logger {}
 
     // 创建记事
     override fun createNote(note: NoteVO) {

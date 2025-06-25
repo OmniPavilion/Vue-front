@@ -20,7 +20,7 @@ class DynamicDataSource : AbstractRoutingDataSource() {
         private val contextHolder = ThreadLocal<String>()
 
         fun setCurrentDataSource(dataSourceName: String) {
-            contextHolder.set(dataSourceName)
+            contextHolder.set(dataSourceName.lowercase())
         }
 
         fun clearCurrentDataSource() {
@@ -29,7 +29,9 @@ class DynamicDataSource : AbstractRoutingDataSource() {
     }
 
     override fun determineCurrentLookupKey(): Any? {
-        return contextHolder.get()
+        val key = contextHolder.get()
+        logger.info("当前数据源: $key") // 添加这行
+        return key
     }
 
     override fun afterPropertiesSet() {

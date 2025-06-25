@@ -4,27 +4,27 @@ CREATE DATABASE IF NOT EXISTS music;
 USE music;
 
 -- 创建歌手表 singer
-CREATE TABLE singer
+CREATE TABLE t_singer
 (
-    singer_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
     cover_path  VARCHAR(512),
-    create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_name (name)
 );
 
 -- 创建类型表 category
-CREATE TABLE category
+CREATE TABLE t_category
 (
-    category_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
-    create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- 创建音乐表 music
-CREATE TABLE music
+CREATE TABLE t_music
 (
     id          INTEGER AUTO_INCREMENT PRIMARY KEY,
     title       TEXT      NOT NULL,
@@ -34,17 +34,17 @@ CREATE TABLE music
     last_played TIMESTAMP NULL,
     singer_id   BIGINT,
     category_id BIGINT,
-    create_time DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_favorite BOOLEAN            DEFAULT 0,
-    update_time DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_title (title(255)),
     INDEX idx_last_played (last_played),
-    FOREIGN KEY (singer_id) REFERENCES singer (singer_id),
-    FOREIGN KEY (category_id) REFERENCES category (category_id)
+    FOREIGN KEY (singer_id) REFERENCES t_singer (id),
+    FOREIGN KEY (category_id) REFERENCES t_category (id)
 );
 
 -- 1. 添加歌手数据
-INSERT INTO singer (name, cover_path)
+INSERT INTO t_singer (name, cover_path)
 VALUES ('周杰伦', '/covers/jaychou.jpg'),
        ('林俊杰', '/covers/jjlin.jpg'),
        ('Taylor Swift', '/covers/taylorswift.jpg'),
@@ -52,7 +52,7 @@ VALUES ('周杰伦', '/covers/jaychou.jpg'),
        ('邓紫棋', '/covers/gem.jpg');
 
 -- 2. 添加音乐类别数据
-INSERT INTO category (name)
+INSERT INTO t_category (name)
 VALUES ('流行'),
        ('摇滚'),
        ('R&B'),
@@ -61,7 +61,7 @@ VALUES ('流行'),
        ('嘻哈');
 
 -- 3. 添加音乐数据
-INSERT INTO music (title, file_name, duration, singer_id, category_id, is_favorite)
+INSERT INTO t_music (title, file_name, duration, singer_id, category_id, is_favorite)
 VALUES ('七里香', 'qilixiang.mp3', 298, 1, 1, 1),
        ('夜曲', 'nocturne.mp3', 213, 1, 3, 1),
        ('江南', 'jiangnan.mp3', 245, 2, 1, 0),
