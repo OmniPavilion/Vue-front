@@ -7,9 +7,8 @@ import java.time.LocalDateTime
 @TableName
 data class Singer(
     @TableId
-    val singerId: Long = 0,
-    val name: String,
-    val coverPath: String? = null,
-    val createTime: LocalDateTime = LocalDateTime.now(),
-    val updateTime: LocalDateTime = LocalDateTime.now()
+    val id: Long = 0,
+    var name: String,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 )

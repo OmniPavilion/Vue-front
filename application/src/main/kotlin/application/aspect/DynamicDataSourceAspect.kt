@@ -21,7 +21,6 @@ class DynamicDataSourceAspect {
     @Before("@within(datasource)")
     fun changeDataSource(datasource: Datasource) {
         val dsName = datasource.value.name.lowercase()
-        logger.info { "!!! 切面生效，切换数据源到: $dsName" } // 添加特殊标记便于日志搜索
         DynamicDataSource.setCurrentDataSource(dsName)
     }
 

@@ -17,6 +17,7 @@ import music.pojo.vo.CategoryVO
 import music.service.CategoryService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Datasource(DataSourceType.MUSIC)
@@ -126,6 +127,7 @@ class CategoryServiceImpl(
             ?: throw MusicException("找不到ID为${categoryVO.id}的分类")
 
         category.name = categoryVO.name
+        category.updatedAt = LocalDateTime.now()
         val updated = categoryMapper.updateById(category)
         if (updated != 1) {
             throw MusicException("更新分类失败")

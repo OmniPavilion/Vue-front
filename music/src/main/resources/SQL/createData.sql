@@ -8,7 +8,6 @@ CREATE TABLE t_singer
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
-    cover_path  VARCHAR(512),
     created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_name (name)
@@ -44,16 +43,18 @@ CREATE TABLE t_music
 );
 
 -- 1. 添加歌手数据
-INSERT INTO t_singer (name, cover_path)
-VALUES ('周杰伦', '/covers/jaychou.jpg'),
-       ('林俊杰', '/covers/jjlin.jpg'),
-       ('Taylor Swift', '/covers/taylorswift.jpg'),
-       ('陈奕迅', '/covers/easonchan.jpg'),
-       ('邓紫棋', '/covers/gem.jpg');
+INSERT INTO t_singer (name)
+VALUES ('默认歌手'),
+       ('周杰伦'),
+       ('林俊杰'),
+       ('Taylor Swift'),
+       ('陈奕迅'),
+       ('邓紫棋');
 
 -- 2. 添加音乐类别数据
 INSERT INTO t_category (name)
-VALUES ('流行'),
+VALUES ('默认分类'),
+       ('流行'),
        ('摇滚'),
        ('R&B'),
        ('电子'),

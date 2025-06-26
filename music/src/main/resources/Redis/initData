@@ -1,0 +1,11 @@
+FLUSHDB
+
+-- 设置player配置
+HSET player: current_music ""
+HSET player: volume "50"
+HSET player: play_mode "RANDOM"
+HSET player: play_duration "0"
+
+-- 设置music配置
+HSET music: root_path "./library"
+
