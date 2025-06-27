@@ -36,6 +36,7 @@ CREATE TABLE t_music
     created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_favorite BOOLEAN            DEFAULT 0,
     updated_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    file_size   INTEGER            DEFAULT 0,
     INDEX idx_title (title(255)),
     INDEX idx_last_played (last_played),
     FOREIGN KEY (singer_id) REFERENCES t_singer (id),
@@ -62,16 +63,16 @@ VALUES ('默认分类'),
        ('嘻哈');
 
 -- 3. 添加音乐数据
-INSERT INTO t_music (title, file_name, duration, singer_id, category_id, is_favorite)
-VALUES ('七里香', 'qilixiang.mp3', 298, 1, 1, 1),
-       ('夜曲', 'nocturne.mp3', 213, 1, 3, 1),
-       ('江南', 'jiangnan.mp3', 245, 2, 1, 0),
-       ('她说', 'shesaid.mp3', 198, 2, 1, 1),
-       ('Love Story', 'lovestory.mp3', 235, 3, 1, 1),
-       ('Blank Space', 'blankspace.mp3', 231, 3, 1, 0),
-       ('K歌之王', 'ksongking.mp3', 223, 4, 1, 1),
-       ('富士山下', 'fuji.mp3', 267, 4, 1, 0),
-       ('泡沫', 'bubble.mp3', 256, 5, 1, 1),
-       ('光年之外', 'lightyears.mp3', 238, 5, 1, 1),
-       ('双截棍', 'nunchucks.mp3', 187, 1, 6, 0),
-       ('曹操', 'caocao.mp3', 203, 2, 2, 0);
+INSERT INTO t_music (title, file_name, duration, singer_id, category_id, is_favorite, file_size)
+VALUES ('七里香', 'qilixiang.mp3', 298, 1, 1, 1, 5200000),
+       ('夜曲', 'nocturne.mp3', 213, 1, 3, 1, 3800000),
+       ('江南', 'jiangnan.mp3', 245, 2, 1, 0, 4100000),
+       ('她说', 'shesaid.mp3', 198, 2, 1, 1, 3400000),
+       ('Love Story', 'lovestory.mp3', 235, 3, 1, 1, 4200000),
+       ('Blank Space', 'blankspace.mp3', 231, 3, 1, 0, 3900000),
+       ('K歌之王', 'ksongking.mp3', 223, 4, 1, 1, 4000000),
+       ('富士山下', 'fuji.mp3', 267, 4, 1, 0, 4700000),
+       ('泡沫', 'bubble.mp3', 256, 5, 1, 1, 4500000),
+       ('光年之外', 'lightyears.mp3', 238, 5, 1, 1, 4100000),
+       ('双截棍', 'nunchucks.mp3', 187, 1, 6, 0, 3300000),
+       ('曹操', 'caocao.mp3', 203, 2, 2, 0, 3600000);

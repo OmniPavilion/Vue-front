@@ -9,14 +9,15 @@ import java.time.Instant
 data class Music(
     @TableId
     val id: Int = 0,
-    val title: String,
-    val fileName: String,
-    val duration: Int = 0,
+    var title: String,
+    var fileName: String,
+    val fileSize: Long = 0,
+    var duration: Int = 0,
     val playCount: Int = 0,
     val lastPlayed: Instant? = null,
-    val singerId: Long? = null,
-    val categoryId: Long? = null,
-    val createTime: LocalDateTime = LocalDateTime.now(),
-    val isFavorite: Boolean = false,
-    val updateTime: LocalDateTime = LocalDateTime.now()
+    var singerId: Long? = null,
+    var categoryId: Long? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var isFavorite: Boolean = false,
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 )

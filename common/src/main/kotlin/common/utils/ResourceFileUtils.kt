@@ -1,149 +1,148 @@
 package common.utils
 
 import common.exception.FileException
-import org.springframework.core.io.Resource
-import org.springframework.core.io.UrlResource
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver
-import org.springframework.util.FileCopyUtils
+import mu.KotlinLogging
+import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
 import java.io.*
-import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 /**
- * 基于Spring Resource的文件工具类
- * 支持处理：classpath、文件系统、URL等资源
+ * 本地文件操作工具类
+ * 仅支持处理本地文件系统的相对路径和绝对路径
  */
+@Component
 object ResourceFileUtils {
 
-    private val resolver = PathMatchingResourcePatternResolver()
+    private val logger = KotlinLogging.logger {}
+
+    private const val TEMP_PATH = "./temp/"
 
     /**
-     * 获取资源对象
-     * @param location 资源路径（支持classpath:、file:、http:等前缀）
+     * 将 MultipartFile 转换为 File（仅支持文件系统资源）
+     * @throws FileException 如果资源无法直接转换为 File
      */
     @Throws(FileException::class)
-    fun getResource(location: String): Resource {
-        return try {
-            resolver.getResource(location)
-        } catch (e: Exception) {
-            throw FileException("获取资源失败: $location").apply {
-                addSuppressed(e)
+    fun getFileByMultipartFile(multipartFile: MultipartFile): File {
+        val originalFilename = multipartFile.originalFilename
+            ?: throw FileException("文件名不能为空")
+        val safeFilename = originalFilename
+            .replace("[^a-zA-Z0-9.-]".toRegex(), "_")  // 替换非法字符为下划线
+
+        val targetFile = File(TEMP_PATH, safeFilename)
+        targetFile.parentFile?.mkdirs()
+
+        multipartFile.inputStream.use { input ->
+            Files.copy(input, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+        targetFile.deleteOnExit()
+
+        return targetFile
+    }
+
+    /**
+     * 添加/创建文件
+     * @param sourceFile 源文件（用于复制内容）
+     * @param targetPath 目标路径（相对路径或绝对路径）
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun addFile(sourceFile: File, targetPath: String) {
+        val targetFile = Paths.get(targetPath).toFile()
+        targetFile.parentFile?.mkdirs()
+
+        if (!sourceFile.exists()) {
+            throw FileException("源文件不存在: ${sourceFile.absolutePath}")
+        }
+        if (!sourceFile.canRead()) {
+            throw FileException("源文件不可读: ${sourceFile.absolutePath}")
+        }
+
+        Files.copy(
+            sourceFile.toPath(),
+            targetFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING
+        )
+    }
+
+    /**
+     * 获取文件对象
+     * @param path 文件路径（相对路径或绝对路径）
+     * @return 文件对象
+     * @throws FileException 当文件不存在时抛出
+     */
+    @Throws(FileException::class)
+    fun getFile(path: String): File {
+        val file = Paths.get(path).toFile()
+        if (!file.exists()) {
+            throw FileException("文件不存在: $path")
+        }
+        return file
+    }
+
+    /**
+     * 复制文件
+     * @param sourcePath 源文件路径
+     * @param targetPath 目标路径
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun copyFile(sourcePath: String, targetPath: String) {
+        val source = getFile(sourcePath)
+        addFile(source, targetPath)
+    }
+
+    /**
+     * 删除文件
+     * @param path 文件路径（相对路径或绝对路径）
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun deleteFile(path: String) {
+        val file = Paths.get(path).toFile()
+        if (!file.exists()) {
+            throw FileException("文件不存在: $path")
+        }
+        if (!file.delete()) {
+            throw FileException("文件删除失败: $path")
+        }
+    }
+
+    /**
+     * 读取文件内容为字符串
+     * @param path 文件路径
+     * @param charset 字符集（默认 UTF-8）
+     * @return 文件内容
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun readFileToString(path: String, charset: String = StandardCharsets.UTF_8.name()): String {
+        val file = getFile(path)
+        return file.inputStream().use { input ->
+            InputStreamReader(input, charset).use { reader ->
+                reader.readText()
             }
         }
     }
 
     /**
-     * 读取资源内容为字符串
+     * 写入字符串内容到文件
+     * @param path 文件路径
+     * @param content 要写入的内容
+     * @param charset 字符集（默认 UTF-8）
+     * @throws FileException 当操作失败时抛出
      */
     @Throws(FileException::class)
-    fun readResourceToString(location: String, charset: String = StandardCharsets.UTF_8.name()): String {
-        return getResource(location).inputStream.use { input ->
-            try {
-                InputStreamReader(input, charset).use { reader ->
-                    reader.readText()
-                }
-            } catch (e: Exception) {
-                throw FileException("读取资源内容失败: $location").apply {
-                    addSuppressed(e)
-                }
-            }
-        }
-    }
+    fun writeStringToFile(path: String, content: String, charset: String = StandardCharsets.UTF_8.name()) {
+        val file = Paths.get(path).toFile()
+        file.parentFile?.mkdirs()
 
-    /**
-     * 复制资源到目标位置
-     * @param sourceLocation 源资源路径
-     * @param targetFile 目标文件（必须是文件系统路径）
-     */
-    @Throws(FileException::class)
-    fun copyResourceToFile(sourceLocation: String, targetFile: File) {
-        try {
-            val source = getResource(sourceLocation)
-            if (!targetFile.parentFile.exists()) {
-                targetFile.parentFile.mkdirs()
-            }
-            source.inputStream.use { input ->
-                FileOutputStream(targetFile).use { output ->
-                    FileCopyUtils.copy(input, output)
-                }
-            }
-        } catch (e: Exception) {
-            throw FileException("复制资源到文件失败: $sourceLocation -> ${targetFile.path}").apply {
-                addSuppressed(e)
-            }
-        }
-    }
-
-    /**
-     * 将资源转换为可访问的URL
-     */
-    @Throws(FileException::class)
-    fun getResourceUrl(location: String): URL {
-        return try {
-            getResource(location).url
-        } catch (e: Exception) {
-            throw FileException("获取资源URL失败: $location").apply {
-                addSuppressed(e)
-            }
-        }
-    }
-
-    /**
-     * 检查资源是否存在
-     */
-    fun exists(location: String): Boolean {
-        return try {
-            getResource(location).exists()
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    /**
-     * 获取资源最后修改时间
-     */
-    @Throws(FileException::class)
-    fun lastModified(location: String): Long {
-        return try {
-            getResource(location).lastModified()
-        } catch (e: Exception) {
-            throw FileException("获取资源修改时间失败: $location").apply {
-                addSuppressed(e)
-            }
-        }
-    }
-
-    /**
-     * 将文件系统资源转换为Spring Resource
-     */
-    fun File.toResource(): Resource {
-        return UrlResource(this.toURI())
-    }
-
-    /**
-     * 安全地将Resource转为File（仅支持文件系统资源）
-     */
-    @Throws(FileException::class)
-    fun Resource.toFileOrThrow(): File {
-        return try {
-            this.file
-        } catch (e: Exception) {
-            throw FileException("资源无法转换为文件: ${this.description}").apply {
-                addSuppressed(e)
-            }
-        }
-    }
-
-    /**
-     * 查找匹配模式的多个资源
-     */
-    @Throws(FileException::class)
-    fun findResources(pattern: String): Array<Resource> {
-        return try {
-            resolver.getResources(pattern)
-        } catch (e: Exception) {
-            throw FileException("查找资源失败: $pattern").apply {
-                addSuppressed(e)
+        file.outputStream().use { output ->
+            OutputStreamWriter(output, charset).use { writer ->
+                writer.write(content)
             }
         }
     }

@@ -11,6 +11,7 @@ import mu.KotlinLogging
 import music.pojo.vo.SingerVO
 import music.service.SingerService
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/singers")

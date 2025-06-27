@@ -25,7 +25,6 @@ import java.time.LocalDateTime
 class SingerServiceImpl(
     private val singerMapper: SingerMapper,
     private val musicMapper: MusicMapper,
-    private val stringRedisTemplate: StringRedisTemplate
 ) : SingerService {
 
     override fun getSingerPage(pageDTO: PageDTO<String>): PageVO<SingerVO> {

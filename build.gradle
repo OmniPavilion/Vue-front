@@ -23,6 +23,8 @@ allprojects {
 
         // 如果需要其他特殊仓库
         maven { url 'https://repo.spring.io/milestone' } // Spring 里程碑仓库
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://repo1.maven.org/maven2/' }
     }
 }
 
@@ -79,6 +81,7 @@ subprojects {
         implementation 'org.jetbrains.kotlin:kotlin-reflect' // Kotlin反射支持
         implementation "com.alibaba:fastjson:2.0.42"   // 阿里云 fastjson（JSON 处理库）
 
+
         // mybatis-plus
         implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.12' // MyBatis-Plus
         implementation 'com.baomidou:mybatis-plus-jsqlparser:3.5.12' // 分页插件
@@ -102,6 +105,9 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-aop")  // Spring AOP核心支持
         implementation("org.aspectj:aspectjweaver:1.9.7") // 如果使用AspectJ注解（如@Aspect）
 
+        // 音频处理
+        implementation 'com.github.RouHim:jaudiotagger:1.4.12'
+        implementation 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
 
         // 测试依赖
         testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot测试工具集

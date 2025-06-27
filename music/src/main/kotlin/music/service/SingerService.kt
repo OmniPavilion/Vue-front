@@ -6,6 +6,7 @@ import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import music.exception.MusicException
 import music.pojo.vo.SingerVO
+import org.springframework.web.multipart.MultipartFile
 
 interface SingerService {
     /**
