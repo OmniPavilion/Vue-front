@@ -9,6 +9,7 @@ import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import common.utils.MultipartFileUtils
+import music.constant.MusicConstant
 import music.constant.MusicRedisConstant
 import music.exception.MusicException
 import music.mapper.MusicMapper
@@ -34,9 +35,10 @@ class MusicServiceImpl(
     private val musicMapper: MusicMapper,
     private val singerMapper: SingerMapper,
     private val categoryMapper: CategoryMapper,
-    private val stringRedisTemplate: StringRedisTemplate,
-    private val resourceFileUtils: MultipartFileUtils
+    private val resourceFileUtils: MultipartFileUtils,
+    private val musicConstant: MusicConstant
 ) : MusicService {
+
 
     // 常用音乐后缀
     private val musicExtensions = listOf("mp3", "flac", "wav", "aac", "ogg", "m4a")
@@ -133,10 +135,7 @@ class MusicServiceImpl(
             throw MusicException("创建音乐失败")
         }
 
-
-        val rootPath = stringRedisTemplate.opsForHash<String, String>()
-                .get(MusicRedisConstant.FILE_KEY, MusicRedisConstant.MUSIC_ROOT_FIELD)
-        resourceFileUtils.addFile(file, "$rootPath$singer/$fileName")
+        resourceFileUtils.addFile(file, "${musicConstant.musicRootPath}$singer/$fileName")
     }
 
     @Transactional
@@ -174,7 +173,10 @@ class MusicServiceImpl(
     override fun deleteMusic(id: Int) {
         if (id == 0) throw MusicException("音乐ID不能为空")
 
-        musicMapper.selectById(id) ?: throw MusicException("id为${id}的音乐不存在")
+        val music = musicMapper.selectById(id) ?: throw MusicException("id为${id}的音乐不存在")
+        val singer = singerMapper.selectById(music.singerId) ?: throw MusicException("歌手不存在")
+
+        MultipartFileUtils.deleteFile("${musicConstant.musicRootPath}${singer.name}/${music.fileName}")
 
         if (musicMapper.deleteById(id) != 1) {
             throw MusicException("删除音乐失败")

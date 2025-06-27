@@ -5,6 +5,7 @@ import common.annotation.Datasource
 import common.enumerate.DataSourceType
 import common.utils.MultipartFileUtils
 import mu.KotlinLogging
+import music.constant.MusicConstant
 import music.constant.MusicRedisConstant
 import music.exception.MusicException
 import music.mapper.SingerMapper
@@ -20,14 +21,12 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 @Datasource(DataSourceType.MUSIC)
 class SingerPictureServiceImpl(
-    private val stringRedisTemplate: StringRedisTemplate,
+    private val musicConstant: MusicConstant,
     private val singerPictureMapper: SingerPictureMapper,
     private val singerMapper: SingerMapper
 ) : SingerPictureService {
 
     val logger = KotlinLogging.logger {}
-
-    val rootPath = stringRedisTemplate.opsForHash<String, String>().get(MusicRedisConstant.FILE_KEY, MusicRedisConstant.SINGER_ROOT_FIELD)
 
 
     @Transactional
@@ -53,13 +52,13 @@ class SingerPictureServiceImpl(
         ))
 
         val file = MultipartFileUtils.getFileByMultipartFile(multipartFile)
-        MultipartFileUtils.addFile(file, "$rootPath$singName/$fileName")
+        MultipartFileUtils.addFile(file, "${musicConstant.singerRootPath}$singName/$fileName")
     }
 
     override fun getPicture(singerId: Long, pictureId: Long?): ByteArray? {
         val singer = singerMapper.selectById(singerId)
         if (singer == null) {
-            throw MusicException("歌手不存在")
+            throw MusicException("id为${singerId}的歌手不存在")
         }
 
         val wrapper = KtQueryWrapper(SingerPicture::class.java)
@@ -74,11 +73,15 @@ class SingerPictureServiceImpl(
         }
 
         if (picture == null || picture.singerId != singerId) {
-            throw MusicException("图片不存在")
+            if (pictureId != null) {
+                throw MusicException("id为${pictureId}的图片不存在")
+            }
+            // 返回默认图片
+            return MultipartFileUtils.getRandomFileFromFolder(musicConstant.defaultSingerPath).readBytes()
         }
 
 
-        return MultipartFileUtils.getFile("$rootPath${singer.name}/${picture.fileName}").readBytes()
+        return MultipartFileUtils.getFile("${musicConstant.singerRootPath}${singer.name}/${picture.fileName}").readBytes()
     }
 
     override fun deletePicture(singerId: Long, pictureId: Long) {
@@ -95,6 +98,17 @@ class SingerPictureServiceImpl(
         val fileName = picture.fileName
 
         singerPictureMapper.deleteById(pictureId)
-        MultipartFileUtils.deleteFile("$rootPath${singer.name}/$fileName")
+        MultipartFileUtils.deleteFile("${musicConstant.singerRootPath}${singer.name}/$fileName")
+    }
+
+    override fun getPictures(singerId: Long) : List<ByteArray?> {
+        val wrapper = KtQueryWrapper(SingerPicture::class.java).apply {
+            eq(SingerPicture::singerId, singerId)
+        }
+        val selectList = singerPictureMapper.selectList(wrapper)
+
+        return selectList.map {
+            getPicture(singerId, it.id)
+        }
     }
 }

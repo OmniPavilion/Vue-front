@@ -8,6 +8,9 @@ import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
+import common.utils.MultipartFileUtils
+import music.constant.MusicConstant
+import music.constant.MusicRedisConstant
 import music.exception.MusicException
 import music.mapper.MusicMapper
 import music.mapper.SingerMapper
@@ -18,6 +21,7 @@ import music.service.SingerService
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Paths
 import java.time.LocalDateTime
 
 @Service
@@ -25,7 +29,9 @@ import java.time.LocalDateTime
 class SingerServiceImpl(
     private val singerMapper: SingerMapper,
     private val musicMapper: MusicMapper,
+    private val musicConstant: MusicConstant
 ) : SingerService {
+
 
     override fun getSingerPage(pageDTO: PageDTO<String>): PageVO<SingerVO> {
         val page = Page<Singer>(
@@ -104,6 +110,17 @@ class SingerServiceImpl(
 
         val singer = singerMapper.selectById(singerVO.id)
             ?: throw MusicException("找不到ID为${singerVO.id}的歌手")
+
+        // 判断文件夹是否存在
+        val musicPath = musicConstant.musicRootPath + singer.name
+        if (Paths.get(musicPath).toFile().exists()) {
+            MultipartFileUtils.renameFolder(musicPath, singerVO.name)
+        }
+
+        val singerPath = musicConstant.musicRootPath + singer.name
+        if (Paths.get(singerPath).toFile().exists()) {
+            MultipartFileUtils.renameFolder(singerPath, singerVO.name)
+        }
 
         singer.name = singerVO.name
         singer.updatedAt = LocalDateTime.now()

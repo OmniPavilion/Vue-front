@@ -16,9 +16,6 @@ import java.nio.file.StandardCopyOption
  */
 @Component
 object MultipartFileUtils {
-
-    private val logger = KotlinLogging.logger {}
-
     private const val TEMP_PATH = "./temp/"
 
     /**
@@ -145,5 +142,111 @@ object MultipartFileUtils {
                 writer.write(content)
             }
         }
+    }
+
+    /**
+     * 重命名文件夹
+     * @param folderPath 文件夹路径（相对路径或绝对路径）
+     * @param newName 新文件夹名称
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun renameFolder(folderPath: String, newName: String) {
+        val folder = Paths.get(folderPath).toFile()
+
+        // 验证原文件夹是否存在
+        if (!folder.exists()) {
+            throw FileException("文件夹不存在: $folderPath")
+        }
+        if (!folder.isDirectory) {
+            throw FileException("路径不是文件夹: $folderPath")
+        }
+
+        // 验证新名称合法性
+        if (newName.isBlank()) {
+            throw FileException("新文件夹名称不能为空")
+        }
+
+        if (newName.contains(File.separator)) {
+            throw FileException("新文件夹名称不能包含路径分隔符")
+        }
+
+
+        // 构建新路径
+        val parentPath = folder.parent ?: throw FileException("无法获取父目录路径")
+        val newFolder = File(parentPath, newName)
+
+        // 检查目标文件夹是否已存在
+        if (newFolder.exists()) {
+            throw FileException("目标文件夹已存在: ${newFolder.absolutePath}")
+        }
+
+        // 执行重命名
+        if (!folder.renameTo(newFolder)) {
+            throw FileException("文件夹重命名失败: ${folder.absolutePath} -> ${newFolder.absolutePath}")
+        }
+    }
+
+    /**
+     * 移动文件夹
+     * @param sourceFolderPath 源文件夹路径
+     * @param targetFolderPath 目标文件夹路径
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun moveFolder(sourceFolderPath: String, targetFolderPath: String) {
+        val sourceFolder = Paths.get(sourceFolderPath).toFile()
+        val targetFolder = Paths.get(targetFolderPath).toFile()
+
+        // 验证源文件夹是否存在
+        if (!sourceFolder.exists()) {
+            throw FileException("源文件夹不存在: $sourceFolderPath")
+        }
+        if (!sourceFolder.isDirectory) {
+            throw FileException("源路径不是文件夹: $sourceFolderPath")
+        }
+
+        // 创建目标文件夹
+        targetFolder.parentFile?.mkdirs()
+
+        // 检查目标文件夹是否已存在
+        if (targetFolder.exists()) {
+            throw FileException("目标文件夹已存在: $targetFolderPath")
+        }
+
+        // 执行移动操作
+        if (!sourceFolder.renameTo(targetFolder)) {
+            throw FileException("文件夹移动失败: $sourceFolderPath -> $targetFolderPath")
+        }
+    }
+
+    /**
+     * 随机从文件夹中读取一个文件
+     * @param folderPath 文件夹路径（相对路径或绝对路径）
+     * @return 随机选中的文件对象
+     * @throws FileException 当文件夹不存在、为空或读取失败时抛出
+     */
+    @Throws(FileException::class)
+    fun getRandomFileFromFolder(folderPath: String): File {
+        val folder = Paths.get(folderPath).toFile()
+
+        // 验证文件夹是否存在且可读
+        if (!folder.exists()) {
+            throw FileException("文件夹不存在: $folderPath")
+        }
+        if (!folder.isDirectory) {
+            throw FileException("路径不是文件夹: $folderPath")
+        }
+        if (!folder.canRead()) {
+            throw FileException("文件夹不可读: $folderPath")
+        }
+
+        // 获取文件夹内所有文件（排除子目录）
+        val files = folder.listFiles { file -> file.isFile }
+            ?.takeIf { it.isNotEmpty() }
+            ?: throw FileException("文件夹为空: $folderPath")
+
+        // 随机选择一个文件
+        return files.random()
     }
 }

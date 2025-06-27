@@ -29,14 +29,18 @@ class MusicController(private val musicService: MusicService) {
         return Result.success(musicService.getMusicById(id))
     }
 
-    @PostMapping
-    fun createMusic(@RequestParam file: MultipartFile,
-                    @RequestParam singer : String,
-                    @RequestParam category : String
+    @PostMapping("/batch")
+    fun createMusics(
+        @RequestParam("files") files: Array<MultipartFile>,
+        @RequestParam singer: String,
+        @RequestParam category: String
     ): Result<Unit> {
-        logger.info { " 音乐参数: $file" }
-        logger.info { " 分类参数: $singer, $category" }
-        musicService.createMusic(file, singer, category)
+        logger.info { "上传音乐文件数量: ${files.size}" }
+        logger.info { "歌手: $singer, 分类: $category" }
+
+        files.forEach { file ->
+            musicService.createMusic(file, singer, category)
+        }
         return Result.success()
     }
 

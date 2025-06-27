@@ -8,8 +8,11 @@ class MusicRedisConstant {
         const val FILE_KEY = MUSIC_KEY + "file:"
 
         // 文件根路径
+        const val DEFAULT_ROOT_FIELD = "default_root_path"
+        const val ROOT_FIELD = "root_path"
         const val MUSIC_ROOT_FIELD = "music_root_path"
         const val SINGER_ROOT_FIELD = "singer_root_path"
+        const val DEFAULT_SINGER_FIELD = "default_singer_path"
         // 当前音乐
         const val CURRENT_MUSIC_FIELD = "current_music"
         // 音量

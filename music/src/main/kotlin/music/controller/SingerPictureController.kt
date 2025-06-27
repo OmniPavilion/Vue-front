@@ -21,15 +21,17 @@ class SingerPictureController(
      * PUT /api/singers/{singerId}/picture
      */
     @PutMapping(
-        path = ["/{singerId}/picture"],
+        path = ["/{singerId}/pictures"],  // 复数路径更语义化
         consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
     )
-    fun uploadSingerPicture(
+    fun uploadSingerPictures(
         @PathVariable singerId: Long,
-        @RequestParam file: MultipartFile
+        @RequestParam files: Array<MultipartFile>  // 改为接收文件数组
     ): Result<Unit> {
-        logger.info { "为歌手 $singerId 上传图片 ${file.name}" }
-        singerPictureService.uploadPicture(singerId, file)
+        logger.info { "为歌手 $singerId 批量上传 ${files.size} 张图片" }
+        files.forEach { file ->
+            singerPictureService.uploadPicture(singerId, file)
+        }
         return Result.success()
     }
 
@@ -50,6 +52,24 @@ class SingerPictureController(
         return ResponseEntity.ok()
             .contentType(MediaType.IMAGE_JPEG)
             .body(imageBytes)
+    }
+
+    /**
+     * 获取歌手所有图片
+     * GET /api/singers/{singerId}/pictures
+     */
+    @GetMapping(
+        path = ["/{singerId}/pictures"],
+        produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE]
+    )
+    fun getSingerPictures(
+        @PathVariable singerId: Long,
+    ): ResponseEntity<List<ByteArray?>?> {
+        logger.info { "获取歌手 $singerId 所有的图片" }
+        val imageBytesArray  = singerPictureService.getPictures(singerId)
+        return ResponseEntity.ok()
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(imageBytesArray)
     }
 
     /**
