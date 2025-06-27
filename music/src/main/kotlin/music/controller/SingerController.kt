@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/singers")
-@Datasource(DataSourceType.MUSIC)
 class SingerController(private val singerService: SingerService) {
     private val logger = KotlinLogging.logger {}
 

@@ -31,6 +31,7 @@ class CategoryServiceImpl(
     /**
      * 分页获取所有分类
      */
+    @Transactional
     override fun getCategoryPage(pageDTO: PageDTO<String>): PageVO<CategoryVO> {
         val page = Page<Category>(
             pageDTO.pageNum.toLong(),

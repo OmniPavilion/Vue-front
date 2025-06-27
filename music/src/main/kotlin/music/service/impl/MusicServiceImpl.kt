@@ -8,7 +8,7 @@ import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
-import common.utils.ResourceFileUtils
+import common.utils.MultipartFileUtils
 import music.constant.MusicRedisConstant
 import music.exception.MusicException
 import music.mapper.MusicMapper
@@ -35,7 +35,7 @@ class MusicServiceImpl(
     private val singerMapper: SingerMapper,
     private val categoryMapper: CategoryMapper,
     private val stringRedisTemplate: StringRedisTemplate,
-    private val resourceFileUtils: ResourceFileUtils
+    private val resourceFileUtils: MultipartFileUtils
 ) : MusicService {
 
     // 常用音乐后缀

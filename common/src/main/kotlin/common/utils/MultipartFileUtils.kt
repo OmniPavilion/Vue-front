@@ -15,7 +15,7 @@ import java.nio.file.StandardCopyOption
  * 仅支持处理本地文件系统的相对路径和绝对路径
  */
 @Component
-object ResourceFileUtils {
+object MultipartFileUtils {
 
     private val logger = KotlinLogging.logger {}
 

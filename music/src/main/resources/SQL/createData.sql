@@ -6,18 +6,26 @@ USE music;
 -- 创建歌手表 singer
 CREATE TABLE t_singer
 (
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
     created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_name (name)
 );
 
+-- 创建歌手图片表 singer_picture
+CREATE TABLE t_singer_picture
+(
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    singer_id BIGINT NOT NULL,
+    file_name TEXT   NOT NULL
+);
+
 -- 创建类型表 category
 CREATE TABLE t_category
 (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
     created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -33,9 +41,9 @@ CREATE TABLE t_music
     last_played TIMESTAMP NULL,
     singer_id   BIGINT,
     category_id BIGINT,
-    created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at  DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_favorite BOOLEAN            DEFAULT 0,
-    updated_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at  DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     file_size   INTEGER            DEFAULT 0,
     INDEX idx_title (title(255)),
     INDEX idx_last_played (last_played),
@@ -76,3 +84,12 @@ VALUES ('七里香', 'qilixiang.mp3', 298, 1, 1, 1, 5200000),
        ('光年之外', 'lightyears.mp3', 238, 5, 1, 1, 4100000),
        ('双截棍', 'nunchucks.mp3', 187, 1, 6, 0, 3300000),
        ('曹操', 'caocao.mp3', 203, 2, 2, 0, 3600000);
+
+-- 4. 添加歌手图片数据
+INSERT INTO t_singer_picture (singer_id, file_name)
+VALUES (1, 'default.jpg'),
+       (2, 'zhoujielun.jpg'),
+       (3, 'linjunjie.jpg'),
+       (4, 'taylorswift.jpg'),
+       (5, 'chenyixun.jpg'),
+       (6, 'dengziqu.jpg');
