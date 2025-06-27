@@ -52,8 +52,8 @@ const formattedDateRange = computed(() => {
 
 // 打开状态选择对话框
 const openStatusDialog = (index: number) => {
-  if (props.plan.status === Status.EXPIRED) {
-    ElMessage.warning("计划以逾期, 无法修改" as any)
+  if (planStore.isUpTo(props.plan)) {
+    ElMessage.warning("计划已截至, 无法修改" as any)
     return
   }
   currentTaskIndex.value = index;
@@ -67,17 +67,24 @@ const openDetailDialog = () => {
 
 // 处理状态变更
 const handleStatusChange = async (newStatus: Status) => {
+  if ((newStatus === Status.EXPIRED || newStatus === Status.IN_PROGRESS) ||
+      (newStatus === Status.COMPLETED && currentTaskIndex.value === -1)) {
+    ElMessage.warning('请选择一个有效的状态' as any);
+    return
+  }
 
   if (currentTaskIndex.value !== -1) {
     props.plan.tasks[currentTaskIndex.value].status = newStatus;
+    // 判断tasks是否都完成了
+    if (props.plan.tasks.every(task => task.status === Status.COMPLETED)) {
+      props.plan.status = Status.COMPLETED;
+    } else {
+      props.plan.status = Status.DRAFT;
+    }
   } else {
     props.plan.status = newStatus;
   }
 
-  if (newStatus === Status.EXPIRED || newStatus === Status.COMPLETED || newStatus === Status.IN_PROGRESS) {
-    ElMessage.warning('请选择一个有效的状态' as any);
-    return
-  }
 
   statusDialogVisible.value = false;
   const res = await planStore.updatePlan(props.plan)
@@ -119,8 +126,8 @@ const handleDeletePlan = () => {
 
 // 添加任务编辑方法
 const openTaskDialog = (index: number) => {
-  if (props.plan.status === Status.EXPIRED) {
-    ElMessage.warning("无法为逾期的计划编辑任务" as any)
+  if (planStore.isUpTo(props.plan)) {
+    ElMessage.warning("无法为截至的计划编辑任务" as any)
     return
   }
   currentTask.value = props.plan.tasks[index];
@@ -171,16 +178,18 @@ const handDeleteTask = () => {
 };
 
 const addTask = () => {
-  if (props.plan.status === Status.EXPIRED) {
-    ElMessage.warning("无法为逾期的计划添加任务" as any)
+  if (planStore.isUpTo(props.plan)) {
+    ElMessage.warning("无法为截至的计划添加任务" as any)
     return
   }
 
   props.plan.tasks.push({
     title: '默认标题',
     description: '',
-    status: Status.PENDING
+    status: Status.DRAFT
   })
+
+  props.plan.status = Status.DRAFT;
 
   ElMessage.success('任务已添加' as any);
 }
@@ -223,8 +232,8 @@ const formatDate = (dateString?: string) => {
 
 // 打开编辑对话框
 const openEditDialog = () => {
-  if (props.plan.status === Status.EXPIRED) {
-    ElMessage.warning("逾期的任务无法编辑" as any)
+  if (planStore.isUpTo(props.plan)) {
+    ElMessage.warning("截至的任务无法编辑" as any)
     return
   }
   editDialogVisible.value = true;
@@ -252,26 +261,37 @@ const disabledStartDate = (time: Date) => {
   return props.plan.endDate && time > new Date(props.plan.endDate);
 };
 
-onMounted(() => {
+
+const examineStatus = async (newStatus: Status) => {
+  // 判断状态是否可以变更的辅助函数
+  const isCanChange = (status: Status) => {
+    return status !== Status.COMPLETED && status !== Status.CANCELLED;
+  };
+
+  // 检查主计划状态是否可以变更
+  if (isCanChange(props.plan.status)) {
+    props.plan.status = newStatus;
+  }
+
+  // 检查所有任务状态是否可以变更
+  props.plan.tasks.forEach(task => {
+    if (isCanChange(task.status)) {
+      task.status = newStatus;
+    }
+  });
+
+  // 更新计划
+  await planStore.updatePlan(props.plan);
+};
+
+onMounted(async () => {
   // 判断是否截止
-  if (props.plan.endDate && new Date(props.plan.endDate) < new Date()) {
-    props.plan.status = Status.EXPIRED
-    props.plan.tasks.forEach(task => {
-      task.status = Status.EXPIRED
-    })
-    planStore.updatePlan(props.plan)
+  if (planStore.isUpTo(props.plan)) {
+    await examineStatus(Status.EXPIRED)
   } else if (props.plan.startDate && new Date(props.plan.startDate) > new Date()) {
-    props.plan.status = Status.PENDING
-    props.plan.tasks.forEach(task => {
-      task.status = Status.PENDING
-    })
-    planStore.updatePlan(props.plan)
+    await examineStatus(Status.PENDING)
   } else {
-    props.plan.status = Status.IN_PROGRESS
-    props.plan.tasks.forEach(task => {
-      task.status = Status.IN_PROGRESS
-    })
-    planStore.updatePlan(props.plan)
+    await examineStatus(Status.IN_PROGRESS)
   }
 })
 </script>

@@ -1,0 +1,43 @@
+import { myAxios } from '@/common/utils/axios';
+import type { Result } from '@/common/types/vo/Result';
+import type { AxiosResponse } from 'axios';
+
+export const musicFileAPI = {
+    /**
+     * 修改音乐文件根目录
+     * PUT /api/musicFile/root
+     * @param path 新的根目录路径
+     */
+    updateRoot(path: string): Promise<AxiosResponse<Result<void>>> {
+        return myAxios({
+            method: 'put',
+            url: '/api/musicFile/root',
+            params: { path }
+        });
+    },
+
+    /**
+     * 重置音乐文件根目录
+     * PUT /api/musicFile/resetRoot
+     */
+    resetRoot(): Promise<AxiosResponse<Result<void>>> {
+        return myAxios({
+            method: 'put',
+            url: '/api/musicFile/resetRoot'
+        });
+    },
+
+    /**
+     * 获取音乐文件（流式下载）
+     * GET /api/musicFile/{id}
+     * @param id 音乐文件ID
+     * @returns 返回文件流
+     */
+    getMusicFile(id: number): Promise<AxiosResponse<Blob>> {
+        return myAxios({
+            method: 'get',
+            url: `/api/musicFile/${id}`,
+            responseType: 'blob' // 重要：指定响应类型为二进制流
+        });
+    }
+};

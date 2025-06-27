@@ -1,1 +1,1 @@
-export {textStore} from '@/application/stores/stores/text'
+export { useMusicStore } from '@/music/stores/stores/musicStore'

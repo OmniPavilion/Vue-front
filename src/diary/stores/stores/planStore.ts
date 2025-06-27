@@ -96,6 +96,10 @@ export const usePlanStore = defineStore('plan', () => {
         return plans
     }
 
+    const isUpTo = (plan: PlanVO) => {
+        return plan.endDate && new Date(plan.endDate) < new Date()
+    }
+
     return {
         loading,
         pageQuery,
@@ -108,5 +112,7 @@ export const usePlanStore = defineStore('plan', () => {
         getPlanById,
         fetchPlansByPage,
         getPlanGoingOn,
+
+        isUpTo
     }
 })
