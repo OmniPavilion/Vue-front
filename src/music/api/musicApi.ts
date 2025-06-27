@@ -1,4 +1,4 @@
-// src/api/musicAPI.ts
+// src/api/musicApi.ts
 import { myAxios } from '@/common/utils/axios';
 import type { Result } from '@/common/types/vo/Result';
 import type { MusicVO } from '@/music/types/vo/MusicVO';
@@ -7,7 +7,7 @@ import type { PageDTO } from '@/common/types/dto/PageDTO';
 import type { PageVO } from '@/common/types/vo/PageVO';
 import type { AxiosResponse } from 'axios';
 
-export const musicAPI = {
+export const musicApi = {
     /**
      * 分页查询音乐
      * POST /api/musics/page

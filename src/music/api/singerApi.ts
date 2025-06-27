@@ -1,4 +1,4 @@
-// src/api/singerAPI.ts
+// src/api/singerApi.ts
 import { myAxios } from '@/common/utils/axios';
 import type { Result } from '@/common/types/vo/Result';
 import type { PageVO } from '@/common/types/vo/PageVO';
@@ -6,7 +6,7 @@ import type { PageDTO } from '@/common/types/dto/PageDTO';
 import type { AxiosResponse } from 'axios';
 import type {SingerVO} from "@/music/types/vo/SingerVO";
 
-export const singerAPI = {
+export const singerApi = {
     /**
      * 分页获取歌手列表
      * POST /api/singers/page

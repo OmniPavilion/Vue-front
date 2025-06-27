@@ -1,4 +1,4 @@
-// src/api/categoryAPI.ts
+// src/api/categoryApi.ts
 import { myAxios } from '@/common/utils/axios';
 import type { Result } from '@/common/types/vo/Result';
 import type { PageVO } from '@/common/types/vo/PageVO';
@@ -6,7 +6,7 @@ import type { PageDTO } from '@/common/types/dto/PageDTO';
 import type { AxiosResponse } from 'axios';
 import type {CategoryVO} from "@/music/types/vo/CategoryVO";
 
-export const categoryAPI = {
+export const categoryApi = {
     /**
      * 分页获取分类列表
      * POST /api/categories/page

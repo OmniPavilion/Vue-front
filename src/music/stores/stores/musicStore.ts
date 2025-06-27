@@ -2,14 +2,17 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { MusicVO } from '@/music/types/vo/MusicVO';
-import { musicAPI } from '@/music/api/musicAPI';
+import { musicApi } from '@/music/api/musicApi';
 import type { PageDTO } from '@/common/types/dto/PageDTO';
 import type { MusicQuery } from '@/music/types/dto/MusicQuery';
+import {musicFileApi} from "@/music/api/musicFileApi";
 
 export const useMusicStore = defineStore('music', () => {
     const musics = ref<MusicVO[]>([]);
     const total = ref(0);
     const loading = ref(false);
+    const currentMusic = ref<MusicVO>();
+    const currentMusicFile = ref<Blob>();
     const pageQuery = ref<PageDTO<MusicQuery>>({
         pageNum: 1,
         pageSize: 10,
@@ -24,7 +27,7 @@ export const useMusicStore = defineStore('music', () => {
         console.log('分页查询音乐', pageQuery.value);
         loading.value = true;
         try {
-            const res = await musicAPI.getMusicPage(pageQuery.value);
+            const res = await musicApi.getMusicPage(pageQuery.value);
             musics.value = res.data.data?.rows || [];
             total.value = res.data.data?.total || 0;
 
@@ -40,7 +43,7 @@ export const useMusicStore = defineStore('music', () => {
         console.log('获取音乐详情', id)
         loading.value = true;
         try {
-            const res = await musicAPI.getMusicById(id);
+            const res = await musicApi.getMusicById(id);
             console.log('获取音乐详情成功', res.data)
             return res.data;
         } finally {
@@ -54,7 +57,7 @@ export const useMusicStore = defineStore('music', () => {
         files.forEach(file => console.log(file.name))
         loading.value = true;
         try {
-            const res = await musicAPI.createMusics(files, singer, category);
+            const res = await musicApi.createMusics(files, singer, category);
             await fetchMusicPage(); // 刷新列表
             console.log("上传成功", res.data)
             return res.data;
@@ -68,7 +71,7 @@ export const useMusicStore = defineStore('music', () => {
         console.log("更新音乐", music)
         loading.value = true;
         try {
-            const res = await musicAPI.updateMusic(music);
+            const res = await musicApi.updateMusic(music);
             musics.value.map(item => item.id === music.id ? music : item)
             console.log("更新成功", res.data)
             return res.data;
@@ -82,7 +85,7 @@ export const useMusicStore = defineStore('music', () => {
         console.log("删除音乐", id)
         loading.value = true;
         try {
-            const res = await musicAPI.deleteMusic(id);
+            const res = await musicApi.deleteMusic(id);
             musics.value = musics.value.filter(m => m.id !== id);
             console.log("删除成功", res.data)
             return res.data;
@@ -96,7 +99,7 @@ export const useMusicStore = defineStore('music', () => {
         console.log("记录播放", id)
         loading.value = true;
         try {
-            const res = await musicAPI.recordPlay(id);
+            const res = await musicApi.recordPlay(id);
             console.log("记录播放成功", res.data)
             return res.data;
         } finally {
@@ -109,7 +112,7 @@ export const useMusicStore = defineStore('music', () => {
         console.log("切换收藏状态", id)
         loading.value = true;
         try {
-            const res = await musicAPI.toggleFavorite(id);
+            const res = await musicApi.toggleFavorite(id);
             const isFavorite = res.data.data;
 
             const music = musics.value.find(m => m.id === id);
@@ -127,6 +130,13 @@ export const useMusicStore = defineStore('music', () => {
         }
     };
 
+    const getMusicFile = async (id: number) => {
+        const res01 = await musicFileApi.getMusicFile(id);
+        currentMusicFile.value = res01.data;
+        const res02 = await musicApi.getMusicById(id);
+        currentMusic.value = res02.data.data;
+    };
+
     return {
         musics,
         total,
@@ -138,6 +148,7 @@ export const useMusicStore = defineStore('music', () => {
         updateMusic,
         deleteMusic,
         recordPlay,
-        toggleFavorite
+        toggleFavorite,
+        getMusicFile
     };
 });

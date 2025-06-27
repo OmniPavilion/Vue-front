@@ -1,9 +1,10 @@
-// src/api/singerPictureAPI.ts
+// src/api/singerPictureApi.ts
 import { myAxios } from '@/common/utils/axios';
 import type { Result } from '@/common/types/vo/Result';
 import type { AxiosResponse } from 'axios';
+import type {SingerPictureResponse} from "@/music/types/dto/SingerPictureResponse";
 
-export const singerPictureAPI = {
+export const singerPictureApi = {
     /**
      * 批量上传歌手图片
      * PUT /api/singers/{singerId}/pictures
@@ -52,7 +53,7 @@ export const singerPictureAPI = {
      * @param singerId 歌手ID
      * @returns 返回图片Blob数组
      */
-    getSingerPictures(singerId: number): Promise<AxiosResponse<Blob[]>> {
+    getSingerPictures(singerId: number): Promise<AxiosResponse<SingerPictureResponse[]>> {
         return myAxios({
             method: 'get',
             url: `/api/singers/${singerId}/pictures`,

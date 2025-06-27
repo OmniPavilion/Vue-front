@@ -2,7 +2,7 @@ import { myAxios } from '@/common/utils/axios';
 import type { Result } from '@/common/types/vo/Result';
 import type { AxiosResponse } from 'axios';
 
-export const musicFileAPI = {
+export const musicFileApi = {
     /**
      * 修改音乐文件根目录
      * PUT /api/musicFile/root
