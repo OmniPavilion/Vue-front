@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import '@/common/styles/gobal.css'
-
+import '@/music/styles/element/index.scss'
 
 import App from './App.vue'
 import { createPinia } from 'pinia'

@@ -1,11 +1,11 @@
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import { fileURLToPath, URL } from 'node:url'
-import { readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
+import {fileURLToPath, URL} from 'node:url'
+import {readdirSync, statSync} from 'node:fs'
+import {join} from 'node:path'
 
 // 自动查找 src 子目录中的 index.html 文件
 function findHtmlEntries(dir: string): Record<string, string> {
@@ -49,7 +49,7 @@ export default defineConfig({
             resolvers: [ElementPlusResolver()],
         }),
         Components({
-            resolvers: [ElementPlusResolver({ importStyle: "sass"})],
+            resolvers: [ElementPlusResolver({importStyle: "sass"})],
         }),
         {
             name: 'rewrite-routes',
@@ -98,7 +98,8 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                additionalData: ``
+                additionalData: `
+        `,
             }
         }
     }

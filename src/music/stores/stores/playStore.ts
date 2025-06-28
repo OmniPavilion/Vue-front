@@ -5,7 +5,7 @@ import {playApi} from "@/music/api/playApi";
 import {musicFileApi} from "@/music/api/musicFileApi";
 
 
-export const useSingerStore = defineStore('playArg', () => {
+export const usePlayStore = defineStore('playArg', () => {
     const playArg = ref<PlayArg>();
 
     const getPlayArg = async function () {

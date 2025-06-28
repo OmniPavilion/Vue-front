@@ -1,0 +1,192 @@
+// 精致霓虹磨砂效果
+$neon-color: rgba(120, 230, 255, 0.12); // 微调霓虹色，稍微亮一点
+$border-smoothness: 0.5px; // 边框光滑度控制
+
+.el-container,
+.el-header,
+.el-main,
+.el-footer,
+.el-aside {
+  background-color: rgba(45, 45, 55, 0.65) !important; // 提高不透明度
+  backdrop-filter: blur(18px) brightness(0.92) !important;
+  border: $border-smoothness solid rgba(120, 230, 255, 0.15) !important;
+  box-shadow:
+          0 0 10px rgba(120, 230, 255, 0.1),
+          inset 0 0 10px rgba(120, 230, 255, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  border-radius: 4px !important; // 添加轻微圆角使边框更光滑
+}
+
+.el-card,
+.el-dialog,
+.el-drawer {
+  background-color: rgba(55, 55, 65, 0.75) !important; // 提高不透明度
+  backdrop-filter: blur(22px) brightness(0.96) !important;
+  border: $border-smoothness solid $neon-color !important;
+  box-shadow:
+          0 0 14px rgba(120, 230, 255, 0.12),
+          inset 0 0 10px rgba(120, 230, 255, 0.1) !important;
+  border-radius: 10px !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow:
+            0 0 18px rgba(120, 230, 255, 0.15),
+            inset 0 0 12px rgba(120, 230, 255, 0.12) !important;
+  }
+}
+
+.el-menu,
+.el-dropdown-menu {
+  background-color: rgba(65, 65, 75, 0.7) !important;
+  backdrop-filter: blur(18px) !important;
+  border: $border-smoothness solid rgba(120, 230, 255, 0.1) !important;
+  border-radius: 6px !important;
+}
+
+.el-menu-item,
+.el-dropdown-menu__item {
+  transition: all 0.2s ease-out !important;
+
+  &:hover {
+    background-color: rgba(120, 230, 255, 0.18) !important;
+    text-shadow: 0 0 6px rgba(120, 230, 255, 0.35) !important;
+    transform: translateX(2px);
+  }
+}
+
+// 增强按钮的光滑感
+$border-smoothness: 0.5px;
+$dark-primary: rgba(50, 120, 200, 0.7); // 更暗的主色调
+$glow-color: rgba(80, 160, 240, 0.25); // 暗色发光效果
+
+.el-button {
+  &.el-button--primary {
+    background-color: rgba(70, 165, 255, 0.8) !important;
+    border: $border-smoothness solid rgba(120, 230, 255, 0.4) !important;
+    box-shadow:
+            0 0 10px rgba(70, 165, 255, 0.4),
+            inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+
+    &:hover {
+      background-color: rgba(70, 165, 255, 0.95) !important;
+      box-shadow:
+              0 0 14px rgba(70, 165, 255, 0.6),
+              inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+
+  // 默认按钮样式 - 也应用暗光玻璃效果
+  &:not(.el-button--primary) {
+    background-color: rgba(60, 60, 80, 0.6) !important;
+    border: $border-smoothness solid rgba(120, 120, 140, 0.3) !important;
+    box-shadow:
+            0 0 8px rgba(0, 0, 0, 0.2),
+            inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+
+    &:hover {
+      background-color: rgba(70, 70, 90, 0.7) !important;
+      box-shadow:
+              0 0 12px rgba(0, 0, 0, 0.25),
+              inset 0 1px 2px rgba(255, 255, 255, 0.15) !important;
+    }
+
+    &:active {
+      background-color: rgba(50, 50, 70, 0.65) !important;
+    }
+  }
+}
+
+
+// 增强输入框的玻璃质感效果
+.el-input {
+  // 外层容器
+  .el-input__wrapper {
+    background-color: rgba(75, 75, 85, 0.65) !important;
+    border: $border-smoothness solid rgba(120, 230, 255, 0.25) !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+
+    // 内部输入区域
+    .el-input__inner {
+      color: #f0f0f0 !important;
+      background: transparent !important;
+      &::placeholder {
+        color: rgba(210, 210, 210, 0.7) !important;
+      }
+    }
+
+    // 前后缀内容
+    .el-input__prefix,
+    .el-input__suffix {
+      color: rgba(180, 220, 255, 0.8) !important;
+    }
+  }
+
+  // 聚焦状态
+  &.is-focus {
+    .el-input__wrapper {
+      border: $border-smoothness solid rgba(120, 230, 255, 0.4) !important;
+      box-shadow:
+              0 0 0 1px rgba(120, 230, 255, 0.3),
+              inset 0 0 8px rgba(120, 230, 255, 0.1) !important;
+      background-color: rgba(80, 80, 90, 0.7) !important;
+    }
+  }
+
+  // 禁用状态
+  &.is-disabled {
+    .el-input__wrapper {
+      background-color: rgba(60, 60, 70, 0.4) !important;
+      border-color: rgba(100, 100, 120, 0.2) !important;
+    }
+    .el-input__inner {
+      color: rgba(180, 180, 180, 0.6) !important;
+    }
+  }
+}
+
+// 文本域样式
+.el-textarea {
+  .el-textarea__inner {
+    background-color: rgba(75, 75, 85, 0.65) !important;
+    border: $border-smoothness solid rgba(120, 230, 255, 0.25) !important;
+    color: #f0f0f0 !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+
+    &:focus {
+      border: $border-smoothness solid rgba(120, 230, 255, 0.4) !important;
+      box-shadow:
+              0 0 0 1px rgba(120, 230, 255, 0.3),
+              inset 0 0 8px rgba(120, 230, 255, 0.1) !important;
+      background-color: rgba(80, 80, 90, 0.7) !important;
+    }
+
+    &::placeholder {
+      color: rgba(210, 210, 210, 0.7) !important;
+    }
+  }
+}
+
+// 特殊边框光滑处理
+.el-dialog__header,
+.el-drawer__header {
+  border-bottom: $border-smoothness solid rgba(120, 230, 255, 0.1) !important;
+}
+
+.el-dialog__footer,
+.el-drawer__footer {
+  border-top: $border-smoothness solid rgba(120, 230, 255, 0.1) !important;
+}

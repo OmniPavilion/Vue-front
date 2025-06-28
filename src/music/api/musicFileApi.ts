@@ -1,4 +1,5 @@
 import { myAxios } from '@/common/utils/axios';
+import { myAxiosForFile } from '@/common/utils/axiosForFile';
 import type { Result } from '@/common/types/vo/Result';
 import type { AxiosResponse } from 'axios';
 
@@ -34,7 +35,7 @@ export const musicFileApi = {
      * @returns 返回文件流
      */
     getMusicFile(id: number): Promise<AxiosResponse<Blob>> {
-        return myAxios({
+        return myAxiosForFile({
             method: 'get',
             url: `/api/musicFile/${id}`,
             responseType: 'blob' // 重要：指定响应类型为二进制流

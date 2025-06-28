@@ -5,8 +5,8 @@ import type {Result} from '@/common/types/vo/Result'
 import {InternetConstant} from "@/common/constants/InternetConstant";
 
 // 创建 axios 实例
-const myAxios: AxiosInstance = axios.create({
-    baseURL: InternetConstant.URL,
+const myAxiosForFile: AxiosInstance = axios.create({
+    baseURL:  InternetConstant.URL,
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
@@ -14,7 +14,7 @@ const myAxios: AxiosInstance = axios.create({
 });
 
 // 请求拦截器
-myAxios.interceptors.request.use(
+myAxiosForFile.interceptors.request.use(
     (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
         // 添加认证 token 示例
         const token = localStorage.getItem('token');
@@ -29,11 +29,8 @@ myAxios.interceptors.request.use(
 );
 
 // 响应拦截器
-myAxios.interceptors.response.use(
-    <T>(response: AxiosResponse<Result<T>>): AxiosResponse<Result<T>> => {
-        if (response.data.code != 1) {
-            console.error("异常：", response.data.message || 'Request failed');
-        }
+myAxiosForFile.interceptors.response.use(
+    <T>(response: AxiosResponse): AxiosResponse => {
         return response;
     },
     (error: AxiosError): Promise<AxiosError> => {
@@ -46,4 +43,4 @@ myAxios.interceptors.response.use(
     }
 );
 
-export { myAxios };
+export { myAxiosForFile };

@@ -1,5 +1,5 @@
 export interface SingerVO {
     id: number;
     name: string;
-    pictureIds: number[];
+    pictureMap: Record<number, string>;
 }
