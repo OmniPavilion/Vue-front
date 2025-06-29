@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { useSingerStore } from "@/music/stores";
-import { onMounted, computed } from "vue";
-import SingerCard from "@/music/views/singer/com/singerCard.vue";
+import { onMounted } from "vue";
+import SingerCard from "@/music/views/singer/com/SingerCard.vue";
 import { ElRow, ElCol, ElSkeleton } from "element-plus";
 
 const singerStore = useSingerStore();
-
-const filteredSingers = computed(() => {
-  return singerStore.singers.filter(singer => singer.id !== 1);
-});
 
 onMounted(() => {
   singerStore.fetchSingerPage();
@@ -18,7 +14,7 @@ onMounted(() => {
 <template>
   <div class="singer-list-container">
     <!-- Loading state -->
-    <el-skeleton :loading="!filteredSingers.length" animated>
+    <el-skeleton :loading="!singerStore.total" animated>
       <template #template>
         <el-row :gutter="20">
           <el-col
@@ -39,7 +35,7 @@ onMounted(() => {
       <!-- Content when loaded -->
       <el-row :gutter="20">
         <el-col
-            v-for="singer in filteredSingers"
+            v-for="singer in singerStore.singers"
             :key="singer.id"
             :xs="12"
             :sm="8"

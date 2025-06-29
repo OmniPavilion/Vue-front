@@ -11,4 +11,6 @@ export interface MusicVO {
     updatedAt: Date;
     singerName?: string;
     categoryName?: string;
+    url: string;
+    pictureUrl: string;
 }

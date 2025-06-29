@@ -3,6 +3,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import '@/common/styles/gobal.css'
 import '@/music/styles/element/index.scss'
+import '@/music/styles/globalScrollbar.css'
 
 import App from './App.vue'
 import { createPinia } from 'pinia'

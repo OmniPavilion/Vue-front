@@ -10,13 +10,26 @@ export const singerApi = {
     /**
      * 分页获取歌手列表
      * POST /api/singers/page
-     * @param params 分页查询参数
+     * @param pageDTO
+     * @param isContainDefaultSinger
      */
-    getSingers: function (params: PageDTO<string>): Promise<AxiosResponse<Result<PageVO<SingerVO>>>> {
+    getSingers: function (pageDTO: PageDTO<string>, isContainDefaultSinger: boolean = true): Promise<AxiosResponse<Result<PageVO<SingerVO>>>> {
         return myAxios({
             method: 'post',
             url: '/api/singers/page',
-            data: params
+            data: pageDTO,
+            params: {isContainDefaultSinger}
+        });
+    },
+
+    /**
+      * 获取歌手列表
+      * GET /api/singers/list
+      */
+    getSingerList(): Promise<AxiosResponse<Result<Record<number, string>>>> {
+        return myAxios({
+            method: 'get',
+            url: '/api/singers/list'
         });
     },
 
@@ -37,7 +50,7 @@ export const singerApi = {
      * POST /api/singers
      * @param singer 歌手数据
      */
-    createSinger(singer: SingerVO): Promise<AxiosResponse<Result<void>>> {
+    createSinger(singer: SingerVO): Promise<AxiosResponse<Result<number>>> {
         return myAxios({
             method: 'post',
             url: '/api/singers',

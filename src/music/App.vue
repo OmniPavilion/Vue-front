@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import WaveBackground from './components/bg/WaveBackground.vue'
-import SingerIndex from '@/music/views/singer/index.vue'
+import WaveBackground from './components/WaveBackground.vue'
+import SongIndex from '@/music/views/song/index.vue'
+import EditCategoryButton from "@/music/components/EditCategoryButton.vue";
 </script>
 
 <template>
   <!-- 背景层 -->
   <WaveBackground/>
 
-  <SingerIndex/>
+  <EditCategoryButton></EditCategoryButton>
+  <SongIndex/>
 </template>
 
 <style scoped>

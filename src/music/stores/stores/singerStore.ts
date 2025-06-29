@@ -5,10 +5,12 @@ import type {SingerVO} from '@/music/types/vo/SingerVO';
 import {singerApi} from '@/music/api/singerApi';
 import type {PageDTO} from '@/common/types/dto/PageDTO';
 import {singerPictureApi} from "@/music/api/singerPictureApi";
+import type {Result} from "@/common/types/vo/Result";
 
 export const useSingerStore = defineStore('singer', () => {
     const singers = ref<SingerVO[]>([]);
     const total = ref(0);
+    const currentSinger = ref<SingerVO>();
     const loading = ref(false);
     const pageQuery = ref<PageDTO<string>>({
         pageNum: 1,
@@ -22,7 +24,10 @@ export const useSingerStore = defineStore('singer', () => {
         console.log('分页查询歌手', pageQuery.value)
         loading.value = true;
         try {
-            const res = await singerApi.getSingers(pageQuery.value);
+            const res = await singerApi.getSingers({
+                ...pageQuery.value,
+                pageSize : pageQuery.value.pageSize + 1
+            });
             singers.value = res.data.data?.rows || [];
             total.value = res.data.data?.total || 0;
             console.log('分页查询歌手成功', res.data)
@@ -31,6 +36,13 @@ export const useSingerStore = defineStore('singer', () => {
             loading.value = false;
         }
     };
+
+    // 获取歌手列表
+    const fetchSingerList = async () => {
+        console.log('获取歌手列表');
+        const res = await singerApi.getSingerList();
+        return res.data;
+    }
 
     // 获取单个歌手详情
     const fetchSingerById = async (id: number) => {
@@ -46,7 +58,7 @@ export const useSingerStore = defineStore('singer', () => {
     };
 
     // 创建歌手
-    const createSinger = async (singerVO: SingerVO) => {
+    const createSinger = async (singerVO: SingerVO): Promise<Result<number>> => {
         console.log('创建歌手', singerVO);
         loading.value = true;
         try {
@@ -127,12 +139,14 @@ export const useSingerStore = defineStore('singer', () => {
         total,
         loading,
         pageQuery,
+        currentSinger,
         fetchSingerPage,
         fetchSingerById,
         createSinger,
         updateSinger,
         deleteSinger,
         deleteSingerPicture,
-        uploadSingerPictures
+        uploadSingerPictures,
+        fetchSingerList
     };
 });

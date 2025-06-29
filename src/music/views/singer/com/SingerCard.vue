@@ -333,4 +333,5 @@ const saveSingerInfo = async () => {
 .preview-image:hover {
   transform: scale(1.03);
 }
+
 </style>

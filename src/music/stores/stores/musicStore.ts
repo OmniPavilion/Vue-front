@@ -1,25 +1,21 @@
 // src/store/musicStore.ts
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { MusicVO } from '@/music/types/vo/MusicVO';
-import { musicApi } from '@/music/api/musicApi';
-import type { PageDTO } from '@/common/types/dto/PageDTO';
-import type { MusicQuery } from '@/music/types/dto/MusicQuery';
+import {defineStore} from 'pinia';
+import {ref} from 'vue';
+import type {MusicVO} from '@/music/types/vo/MusicVO';
+import {musicApi} from '@/music/api/musicApi';
+import type {PageDTO} from '@/common/types/dto/PageDTO';
+import type {MusicQuery} from '@/music/types/dto/MusicQuery';
 import {musicFileApi} from "@/music/api/musicFileApi";
 
 export const useMusicStore = defineStore('music', () => {
     const musics = ref<MusicVO[]>([]);
     const total = ref(0);
     const loading = ref(false);
-    const currentMusic = ref<MusicVO>();
-    const currentMusicFile = ref<Blob>();
     const pageQuery = ref<PageDTO<MusicQuery>>({
         pageNum: 1,
         pageSize: 10,
         order: 'ASC',
-        query: {
-
-        }
+        query: {}
     });
 
     // 分页查询音乐
@@ -131,10 +127,8 @@ export const useMusicStore = defineStore('music', () => {
     };
 
     const getMusicFile = async (id: number) => {
-        const res01 = await musicFileApi.getMusicFile(id);
-        currentMusicFile.value = res01.data;
-        const res02 = await musicApi.getMusicById(id);
-        currentMusic.value = res02.data.data;
+        const res = await musicFileApi.getMusicFile(id);
+        return res.data;
     };
 
     return {

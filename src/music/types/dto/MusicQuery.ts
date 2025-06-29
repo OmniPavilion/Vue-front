@@ -1,6 +1,6 @@
 export interface MusicQuery {
-    title?: string;
-    singerId?: number;
-    categoryId?: number;
-    isFavorite?: boolean;
+    title?: string | null;
+    singerId?: number | null;
+    categoryId?: number | null;
+    isFavorite?: boolean | null;
 }

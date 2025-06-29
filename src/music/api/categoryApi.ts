@@ -21,6 +21,17 @@ export const categoryApi = {
     },
 
     /**
+     * 获取分类列表
+     * GET /api/categories/list
+     */
+    getCategoryList(): Promise<AxiosResponse<Result<Record<number, string>>>> {
+        return myAxios({
+            method: 'get',
+            url: '/api/categories/list'
+        });
+    },
+
+    /**
      * 获取单个分类详情
      * GET /api/categories/{id}
      * @param id 分类ID

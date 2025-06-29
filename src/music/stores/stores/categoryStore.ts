@@ -32,6 +32,13 @@ export const useCategoryStore = defineStore('category', () => {
         }
     };
 
+    // 获取分类列表
+    const fetchCategoryList = async () => {
+        console.log('获取分类列表')
+        const res =  await categoryApi.getCategoryList();
+        return res.data;
+    }
+
     // 获取单个分类详情
     const fetchCategoryById = async (id: number) => {
         console.log('获取单个分类详情', id);
@@ -51,7 +58,9 @@ export const useCategoryStore = defineStore('category', () => {
         loading.value = true;
         try {
             const res = await categoryApi.createCategory(category);
-            categories.value.push(category)
+            if (res.data.code === 1) {
+                categories.value.push(category)
+            }
             console.log('创建分类结果', res);
             return res.data;
         } finally {
@@ -96,6 +105,7 @@ export const useCategoryStore = defineStore('category', () => {
         fetchCategoryById,
         createCategory,
         updateCategory,
-        deleteCategory
+        deleteCategory,
+        fetchCategoryList
     };
 });
