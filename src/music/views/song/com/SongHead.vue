@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { VideoPlay, Star, Search, Plus, StarFilled, VideoPause, Close } from "@element-plus/icons-vue";
+import {VideoPlay, Star, Search, Plus, StarFilled, VideoPause, Close} from "@element-plus/icons-vue";
 import {useMusicStore, useCategoryStore, useMusicPlayStore, useSingerStore} from "@/music/stores";
-import {onMounted, ref, watch} from "vue";
-import { ElMessage } from "element-plus";
-import type { UploadFile, UploadFiles } from 'element-plus';
+import {onMounted, ref, watch, computed} from "vue";
+import type {UploadFile, UploadFiles} from 'element-plus';
+import {ElMessage, ElMessageBox} from "element-plus";
+import {Delete} from "@element-plus/icons-vue";
 
 const musicStore = useMusicStore();
 const categoryStore = useCategoryStore();
@@ -43,9 +44,7 @@ const playMusicByRandom = () => {
   if (musicPlayStore.isPlaying === true) {
     musicPlayStore.pauseMusic();
   } else {
-    musicStore.musics.length > 0 && musicPlayStore.playMusic(
-        musicStore.musics[Math.floor(Math.random() * musicStore.musics.length)]
-    );
+    musicPlayStore.playRandom();
   }
 }
 
@@ -73,7 +72,7 @@ const submitUpload = async () => {
 
   try {
     await musicStore.createMusics(uploadFiles.value, uploadSinger.value, uploadCategory.value);
-    ElMessage.success('批量上传成功' as  any);
+    ElMessage.success('批量上传成功' as any);
     showUploadDialog.value = false;
     uploadFiles.value = [];
     uploadSinger.value = '';
@@ -83,6 +82,71 @@ const submitUpload = async () => {
     console.error('批量上传失败:', error);
     ElMessage.error('批量上传失败' as any);
   }
+}
+
+// 批量删除方法
+const batchDelete = async () => {
+  if (musicStore.deleteMusicIds.length === 0) {
+    ElMessage.warning('请至少选择一首歌曲' as any);
+    return;
+  }
+
+  try {
+    await ElMessageBox.confirm(`确定要删除选中的 ${musicStore.deleteMusicIds.length} 首歌曲吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+
+    // 禁止删除正在播放的文件
+    if (musicPlayStore.currentMusic && musicStore.deleteMusicIds.includes(musicPlayStore.currentMusic.id)) {
+      ElMessage.error('禁止删除正在播放的文件' as any);
+      return;
+    }
+    const res = await musicStore.deleteMusics(musicStore.deleteMusicIds);
+    if (res.code !== 1) {
+      ElMessage.error(res.message as any);
+      return;
+    }
+    ElMessage.success(`成功删除 ${musicStore.deleteMusicIds.length} 首歌曲` as any);
+    musicStore.deleteMusicIds = [];
+    musicStore.isDeleteMode = false;
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('批量删除失败:', error);
+      ElMessage.error('批量删除失败' as any);
+    }
+  }
+};
+
+// 切换批量模式
+const toggleBatchMode = () => {
+  musicStore.isDeleteMode = !musicStore.isDeleteMode;
+  if (!musicStore.isDeleteMode) {
+    musicStore.deleteMusicIds = [];
+  }
+};
+
+// 计算总文件大小
+const totalFileSize = computed(() => {
+  return uploadFiles.value.reduce((total, file) => total + file.size, 0)
+})
+
+// 格式化文件名（省略过长的部分）
+const formatFileName = (name: any) => {
+  if (name.length > 30) {
+    return `${name.substring(0, 15)}...${name.substring(name.length - 10)}`
+  }
+  return name
+}
+
+// 格式化文件大小
+const formatFileSize = (bytes: any) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 watch(
@@ -121,6 +185,7 @@ onMounted(async () => {
       <!-- 第一行：大字号歌手名称 -->
       <div class="artist-info">
         <h1 class="artist-name">{{ musicPlayStore.currentMusic?.singerName || '佚名' }}</h1>
+        <h2 class="title-name">{{ musicPlayStore.currentMusic?.title }}</h2>
       </div>
 
       <!-- 第二行：操作按钮组（底部对齐图片） -->
@@ -132,8 +197,8 @@ onMounted(async () => {
             @click="playMusicByRandom"
             circle>
           <el-icon size="20">
-            <VideoPause v-if="musicPlayStore.isPlaying" />
-            <VideoPlay v-else />
+            <VideoPause v-if="musicPlayStore.isPlaying"/>
+            <VideoPlay v-else/>
           </el-icon>
         </el-button>
 
@@ -145,7 +210,9 @@ onMounted(async () => {
             clearable
         >
           <template #prefix>
-            <el-icon><Search /></el-icon>
+            <el-icon>
+              <Search/>
+            </el-icon>
           </template>
         </el-input>
 
@@ -171,17 +238,42 @@ onMounted(async () => {
             class="add-song-btn"
             @click="showUploadDialog = true"
         >
-          <el-icon><Plus /></el-icon>
+          <el-icon>
+            <Plus/>
+          </el-icon>
           <span>添加歌曲</span>
         </el-button>
 
         <!-- 收藏按钮 -->
         <el-button class="favorite-btn" @click="formData.isFavorite = !formData.isFavorite">
           <el-icon>
-            <StarFilled v-if="formData.isFavorite" />
-            <Star v-else />
+            <StarFilled v-if="formData.isFavorite"/>
+            <Star v-else/>
           </el-icon>
           <span>收藏</span>
+        </el-button>
+
+        <el-button
+            type="danger"
+            @click="toggleBatchMode"
+            :class="{ 'active-batch': musicStore.isDeleteMode }"
+        >
+          <el-icon>
+            <Delete/>
+          </el-icon>
+          <span>{{ musicStore.isDeleteMode ? '取消批量' : '批量删除' }}</span>
+        </el-button>
+
+        <el-button
+            v-if="musicStore.isDeleteMode"
+            type="danger"
+            @click="batchDelete"
+            :disabled="musicStore.deleteMusicIds.length === 0"
+        >
+          <el-icon>
+            <Delete/>
+          </el-icon>
+          <span>删除选中({{ musicStore.deleteMusicIds.length }})</span>
         </el-button>
       </div>
     </div>
@@ -193,6 +285,7 @@ onMounted(async () => {
       title="批量添加歌曲"
       width="600px"
       :close-on-click-modal="false"
+      append-to-body
   >
     <el-form label-width="80px">
       <el-form-item label="歌手">
@@ -242,11 +335,29 @@ onMounted(async () => {
             <div class="el-upload__tip">支持批量上传音频文件</div>
           </template>
         </el-upload>
+      </el-form-item>
 
-        <div class="file-list" v-if="uploadFiles.length > 0">
-          <div v-for="(file, index) in uploadFiles" :key="index" class="file-item">
-            <span>{{ file.name }}</span>
-            <el-icon @click="removeFile(index)"><Close /></el-icon>
+      <el-form-item>
+        <!-- 优化后的文件列表 -->
+        <div class="enhanced-file-list" v-if="uploadFiles.length > 0">
+          <div class="file-list-header">
+            <span class="file-name">文件名</span>
+            <span class="file-size">大小</span>
+            <span class="file-actions">操作</span>
+          </div>
+          <div class="file-list-body">
+            <div v-for="(file, index) in uploadFiles" :key="index" class="file-item">
+              <span class="file-name" :title="file.name">{{ formatFileName(file.name) }}</span>
+              <span class="file-size">{{ formatFileSize(file.size) }}</span>
+              <span class="file-actions">
+                <el-tooltip effect="dark" content="移除" placement="top">
+                  <el-icon @click="removeFile(index)"><Close/></el-icon>
+                </el-tooltip>
+              </span>
+            </div>
+          </div>
+          <div class="file-list-footer">
+            共 {{ uploadFiles.length }} 个文件，总计 {{ formatFileSize(totalFileSize) }}
           </div>
         </div>
       </el-form-item>
@@ -275,7 +386,18 @@ onMounted(async () => {
   height: 120px;
   border-radius: 12px;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      0 0 8px rgba(120, 230, 255, 0.2);
+  border: 0.5px solid rgba(120, 230, 255, 0.2);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.3),
+        0 0 12px rgba(120, 230, 255, 0.3);
+  }
 }
 
 .right-section {
@@ -293,9 +415,22 @@ onMounted(async () => {
 .artist-name {
   font-size: 24px;
   font-weight: bold;
-  color: var(--el-text-color-primary);
+  color: rgba(220, 230, 240, 0.95);
   margin: 0;
   line-height: 1.2;
+  text-shadow: 0 0 6px rgba(120, 230, 255, 0.3);
+}
+
+.title-name {
+  font-size: 18px;
+  font-weight: normal;
+  color: rgba(200, 220, 240, 0.85);
+  margin: 4px 0 0 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .action-buttons {
@@ -309,45 +444,109 @@ onMounted(async () => {
 .play-btn {
   width: 44px;
   height: 44px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 16px rgba(70, 130, 255, 0.4);
+  }
 }
 
 .song-search {
   flex: 1;
-  min-width: 200px;
-  max-width: 300px;
+  min-width: 100px;
+  max-width: 500px;
 }
 
 .category-select {
-  width: 120px;
+  width: 100px;
 }
 
-/* 文件列表样式 */
-.file-list {
-  margin-top: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid var(--el-border-color-light);
+:deep(.el-dialog) {
+  .el-dialog__header {
+    border-bottom: 0.5px solid rgba(120, 230, 255, 0.1);
+  }
+
+  .el-dialog__body {
+    padding: 20px;
+  }
+
+  .el-form-item__label {
+    color: rgba(200, 220, 240, 0.9);
+  }
+}
+
+.enhanced-file-list {
+  margin-top: 12px;
+  border: 0.5px solid rgba(120, 230, 255, 0.2);
   border-radius: 4px;
-  padding: 8px;
+  overflow: hidden;
+  background-color: rgba(65, 65, 75, 0.6);
+  box-shadow: inset 0 0 8px rgba(120, 230, 255, 0.05);
+}
+
+.file-list-header {
+  display: flex;
+  padding: 8px 12px;
+  background-color: rgba(70, 70, 80, 0.7);
+  font-weight: 500;
+  color: rgba(180, 220, 255, 0.9);
+  border-bottom: 0.5px solid rgba(120, 230, 255, 0.15);
+}
+
+.file-list-body {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .file-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 6px 8px;
-  margin-bottom: 4px;
-  background-color: var(--el-fill-color-light);
-  border-radius: 3px;
+  padding: 8px 12px;
+  border-bottom: 0.5px solid rgba(120, 230, 255, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(120, 230, 255, 0.1);
+  }
 }
 
-.file-item:hover {
-  background-color: var(--el-fill-color);
+.file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12px;
+  color: rgba(220, 230, 240, 0.9);
 }
 
-.file-item .el-icon {
+.file-size {
+  width: 80px;
+  text-align: right;
+  padding-right: 12px;
+  color: rgba(180, 200, 220, 0.8);
+  font-size: 0.9em;
+}
+
+.file-actions .el-icon {
   cursor: pointer;
-  color: var(--el-color-danger);
+  color: rgba(255, 120, 120, 0.8);
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: rgba(255, 120, 120, 1);
+    transform: scale(1.2);
+  }
+}
+
+.file-list-footer {
+  padding: 8px 12px;
+  background-color: rgba(70, 70, 80, 0.7);
+  text-align: center;
+  font-size: 0.9em;
+  color: rgba(180, 200, 220, 0.8);
+  border-top: 0.5px solid rgba(120, 230, 255, 0.1);
 }
 
 /* 响应式调整 */
@@ -369,6 +568,14 @@ onMounted(async () => {
   .song-search,
   .category-select {
     min-width: 100%;
+  }
+
+  .file-name {
+    max-width: 180px;
+  }
+
+  .file-size {
+    width: 60px;
   }
 }
 </style>

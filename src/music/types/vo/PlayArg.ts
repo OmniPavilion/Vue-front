@@ -1,6 +1,6 @@
-export interface PlayArg{
-    currentMusicId?: number,
-    playMode: String,
-     volume: number,
+export interface PlayArg {
+    currentMusicId?: number | null,
+    playMode: 'order' | 'random' | 'loop',
+    volume: number,
     playDuration: number
 }

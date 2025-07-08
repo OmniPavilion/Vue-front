@@ -15,7 +15,7 @@ export const useSingerStore = defineStore('singer', () => {
     const pageQuery = ref<PageDTO<string>>({
         pageNum: 1,
         pageSize: 10,
-        order: 'ASC',
+        order: 'DESC',
         query: ''
     });
 
@@ -26,10 +26,11 @@ export const useSingerStore = defineStore('singer', () => {
         try {
             const res = await singerApi.getSingers({
                 ...pageQuery.value,
-                pageSize : pageQuery.value.pageSize + 1
+                pageSize : pageQuery.value.pageNum === 1 ? pageQuery.value.pageSize + 1 : pageQuery.value.pageSize
             });
             singers.value = res.data.data?.rows || [];
             total.value = res.data.data?.total || 0;
+            total.value = (pageQuery.value.pageNum === 1 && total.value !== 0)? total.value - 1 : total.value;
             console.log('分页查询歌手成功', res.data)
             return res.data;
         } finally {

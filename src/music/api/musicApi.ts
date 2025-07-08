@@ -73,6 +73,18 @@ export const musicApi = {
     },
 
     /**
+     * 批量删除音乐
+     * DELETE /api/musics
+     */
+    deleteMusics(ids: number[]): Promise<AxiosResponse<Result<void>>> {
+        return myAxios({
+            method: 'delete',
+            url: '/api/musics/batch',
+            data: ids
+        });
+    },
+
+    /**
      * 记录播放
      * POST /api/musics/{id}/play
      */
@@ -91,6 +103,21 @@ export const musicApi = {
         return myAxios({
             method: 'post',
             url: `/api/musics/${id}/favorite`
+        });
+    },
+
+    /**
+     * 获取下一首或上一首
+     * GET /api/musics/{id}/next
+     */
+    getNextMusic(id: number, playMode: string, isNext: boolean) : Promise<AxiosResponse<Result<MusicVO>>> {
+        return myAxios({
+            method: 'get',
+            url: `/api/musics/${id}/next`,
+            params: {
+                playMode,
+                isNext
+            }
         });
     }
 };

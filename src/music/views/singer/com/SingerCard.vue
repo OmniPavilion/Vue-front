@@ -3,7 +3,7 @@ import {computed, ref} from 'vue';
 import type {SingerVO} from '@/music/types/vo/SingerVO';
 import {CloseBold} from '@element-plus/icons-vue';
 import {useSingerStore} from "@/music/stores";
-import {ElMessage, type UploadFile} from "element-plus";
+import {ElMessage, type UploadFile, ElMessageBox} from "element-plus";
 import {Plus} from '@element-plus/icons-vue';
 
 const props = defineProps<{
@@ -77,10 +77,45 @@ const saveSingerInfo = async () => {
     console.error(error);
   }
 };
+
+// 删除歌手方法
+const deleteSinger = async () => {
+  try {
+    await ElMessageBox.confirm(`确定要删除歌手 "${props.singer.name}" 吗？`, '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+
+    const res = await singerStore.deleteSinger(props.singer.id);
+
+    if (res.code === 1) {
+      ElMessage.success('歌手删除成功' as any);
+    } else {
+      ElMessage.error(res.message || '删除失败' as any);
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除操作失败' as any);
+      console.error('删除歌手失败:', error);
+    }
+  }
+};
 </script>
 
 <template>
   <div class="singer-card">
+    <div class="singer-actions">
+      <el-button
+          type="danger"
+          circle
+          size="small"
+          @click.stop="deleteSinger"
+          class="delete-singer-btn"
+      >
+        <el-icon><CloseBold /></el-icon>
+      </el-button>
+    </div>
     <el-avatar
         :size="120"
         :src="randomPicture"
@@ -180,7 +215,7 @@ const saveSingerInfo = async () => {
   padding: 16px;
   background-color: rgba(55, 55, 65, 0.6) !important;
   backdrop-filter: blur(10px) !important;
-  border: 0.5px solid rgba(120, 230, 255, 0.15) !important;
+  border: 1px solid rgba(120, 230, 255, 0.15) !important;
   border-radius: 8px !important;
   box-shadow:
       0 0 10px rgba(120, 230, 255, 0.1),
@@ -215,7 +250,7 @@ const saveSingerInfo = async () => {
 
 .singer-name {
   background-color: rgba(65, 65, 75, 0.7) !important;
-  border: 0.5px solid rgba(120, 230, 255, 0.2) !important;
+  border: 1px solid rgba(120, 230, 255, 0.2) !important;
   color: rgba(220, 240, 255, 0.9) !important;
   border-radius: 20px !important;
   padding: 6px 16px !important;
@@ -334,4 +369,27 @@ const saveSingerInfo = async () => {
   transform: scale(1.03);
 }
 
+/* 添加删除按钮样式 */
+.singer-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.singer-card:hover .singer-actions {
+  opacity: 1;
+}
+
+.delete-singer-btn {
+  background-color: rgba(200, 60, 60, 0.8) !important;
+  border: none !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.delete-singer-btn:hover {
+  background-color: rgba(220, 80, 80, 0.9) !important;
+  transform: scale(1.1);
+}
 </style>

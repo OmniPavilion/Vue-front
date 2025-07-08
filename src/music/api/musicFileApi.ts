@@ -1,5 +1,4 @@
 import { myAxios } from '@/common/utils/axios';
-import { myAxiosForFile } from '@/common/utils/axiosForFile';
 import type { Result } from '@/common/types/vo/Result';
 import type { AxiosResponse } from 'axios';
 
@@ -29,16 +28,14 @@ export const musicFileApi = {
     },
 
     /**
-     * 获取音乐文件（流式下载）
-     * GET /api/musicFile/{id}
-     * @param id 音乐文件ID
-     * @returns 返回文件流
+     * 获取音乐文件根目录
+     * GET /api/musicFile/root
+     * @returns 音乐文件根目录
      */
-    getMusicFile(id: number): Promise<AxiosResponse<Blob>> {
-        return myAxiosForFile({
+    getRoot() {
+        return myAxios({
             method: 'get',
-            url: `/api/musicFile/${id}`,
-            responseType: 'blob' // 重要：指定响应类型为二进制流
+            url: '/api/musicFile/root'
         });
     }
 };

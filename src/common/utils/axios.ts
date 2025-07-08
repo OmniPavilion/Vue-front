@@ -7,7 +7,7 @@ import {InternetConstant} from "@/common/constants/InternetConstant";
 // 创建 axios 实例
 const myAxios: AxiosInstance = axios.create({
     baseURL: InternetConstant.URL,
-    timeout: 5000,
+    timeout: 500000,
     headers: {
         'Content-Type': 'application/json',
     },

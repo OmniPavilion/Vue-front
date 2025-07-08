@@ -9,10 +9,8 @@ export default {
   name: 'AlienLandscape',
   mounted() {
     this.initAlienLandscape();
-    window.addEventListener('resize', this.handleResize);
   },
   beforeUnmount() {
-    window.removeEventListener('resize', this.handleResize);
     cancelAnimationFrame(this.animationFrame);
   },
   methods: {
@@ -234,11 +232,6 @@ export default {
       });
       y();
     },
-
-    handleResize() {
-      // 重新初始化以适应新尺寸
-      this.initAlienLandscape();
-    }
   }
 }
 </script>

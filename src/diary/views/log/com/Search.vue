@@ -308,6 +308,7 @@ onMounted(() => {
   }
 
   .add-button {
+
     margin-left: 0;
     width: 100%;
   }

@@ -5,24 +5,24 @@ import type {PlayArg} from "@/music/types/vo/PlayArg";
 
 export const playApi = {
     /**
-     * 分页获取歌手列表
-     * POST /api/singers/page
+     * 获取播放参数
+     * POST /api/play/arg
      */
     getPlayArg: function (): Promise<AxiosResponse<Result<PlayArg>>> {
         return myAxios({
-            method: 'post',
+            method: 'get',
             url: '/api/play/arg',
         });
     },
 
     /**
-     * 获取单个歌手详情
-     * GET /api/singers/{id}
+     * 社长播放参数
+     * GET /api/play/arg}
      * @param playArg
      */
     setPlayArg(playArg: PlayArg): Promise<AxiosResponse<Result<null>>> {
         return myAxios({
-            method: 'get',
+            method: 'post',
             url: '/api/play/arg',
             data: playArg
         });

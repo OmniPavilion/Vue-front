@@ -150,6 +150,7 @@ onMounted(async () => {
         title="分类管理"
         width="800px"
         :close-on-click-modal="false"
+        append-to-body
     >
       <div class="dialog-content-wrapper">
         <!-- 分类列表 -->
@@ -199,6 +200,7 @@ onMounted(async () => {
         <el-divider />
         <div class="form-wrapper">
           <el-form
+              @submit.native.prevent
               :model="newCategory"
               label-width="80px"
           >

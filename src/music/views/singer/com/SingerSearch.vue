@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from 'vue';
-import { Search, Plus, CloseBold } from '@element-plus/icons-vue';
-import { useSingerStore } from '@/music/stores';
-import type { SingerVO } from '@/music/types/vo/SingerVO';
-import { ElMessage } from 'element-plus';
+import {ref, watch, onBeforeUnmount} from 'vue';
+import {Search, Plus, CloseBold} from '@element-plus/icons-vue';
+import {useSingerStore} from '@/music/stores';
+import type {SingerVO} from '@/music/types/vo/SingerVO';
+import {ElMessage} from 'element-plus';
 
 const singerStore = useSingerStore();
 
@@ -16,7 +16,7 @@ const newSinger = ref<SingerVO>({
 });
 
 // 图片上传相关状态
-const uploadFiles = ref<{file: File, url: string}[]>([]);
+const uploadFiles = ref<{ file: File, url: string }[]>([]);
 
 // 监听搜索条件变化
 watch(
@@ -46,6 +46,14 @@ const openAddDialog = () => {
 // 处理图片上传
 const handlePictureUpload = (uploadFile: { raw: File }) => {
   if (uploadFile?.raw) {
+    if (!uploadFile.raw.type.includes('image/')) {
+      ElMessage.warning('请上传图片文件' as any);
+      return false;
+    }
+    if (uploadFile.raw.size > 25 * 1024 * 1024) {
+      ElMessage.warning('图片大小不能超过25MB' as any);
+      return false;
+    }
     const url = URL.createObjectURL(uploadFile.raw);
     uploadFiles.value.push({
       file: uploadFile.raw,
@@ -53,6 +61,27 @@ const handlePictureUpload = (uploadFile: { raw: File }) => {
     });
   }
   return false; // 阻止自动上传
+};
+
+// 处理拖拽上传
+const handleDrop = (e: DragEvent) => {
+  e.preventDefault();
+  if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.includes('image/')) {
+      if (file.size > 25 * 1024 * 1024) {
+        ElMessage.warning('图片大小不能超过25MB' as any);
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      uploadFiles.value.push({
+        file,
+        url
+      });
+    } else {
+      ElMessage.warning('请拖拽图片文件' as any);
+    }
+  }
 };
 
 // 移除已选择的图片
@@ -79,15 +108,16 @@ const submitAddSinger = async () => {
   try {
     const createRes = await singerStore.createSinger(newSinger.value);
 
-    if (createRes.code === 1 && uploadFiles.value.length > 0) {
+    if (createRes.code !== 1) {
+      ElMessage.error(createRes.message as any);
+    }
+
+    if (uploadFiles.value.length > 0) {
       const singerId = createRes.data;
       if (singerId) {
         const files = uploadFiles.value.map(item => item.file);
         await singerStore.uploadSingerPictures(singerId, files);
       }
-    } else {
-      ElMessage.warning(createRes.message as any);
-      return;
     }
 
     ElMessage.success('添加歌手成功' as any);
@@ -110,45 +140,51 @@ handleSearch();
 
 <template>
   <div class="singer-search-container">
-    <!-- 搜索栏 -->
-    <div class="search-controls">
-      <div class="search-input-container">
-        <el-input
-            v-model="singerStore.pageQuery.query"
-            placeholder="搜索歌手名称..."
-            clearable
-            @change="handleSearch"
-            @clear="handleSearch"
-            class="search-input"
+    <!-- 搜索栏和分页在同一行 -->
+    <div class="search-pagination-row">
+      <!-- 搜索栏 -->
+      <div class="search-controls">
+        <div class="search-input-container">
+          <el-input
+              v-model="singerStore.pageQuery.query"
+              placeholder="搜索"
+              clearable
+              @change="handleSearch"
+              @clear="handleSearch"
+              class="search-input"
+          >
+            <template #prefix>
+              <el-icon class="search-icon">
+                <Search/>
+              </el-icon>
+            </template>
+          </el-input>
+        </div>
+
+        <el-button
+            type="primary"
+            @click="openAddDialog"
+            :icon="Plus"
+            class="add-button"
         >
-          <template #prefix>
-            <el-icon class="search-icon"><Search /></el-icon>
-          </template>
-        </el-input>
+          添加歌手
+        </el-button>
       </div>
 
-      <el-button
-          type="primary"
-          @click="openAddDialog"
-          :icon="Plus"
-          class="add-button"
-      >
-        添加歌手
-      </el-button>
-    </div>
-
-    <!-- 分页 -->
-    <div class="pagination-container">
-      <el-pagination
-          v-model:current-page="singerStore.pageQuery.pageNum"
-          v-model:page-size="singerStore.pageQuery.pageSize"
-          :page-sizes="[10, 20, 30, 50]"
-          :total="singerStore.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSearch"
-          @current-change="handleSearch"
-          class="pagination"
-      />
+      <!-- 分页 -->
+      <div class="pagination-container">
+        <el-pagination
+            v-model:current-page="singerStore.pageQuery.pageNum"
+            v-model:page-size="singerStore.pageQuery.pageSize"
+            :page-sizes="[10, 20, 30, 50]"
+            :total="singerStore.total"
+            layout="sizes, prev, pager, next"
+            @size-change="handleSearch"
+            @current-change="handleSearch"
+            class="pagination"
+            background
+        />
+      </div>
     </div>
 
     <!-- 添加歌手对话框 -->
@@ -160,7 +196,10 @@ handleSearch();
         class="add-singer-dialog"
         append-to-body
     >
-      <el-form :model="newSinger" label-width="100px">
+      <el-form
+          @submit.native.prevent
+          :model="newSinger"
+          label-width="100px">
         <el-form-item label="歌手名称" required>
           <el-input
               v-model="newSinger.name"
@@ -179,9 +218,14 @@ handleSearch();
                 accept="image/*"
                 list-type="picture-card"
                 class="avatar-uploader"
+                drag
+                @drop.prevent="handleDrop"
+                @dragover.prevent
             >
-              <el-icon class="upload-icon"><Plus /></el-icon>
-              <div class="upload-tip">点击上传图片</div>
+              <el-icon class="upload-icon">
+                <Plus/>
+              </el-icon>
+              <div class="upload-tip">点击或拖拽图片到此处上传</div>
             </el-upload>
 
             <div class="upload-tips">
@@ -189,10 +233,9 @@ handleSearch();
               <div class="tip-text">图片大小不超过 25MB</div>
             </div>
           </div>
-          <div>111</div>
-
-          <div class="preview-container" v-if="uploadFiles.length > 0">
-            <div class="preview-title">已上传图片:</div>
+        </el-form-item>
+        <el-form-item label="已上传图片" v-if="uploadFiles.length > 0">
+          <div class="preview-container">
             <div class="preview-grid">
               <div
                   class="preview-item"
@@ -206,6 +249,10 @@ handleSearch();
                     fit="cover"
                     class="preview-image"
                     hide-on-click-modal
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
+                    :preview-teleported="true"
                 >
                   <template #error>
                     <div class="image-error">图片加载失败</div>
@@ -218,7 +265,9 @@ handleSearch();
                     @click.stop="removePicture(index)"
                     class="delete-btn"
                 >
-                  <el-icon><CloseBold /></el-icon>
+                  <el-icon>
+                    <CloseBold/>
+                  </el-icon>
                 </el-button>
               </div>
             </div>
@@ -244,26 +293,54 @@ handleSearch();
 
 <style scoped lang="scss">
 .singer-search-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
-  background-color: rgba(55, 55, 65, 0.6);
   border-radius: 8px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(120, 230, 255, 0.1);
-  box-shadow: 0 0 15px rgba(120, 230, 255, 0.05);
+}
+
+/* 新增的行布局样式 */
+.search-pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 }
 
 .search-controls {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 .search-input-container {
   flex: 1;
+  width: 100px;
+  max-width: 100px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .search-input {
+  height: 40px;
+
   :deep(.el-input__wrapper) {
     background-color: rgba(65, 65, 75, 0.7);
     border: 1px solid rgba(120, 230, 255, 0.2);
@@ -286,20 +363,47 @@ handleSearch();
 }
 
 .add-button {
+  height: 40px;
+
   background-color: rgba(70, 165, 255, 0.8);
   border: 1px solid rgba(120, 230, 255, 0.3);
   transition: all 0.3s ease;
+  white-space: nowrap;
 
   &:hover {
     background-color: rgba(70, 165, 255, 0.9);
     transform: translateY(-1px);
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  padding: 8px 0;
+
+  :deep(.el-pagination) {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 1100px) {
+  :deep(.el-pagination) {
+    .btn-prev, .btn-next, .el-pager li {
+      min-width: 28px;
+    }
+
+    .el-pagination__sizes {
+      display: none;
+    }
+  }
 }
 
 .add-singer-dialog {
@@ -346,6 +450,18 @@ handleSearch();
       background-color: rgba(70, 70, 80, 0.7);
     }
   }
+
+  :deep(.el-upload-dragger) {
+    width: 120px;
+    height: 120px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+  }
 }
 
 .upload-icon {
@@ -372,12 +488,8 @@ handleSearch();
 
 .preview-container {
   margin-top: 16px;
-}
-
-.preview-title {
-  color: rgba(180, 200, 220, 0.9);
-  font-size: 14px;
-  margin-bottom: 12px;
+  overflow-y: auto;
+  max-height: 300px;
 }
 
 .preview-grid {
@@ -388,8 +500,9 @@ handleSearch();
 
 .preview-item {
   position: relative;
-  width: 120px;
-  height: 120px;
+  display: flex;
+  min-width: 120px;
+  min-height: 120px;
   border-radius: 6px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -445,19 +558,6 @@ handleSearch();
 }
 
 @media (max-width: 768px) {
-  .search-controls {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .search-input-container {
-    width: 100%;
-  }
-
-  .add-button {
-    width: 100%;
-  }
-
   .upload-section {
     flex-direction: column;
     gap: 12px;
