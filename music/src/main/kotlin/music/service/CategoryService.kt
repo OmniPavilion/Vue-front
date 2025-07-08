@@ -1,7 +1,5 @@
 package music.service
 
-import common.annotation.Datasource
-import common.enumerate.DataSourceType
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import music.exception.MusicException
@@ -49,4 +47,5 @@ interface CategoryService {
      */
     @Throws(MusicException::class)
     fun getCategoryPage(pageDTO: PageDTO<String>): PageVO<CategoryVO>
+    fun getCategoryNames(): Map<Long, String>?
 }

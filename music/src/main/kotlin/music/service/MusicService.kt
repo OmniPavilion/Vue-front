@@ -22,4 +22,8 @@ interface MusicService {
     fun incrementPlayCount(id: Int)
     @Throws(MusicException::class)
     fun toggleFavorite(id: Int): Boolean
+    @Throws(MusicException::class)
+    fun deleteMusics(ids: IntArray)
+    @Throws(MusicException::class)
+    fun getNextMusic(id: Int, mode: String, isNext:  Boolean): MusicVO
 }

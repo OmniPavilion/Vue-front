@@ -30,7 +30,6 @@ class DynamicDataSource : AbstractRoutingDataSource() {
 
     override fun determineCurrentLookupKey(): Any? {
         val key = contextHolder.get()
-        logger.info("当前数据源: $key") // 添加这行
         return key
     }
 

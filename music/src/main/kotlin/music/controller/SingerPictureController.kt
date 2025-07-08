@@ -50,26 +50,9 @@ class SingerPictureController(
         logger.info { "获取歌手 $singerId 的图片 ${pictureId?: "随机"}" }
         val imageBytes  = singerPictureService.getPicture(singerId, pictureId)
         return ResponseEntity.ok()
-            .contentType(MediaType.IMAGE_JPEG)
+            .contentType(MediaType.IMAGE_JPEG)  // 或根据实际图片类型动态设置
+            .header("Content-Disposition", "inline")  // 确保浏览器直接显示图片
             .body(imageBytes)
-    }
-
-    /**
-     * 获取歌手所有图片
-     * GET /api/singers/{singerId}/pictures
-     */
-    @GetMapping(
-        path = ["/{singerId}/pictures"],
-        produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE]
-    )
-    fun getSingerPictures(
-        @PathVariable singerId: Long,
-    ): ResponseEntity<List<ByteArray?>?> {
-        logger.info { "获取歌手 $singerId 所有的图片" }
-        val imageBytesArray  = singerPictureService.getPictures(singerId)
-        return ResponseEntity.ok()
-            .contentType(MediaType.IMAGE_JPEG)
-            .body(imageBytesArray)
     }
 
     /**

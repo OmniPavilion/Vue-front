@@ -4,7 +4,7 @@ class MusicRedisConstant {
     companion object {
         const val MUSIC_KEY = "music:"
 
-        const val PLAY_KEY = MUSIC_KEY + "play:"
+        const val PLAY_KEY = MUSIC_KEY + "player:"
         const val FILE_KEY = MUSIC_KEY + "file:"
 
         // 文件根路径
@@ -14,7 +14,7 @@ class MusicRedisConstant {
         const val SINGER_ROOT_FIELD = "singer_root_path"
         const val DEFAULT_SINGER_FIELD = "default_singer_path"
         // 当前音乐
-        const val CURRENT_MUSIC_FIELD = "current_music"
+        const val CURRENT_MUSIC_ID_FIELD = "current_music_id"
         // 音量
         const val VOLUME_FIELD = "volume"
         // 播放模式

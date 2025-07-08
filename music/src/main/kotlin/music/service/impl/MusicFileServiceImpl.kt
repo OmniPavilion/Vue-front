@@ -29,10 +29,22 @@ class MusicFileServiceImpl(
             throw FileException("路径不能为空")
         }
 
+
         val oldSingerRootPath = musicConstant.rootPath
 
-        if (path == oldSingerRootPath) {
+        if (path == oldSingerRootPath ) {
+            val defaultPath = stringRedisTemplate.opsForHash<String, String>()
+                .get(MusicRedisConstant.FILE_KEY, MusicRedisConstant.DEFAULT_ROOT_FIELD)
+                ?: throw FileException("请先设置默认音乐根目录")
+
+            if (path == defaultPath) return
+
             throw FileException("路径不能相同")
+        }
+
+        // 禁止将文件夹移动到其自身子目录
+        if (path.startsWith(oldSingerRootPath)) {
+            throw FileException("请勿将文件夹移动到其自身子目录")
         }
 
         MultipartFileUtils.moveFolder(oldSingerRootPath, path)
@@ -40,8 +52,6 @@ class MusicFileServiceImpl(
         stringRedisTemplate.opsForHash<String, String>()
             .put(MusicRedisConstant.FILE_KEY, MusicRedisConstant.ROOT_FIELD, path)
         musicConstant.init()
-
-
     }
 
     override fun getMusicFile(id: Int): File {

@@ -2,8 +2,6 @@ package music.controller
 
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.serializer.SerializerFeature
-import common.annotation.Datasource
-import common.enumerate.DataSourceType
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import common.pojo.vo.Result
@@ -20,11 +18,17 @@ class CategoryController(private val categoryService: CategoryService) {
     /**
      * 获取分类列表(分页)
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     fun getCategories(@RequestBody pageDTO: PageDTO<String>): Result<PageVO<CategoryVO>> {
         logger.info { "获取分类列表(分页)：${JSON.toJSONString(pageDTO, SerializerFeature.PrettyFormat)}" }
         val categoryPage = categoryService.getCategoryPage(pageDTO)
         return Result.success(categoryPage)
+    }
+
+    @GetMapping("/list")
+    fun getCategoryNames(): Result<Map<Long, String>?> {
+        val categories = categoryService.getCategoryNames()
+        return Result.success(categories)
     }
 
     /**

@@ -6,7 +6,7 @@ spring:
   servlet:
     multipart:
       max-file-size: 1024MB #  设置上传文件大小
-      max-request-size: 1024MB # 设置上传文件大小
+      max-request-size: 102400MB # 设置上传文件大小
   application:
     name: java-final-assignment # 应用名称
   ai:

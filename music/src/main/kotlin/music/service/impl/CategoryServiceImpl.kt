@@ -42,6 +42,7 @@ class CategoryServiceImpl(
             pageDTO.query?.let {
                 like(Category::name, it)
             }
+            ne(Category::id, 1L)
 
 
             // 排序
@@ -62,6 +63,12 @@ class CategoryServiceImpl(
         val pageVO = PageVO(result.total, categoryVOList)
         return pageVO
     }
+
+    override fun getCategoryNames(): Map<Long, String>? {
+        return categoryMapper.selectList(KtQueryWrapper(Category::class.java).ne(Category::id, 1L))
+            .associateBy { it.id }
+            .mapValues { it.value.name }
+         }
 
     /**
      * 根据ID获取分类

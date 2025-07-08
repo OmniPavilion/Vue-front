@@ -4,6 +4,7 @@ import common.exception.FileException
 import common.pojo.vo.Result
 import mu.KotlinLogging
 import music.constant.MusicRedisConstant
+import music.exception.MusicException
 import music.service.MusicFileService
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpHeaders
@@ -47,24 +48,15 @@ class MusicFileController(
         return Result.success()
     }
 
-    // 获取音乐文件（流式传输）
-    @GetMapping("/{id}")
-    fun getMusicFile(@PathVariable id: Int): ResponseEntity<InputStreamResource> {
-        logger.info("获取音乐文件$id")
-        val musicFile = musicFileService.getMusicFile(id)
-        val inputStream = FileInputStream(musicFile)
-
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_OCTET_STREAM // 或具体音频类型，如 "audio/mpeg"
-            contentLength = musicFile.length()
-            contentDisposition = ContentDisposition.builder("attachment")
-                .filename(musicFile.name)
-                .build()
+    //获取音乐根目录
+    @GetMapping("/root")
+    fun getRoot(): Result<String> {
+        val root = stringRedisTemplate.opsForHash<String, String>().get(MusicRedisConstant.FILE_KEY, MusicRedisConstant.ROOT_FIELD)
+        if (root != null) {
+            Result.success(root)
+        } else {
+            throw MusicException("未设置音乐根目录")
         }
-
-        return ResponseEntity
-            .ok()
-            .headers(headers)
-            .body(InputStreamResource(inputStream))
+        return Result.success(root)
     }
 }

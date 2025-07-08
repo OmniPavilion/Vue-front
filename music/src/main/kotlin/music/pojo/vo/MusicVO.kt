@@ -14,6 +14,8 @@ data class MusicVO(
     val isFavorite: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
-    val singerName: String? = null,
-    val categoryName: String? = null
+    val singerName: String? = "",
+    val categoryName: String? = "",
+    val url : String,
+    val pictureUrl: String
 )

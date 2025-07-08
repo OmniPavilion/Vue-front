@@ -1,8 +1,8 @@
 package common.utils
 
 import common.exception.FileException
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.io.*
 import java.nio.charset.StandardCharsets
@@ -29,7 +29,9 @@ object MultipartFileUtils {
         val safeFilename = originalFilename
             .replace("[^a-zA-Z0-9.-]".toRegex(), "_")  // 替换非法字符为下划线
 
-        val targetFile = File(TEMP_PATH, safeFilename)
+        // 时间戳
+        val timestamp = System.currentTimeMillis()
+        val targetFile = File(TEMP_PATH, timestamp.toString() + safeFilename)
         targetFile.parentFile?.mkdirs()
 
         multipartFile.inputStream.use { input ->
@@ -47,6 +49,16 @@ object MultipartFileUtils {
      * @throws FileException 当操作失败时抛出
      */
     @Throws(FileException::class)
+    fun addFileWithDeleteBefore(sourceFile: File, targetPath: String) {
+        addFile(sourceFile, targetPath)
+        deleteFile(sourceFile.toString())
+    }
+    /**
+     * 添加/创建文件
+     * @param sourceFile 源文件（用于复制内容）
+     * @param targetPath 目标路径（相对路径或绝对路径）
+     * @throws FileException 当操作失败时抛出
+     */
     fun addFile(sourceFile: File, targetPath: String) {
         val targetFile = Paths.get(targetPath).toFile()
         targetFile.parentFile?.mkdirs()
@@ -63,6 +75,7 @@ object MultipartFileUtils {
             targetFile.toPath(),
             StandardCopyOption.REPLACE_EXISTING
         )
+
     }
 
     /**
@@ -89,7 +102,7 @@ object MultipartFileUtils {
     @Throws(FileException::class)
     fun copyFile(sourcePath: String, targetPath: String) {
         val source = getFile(sourcePath)
-        addFile(source, targetPath)
+        addFileWithDeleteBefore(source, targetPath)
     }
 
     /**
@@ -248,5 +261,101 @@ object MultipartFileUtils {
 
         // 随机选择一个文件
         return files.random()
+    }
+
+    /**
+     * 删除文件夹及其所有内容
+     * @param folderPath 文件夹路径（相对路径或绝对路径）
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun deleteFolder(folderPath: String) {
+        val folder = Paths.get(folderPath).toFile()
+
+        // 验证文件夹是否存在
+        if (!folder.exists()) {
+            throw FileException("文件夹不存在: $folderPath")
+        }
+        if (!folder.isDirectory) {
+            throw FileException("路径不是文件夹: $folderPath")
+        }
+
+        // 递归删除文件夹内容
+        folder.listFiles()?.forEach { file ->
+            if (file.isDirectory) {
+                deleteFolder(file.absolutePath) // 递归删除子文件夹
+            } else {
+                if (!file.delete()) {
+                    throw FileException("文件删除失败: ${file.absolutePath}")
+                }
+            }
+        }
+
+        // 删除空文件夹
+        if (!folder.delete()) {
+            throw FileException("文件夹删除失败: $folderPath")
+        }
+    }
+
+    /**
+     * 安全删除文件夹（不抛出异常）
+     * @param folderPath 文件夹路径
+     * @return 是否删除成功
+     */
+    fun deleteFolderSafely(folderPath: String): Boolean {
+        return try {
+            deleteFolder(folderPath)
+            true
+        } catch (e: FileException) {
+            false
+        }
+    }
+
+    /**
+     * 移动文件
+     * @param sourceFilePath 源文件路径（相对路径或绝对路径）
+     * @param targetFilePath 目标文件路径（相对路径或绝对路径）
+     * @throws FileException 当操作失败时抛出
+     */
+    @Throws(FileException::class)
+    fun moveFile(sourceFilePath: String, targetFilePath: String) {
+        val sourceFile = Paths.get(sourceFilePath).toFile()
+        val targetFile = Paths.get(targetFilePath).toFile()
+
+        // 验证源文件是否存在
+        if (!sourceFile.exists()) {
+            throw FileException("源文件不存在: $sourceFilePath")
+        }
+        if (sourceFile.isDirectory) {
+            throw FileException("源路径是文件夹而不是文件: $sourceFilePath")
+        }
+
+        // 创建目标文件的父目录
+        targetFile.parentFile?.mkdirs()
+
+        // 检查目标文件是否已存在
+        if (targetFile.exists()) {
+            throw FileException("目标文件已存在: $targetFilePath")
+        }
+
+        // 执行移动操作
+        if (!sourceFile.renameTo(targetFile)) {
+            // 如果重命名失败，尝试复制后删除
+            try {
+                Files.copy(
+                    sourceFile.toPath(),
+                    targetFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING
+                )
+                if (!sourceFile.delete()) {
+                    if (!targetFile.delete()) {
+                        throw FileException("目标文件删除失败: $targetFilePath")
+                    }
+                    throw FileException("源文件删除失败: $sourceFilePath")
+                }
+            } catch (e: IOException) {
+                throw FileException("文件移动失败: $sourceFilePath -> $targetFilePath ${e}")
+            }
+        }
     }
 }

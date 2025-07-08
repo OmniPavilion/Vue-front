@@ -7,7 +7,7 @@ HSET general:file: temp_path "./temp/"
 -- 音乐模块
 
 ---- 设置player配置
-HSET music:player: current_music ""
+HSET music:player: current_music_id ""
 HSET music:player: volume "50"
 HSET music:player: play_mode "RANDOM"
 HSET music:player: play_duration "0"

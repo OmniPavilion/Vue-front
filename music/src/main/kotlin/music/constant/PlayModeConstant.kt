@@ -2,8 +2,8 @@ package music.constant
 
 class PlayModeConstant {
     companion object {
-        const val LOOP = "LOOP"
-        const val RANDOM = "RANDOM"
-        const val SINGLE = "SINGLE"
+        const val LOOP = "loop"
+        const val RANDOM = "random"
+        const val ORDER = "order"
     }
 }

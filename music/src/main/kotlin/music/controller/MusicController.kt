@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile
 class MusicController(private val musicService: MusicService) {
     private val logger = KotlinLogging.logger {}
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     fun getMusicPage(@RequestBody pageDTO: PageDTO<MusicQuery>): Result<PageVO<MusicVO>> {
         logger.info { " 分页查询参数: ${JSON.toJSONString(pageDTO, SerializerFeature.PrettyFormat)}" }
         return Result.success(musicService.getMusicPage(pageDTO))
@@ -37,6 +37,7 @@ class MusicController(private val musicService: MusicService) {
     ): Result<Unit> {
         logger.info { "上传音乐文件数量: ${files.size}" }
         logger.info { "歌手: $singer, 分类: $category" }
+        logger.info { "文件名: ${files.map { it.originalFilename }}" }
 
         files.forEach { file ->
             musicService.createMusic(file, singer, category)
@@ -46,6 +47,7 @@ class MusicController(private val musicService: MusicService) {
 
     @PutMapping
     fun updateMusic(@RequestBody musicVO: MusicVO): Result<Unit> {
+        logger.info { " 修改参数: ${JSON.toJSONString(musicVO, SerializerFeature.PrettyFormat)}" }
         musicService.updateMusic(musicVO)
         return Result.success()
     }
@@ -54,6 +56,13 @@ class MusicController(private val musicService: MusicService) {
     fun deleteMusic(@PathVariable id: Int): Result<Unit> {
         logger.info { " 删除参数: $id" }
         musicService.deleteMusic(id)
+        return Result.success()
+    }
+
+    @DeleteMapping("/batch")
+    fun deleteMusics(@RequestBody ids: IntArray): Result<Unit> {
+        logger.info { " 批量删除参数: ${JSON.toJSONString(ids, SerializerFeature.PrettyFormat)}" }
+        musicService.deleteMusics(ids)
         return Result.success()
     }
 
@@ -68,5 +77,15 @@ class MusicController(private val musicService: MusicService) {
     fun toggleFavorite(@PathVariable id: Int): Result<Boolean> {
         logger.info { " 收藏参数: $id" }
         return Result.success(musicService.toggleFavorite(id))
+    }
+
+    @GetMapping("/{id}/next")
+    fun getNextMusic(
+        @PathVariable id: Int,
+        @RequestParam playMode: String,
+        @RequestParam isNext : Boolean
+    ): Result<MusicVO> {
+        logger.info { "获取下一首参数: $id, $playMode" }
+        return Result.success(musicService.getNextMusic(id,  playMode, isNext))
     }
 }

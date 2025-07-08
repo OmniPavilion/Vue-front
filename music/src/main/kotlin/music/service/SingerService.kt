@@ -1,12 +1,9 @@
 package music.service
 
-import common.annotation.Datasource
-import common.enumerate.DataSourceType
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import music.exception.MusicException
 import music.pojo.vo.SingerVO
-import org.springframework.web.multipart.MultipartFile
 
 interface SingerService {
     /**
@@ -15,7 +12,7 @@ interface SingerService {
      * @throws MusicException 当创建失败时抛出
      */
     @Throws(MusicException::class)
-    fun createSinger(singerVO: SingerVO)
+    fun createSinger(singerVO: SingerVO): Long
 
     /**
      * 根据ID获取歌手
@@ -49,5 +46,12 @@ interface SingerService {
      * @throws MusicException 当查询失败时抛出
      */
     @Throws(MusicException::class)
-    fun getSingerPage(pageDTO: PageDTO<String>): PageVO<SingerVO>
+    fun getSingerPage(pageDTO: PageDTO<String>, isContainDefaultSinger:  Boolean): PageVO<SingerVO>
+
+    /**
+     * 获取歌手名称列表
+     * @return 歌手名称列表
+     */
+    @Throws(MusicException::class)
+    fun getSingerNames(): Map<Long, String>?
 }
