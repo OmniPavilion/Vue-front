@@ -1,0 +1,157 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
+plugins {
+    // 应用构建所需的Gradle插件
+    id 'org.jetbrains.kotlin.jvm' version '2.1.21' // Kotlin JVM插件，用于编译Kotlin代码
+    id 'org.jetbrains.kotlin.plugin.spring' version '2.1.21' // Kotlin Spring插件，优化Spring与Kotlin的集成
+    id 'org.springframework.boot' version '3.4.6' // Spring Boot插件，提供构建可执行JAR和依赖管理支持
+    id 'io.spring.dependency-management' version '1.1.7' // Spring依赖管理插件，集中管理依赖版本
+    id 'java'  // Java 支持
+
+}
+
+// 主项目仓库配置
+allprojects {
+    repositories {
+        // 阿里云镜像（推荐国内使用）
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/spring' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // 中央仓库（备用）
+        mavenCentral()
+
+        // 如果需要其他特殊仓库
+        maven { url 'https://repo.spring.io/milestone' } // Spring 里程碑仓库
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://repo1.maven.org/maven2/' }
+    }
+}
+
+
+// 针对所有子项目的配置
+subprojects {
+    apply {
+        // 应用Kotlin、Spring及Spring Boot相关插件到子项目
+        plugin 'org.jetbrains.kotlin.jvm'
+        plugin 'org.jetbrains.kotlin.plugin.spring'
+        plugin 'org.springframework.boot'
+        plugin 'io.spring.dependency-management'
+        plugin 'java'
+    }
+    // 项目组名
+    group = 'JavaProject'
+    // 项目版本号
+    version = '0.0.1-SNAPSHOT'
+
+    // Java工具链配置，指定使用Java 21
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    // 禁用所有模块的bootJar任务（后续在主模块中单独启用）
+    tasks.configureEach { task ->
+        if (task instanceof BootJar) {
+            task.enabled = false
+        }
+    }
+
+    // 仓库配置，使用Maven Central
+    repositories {
+        mavenCentral()
+    }
+
+    // 扩展属性，定义Spring AI的版本
+    ext {
+        set('springAiVersion', "1.0.0")
+    }
+
+    // 项目依赖配置
+    dependencies {
+        // 主要实现依赖
+        implementation 'org.springframework.boot:spring-boot-starter-web' // Web应用基础依赖
+        implementation "org.springframework:spring-aspects" // 自动匹配 Spring Boot 版本
+        implementation 'com.fasterxml.jackson.module:jackson-module-kotlin' // Jackson对Kotlin的支持
+
+        implementation 'org.springframework.ai:spring-ai-starter-model-openai' // OpenAI模型集成
+        implementation 'io.github.microutils:kotlin-logging-jvm:3.0.5' // Kotlin 日志库
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation 'org.jetbrains.kotlin:kotlin-reflect' // Kotlin反射支持
+        implementation "com.alibaba:fastjson:2.0.42"   // 阿里云 fastjson（JSON 处理库）
+
+
+        // mybatis-plus
+        implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.12' // MyBatis-Plus
+        implementation 'com.baomidou:mybatis-plus-jsqlparser:3.5.12' // 分页插件
+        implementation 'com.baomidou:mybatis-plus-extension:3.5.12' // 扩展模块
+
+        // lombok
+        compileOnly "org.projectlombok:lombok:1.18.38"
+        annotationProcessor "org.projectlombok:lombok:1.18.38"
+
+        testCompileOnly "org.projectlombok:lombok:1.18.38"
+        testAnnotationProcessor "org.projectlombok:lombok:1.18.38"
+
+        // 运行时依赖
+        runtimeOnly 'com.mysql:mysql-connector-j' // MySQL数据库驱动
+
+        // Redis
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Spring Data Redis核心依赖
+        implementation 'org.apache.commons:commons-pool2'  // 如果需要连接池（推荐）
+
+        // AOP
+        implementation("org.springframework.boot:spring-boot-starter-aop")  // Spring AOP核心支持
+        implementation("org.aspectj:aspectjweaver:1.9.7") // 如果使用AspectJ注解（如@Aspect）
+
+        // 音频处理
+        implementation 'com.github.RouHim:jaudiotagger:1.4.12'
+        implementation 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
+
+        // 测试依赖
+        testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot测试工具集
+        testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5' // Kotlin JUnit5测试库
+        testImplementation 'com.baomidou:mybatis-plus-boot-starter-test:3.5.6' // MyBatis-Plus 测试支持
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher' // JUnit Platform launcher
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    // 依赖管理，导入Spring AI的BOM版本控制
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+        }
+    }
+
+    kotlin {
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict") // 启用严格的空安全检查
+        }
+    }
+
+
+    // 测试任务配置，使用JUnit Platform
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+
+    afterEvaluate {
+        layout.buildDirectory.set(file("${rootProject.layout.buildDirectory.get().asFile}/${project.name}"))
+    }
+
+}
+
+springBoot {
+    mainClass = 'application.Application' // 替换为你的主类全路径
+}
+
+// 仅为主模块启用bootJar任务
+project(':application') { // 替换为你的主模块名称
+    tasks.withType(BootJar).tap {
+        configureEach {
+            enabled = true
+        }
+    }
+}

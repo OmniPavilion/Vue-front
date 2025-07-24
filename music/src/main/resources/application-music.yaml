@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: music
+  datasource:
+    music:
+      driver-class-name: com.mysql.cj.jdbc.Driver # 数据库驱动
+      jdbc-url: jdbc:mysql://localhost:3306/music # 数据库地址
+      username: root #   用户
+      password: 20050816pc.. # 密码
+      type: com.zaxxer.hikari.HikariDataSource
+
+
