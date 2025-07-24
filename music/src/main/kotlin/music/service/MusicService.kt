@@ -25,5 +25,7 @@ interface MusicService {
     @Throws(MusicException::class)
     fun deleteMusics(ids: IntArray)
     @Throws(MusicException::class)
-    fun getNextMusic(id: Int, mode: String, isNext:  Boolean): MusicVO
+    fun getNextMusic(id: Int, mode: String, isNext:  Boolean, query: MusicQuery): MusicVO
+    @Throws(MusicException::class)
+    fun getMusicPosition(id: Int, pageDTO: PageDTO<MusicQuery>): Int
 }

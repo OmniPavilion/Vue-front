@@ -3,6 +3,8 @@ package diary.service.impl
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import common.annotation.Datasource
+import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
+@Datasource(DataSourceType.DIARY)
 class PlanServiceImpl(
     private val planMapper: PlanMapper,
     private val planTaskMapper: PlanTaskMapper

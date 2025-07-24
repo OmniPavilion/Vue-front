@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.serializer.SerializerFeature
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import common.annotation.Datasource
+import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
+@Datasource(DataSourceType.DIARY)
 class NoteServiceImpl(private val noteMapper: NoteMapper) : NoteService {
 
     // 创建记事

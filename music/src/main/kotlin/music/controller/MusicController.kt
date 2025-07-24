@@ -79,13 +79,21 @@ class MusicController(private val musicService: MusicService) {
         return Result.success(musicService.toggleFavorite(id))
     }
 
-    @GetMapping("/{id}/next")
+    @PostMapping("/{id}/next")
     fun getNextMusic(
         @PathVariable id: Int,
         @RequestParam playMode: String,
-        @RequestParam isNext : Boolean
+        @RequestParam isNext : Boolean,
+        @RequestBody query: MusicQuery
     ): Result<MusicVO> {
         logger.info { "获取下一首参数: $id, $playMode" }
-        return Result.success(musicService.getNextMusic(id,  playMode, isNext))
+        return Result.success(musicService.getNextMusic(id,  playMode, isNext, query))
+    }
+
+
+    @PostMapping("/{id}/position")
+    fun getMusicPosition(@RequestBody pageDTO: PageDTO<MusicQuery>, @PathVariable id: Int) : Result<Int> {
+        logger.info { "获取音乐位置参数: ${JSON.toJSONString(pageDTO, SerializerFeature.PrettyFormat)}" }
+        return Result.success(musicService.getMusicPosition(id, pageDTO))
     }
 }

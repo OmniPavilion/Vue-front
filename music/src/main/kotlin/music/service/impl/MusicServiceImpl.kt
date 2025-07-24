@@ -1,5 +1,7 @@
 package music.service.impl
 
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.serializer.SerializerFeature
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
@@ -270,13 +272,19 @@ class MusicServiceImpl(
     }
 
     @Transactional
-    override fun getNextMusic(id: Int, mode: String, isNext: Boolean): MusicVO {
+    override fun getNextMusic(id: Int, mode: String, isNext: Boolean, query: MusicQuery): MusicVO {
         musicMapper.selectById(id) ?: throw MusicException("当前音乐不存在")
 
         val wrapper = KtQueryWrapper(Music::class.java).apply {
+            query.let { q ->
+                q.singerId?.let { eq(Music::singerId, it) }
+                q.categoryId?.let { eq(Music::categoryId, it) }
+                q.isFavorite?.takeIf { it }?.let { eq(Music::isFavorite, true) }
+            }
+
             when (mode) {
                 PlayModeConstant.RANDOM -> last("ORDER BY RAND() LIMIT 1")
-                PlayModeConstant.LOOP -> eq(Music::id, id)
+                PlayModeConstant.LOOP ->  return toVO(musicMapper.selectById(id) ?: throw MusicException("当前音乐不存在"))
 
                 // 数据库中的歌曲按时按正序排列，但是播放时是按倒序排列的，所以需要倒序
                 PlayModeConstant.ORDER -> {
@@ -303,18 +311,31 @@ class MusicServiceImpl(
             }
         }
 
-        var nextMusic = musicMapper.selectOne(wrapper)
+        val nextMusic = musicMapper.selectOne(wrapper)
 
         // 如果找不到相邻音乐，则循环跳转
         if (nextMusic == null) {
-            nextMusic = if (isNext) {
-                musicMapper.selectOne(KtQueryWrapper(Music::class.java).orderByAsc(Music::id).last("limit 1"))
-            } else {
-                musicMapper.selectOne(KtQueryWrapper(Music::class.java).orderByDesc(Music::id).last("limit 1"))
-            } ?: throw MusicException("播放列表为空")
+            return toVO(musicMapper.selectById(id) ?: throw MusicException("当前音乐不存在"))
         }
 
         return toVO(nextMusic)
+    }
+
+    override fun getMusicPosition(id: Int, pageDTO: PageDTO<MusicQuery>): Int {
+        val wrapper = KtQueryWrapper(Music::class.java).apply {
+            pageDTO.query?.let { q ->
+                q.singerId?.let { eq(Music::singerId, it) }
+                q.categoryId?.let { eq(Music::categoryId, it) }
+                q.isFavorite?.takeIf { it }?.let { eq(Music::isFavorite, true) }
+            }
+            orderByDesc(Music::id)
+        }
+
+        val musicList = musicMapper.selectList(wrapper)
+
+        if (musicList.isEmpty()) return 1
+        if (!musicList.any { it.id == id }) return 1
+        return musicList.indexOfFirst { it.id == id } / pageDTO.pageSize + 1
     }
 
     private fun validateMusic(musicVO: MusicVO) {
@@ -327,12 +348,20 @@ class MusicServiceImpl(
         val singerName = music.singerId?.let { singerMapper.selectById(it)?.name }
         val categoryName = music.categoryId?.let { categoryMapper.selectById(it)?.name }
 
-        val selectOne = singerPictureMapper.selectOne(
+        var selectOne = singerPictureMapper.selectOne(
             KtQueryWrapper(SingerPicture::class.java).apply {
                 eq(SingerPicture::singerId, music.singerId)
                 last("ORDER BY RAND() LIMIT 1") // 随机获取一条默认图片
             })
-        val pictureUrl = if (music.singerId == 1L) {
+
+        selectOne = selectOne
+            ?: singerPictureMapper.selectOne(
+                KtQueryWrapper(SingerPicture::class.java).apply {
+                    eq(SingerPicture::singerId, 1)
+                    last("ORDER BY RAND() LIMIT 1") // 随机获取一条默认图片
+                })
+
+        val pictureUrl = if (selectOne.singerId == 1L) {
 
             "$URL$SINGER_IMAGES_STATIC_PATH${musicConstant.DEFAULT}${selectOne.fileName}"
         } else {
