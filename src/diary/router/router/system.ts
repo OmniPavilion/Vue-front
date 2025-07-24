@@ -1,0 +1,39 @@
+import type { RouteRecordRaw } from 'vue-router';
+
+const aboutRoutes: RouteRecordRaw[] = [
+    {
+        path: '/diary',
+        name: 'diary',
+        redirect: '/diary/home',
+        component: () => import('@/diary/views/main/index.vue'),
+        children: [
+            {
+                path: '/diary/home',
+                name: 'home',
+                component: () => import('@/diary/views/home/index.vue'),
+            },
+            {
+                path: '/diary/log',
+                name: 'log',
+                component: () => import('@/diary/views/log/index.vue'),
+            },
+            {
+                path: '/diary/plan',
+                name: 'plan',
+                component: () => import('@/diary/views/plan/index.vue'),
+            },
+            {
+                path: '/diary/note',
+                name: 'note',
+                component: () => import('@/diary/views/note/index.vue'),
+            },
+        ]
+    },
+     {
+         path: '/:pathMatch(.*)*',
+         name: '404',
+         component: () => import('@/common/components/404/index.vue'),
+     }
+];
+
+export default aboutRoutes;

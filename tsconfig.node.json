@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    /* ================= 基础编译配置 ================= */
+    "target": "ES2022",                  // 编译目标版本
+    "module": "ESNext",                  // 模块系统类型
+    "lib": ["ES2023"],                   // 包含的运行时库
+    "composite": true,                   // 启用项目组合编译
+    "declaration": true,                 // 生成声明文件
+    "declarationDir": "types",           // 声明文件输出目录
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo", // 增量编译缓存
+    "noEmit": false,                     // 允许输出文件
+
+    /* ================= 模块解析配置 ================= */
+    "moduleResolution": "bundler",       // 模块解析策略
+    "moduleDetection": "force",          // 强制模块检测
+    "isolatedModules": true,             // 隔离模块编译
+    "esModuleInterop": true,             // ES模块互操作性
+    "allowSyntheticDefaultImports": true,// 允许合成默认导入
+
+    /* ================= 严格类型检查 ================= */
+    "strict": true,                      // 启用所有严格检查
+    "exactOptionalPropertyTypes": true,  // 精确可选属性类型
+    "noImplicitOverride": true,          // 要求显式override标记
+    "noUncheckedSideEffectImports": true,// 禁止未验证副作用导入
+
+    /* ================= 代码质量检查 ================= */
+    "noUnusedLocals": true,              // 未使用局部变量报错
+    "noUnusedParameters": true,          // 未使用参数报错
+    "noFallthroughCasesInSwitch": true,  // 禁止switch穿透
+
+    /* ================= 其他安全配置 ================= */
+    "skipLibCheck": true,                // 跳过库文件检查
+    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
+    "noPropertyAccessFromIndexSignature": true // 禁止点语法访问索引签名
+  },
+
+  /* ================= 文件包含配置 ================= */
+  "include": ["vite.config.ts"]
+}
