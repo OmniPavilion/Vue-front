@@ -103,7 +103,7 @@ const formatPlayTime = (seconds) => {
 
 <template>
   <div class="setting-button-container">
-    <el-tooltip effect="dark" content="设置音乐目录" placement="bottom">
+    <el-tooltip effect="dark" content="设置" placement="bottom">
       <el-button
           class="setting-btn"
           :icon="Setting"

@@ -110,14 +110,27 @@ export const musicApi = {
      * 获取下一首或上一首
      * GET /api/musics/{id}/next
      */
-    getNextMusic(id: number, playMode: string, isNext: boolean) : Promise<AxiosResponse<Result<MusicVO>>> {
+    getNextMusic(id: number, playMode: string, isNext: boolean, query : MusicQuery) : Promise<AxiosResponse<Result<MusicVO>>> {
         return myAxios({
-            method: 'get',
+            method: 'post',
             url: `/api/musics/${id}/next`,
             params: {
                 playMode,
-                isNext
-            }
+                isNext,
+            },
+            data: query
+        });
+    },
+
+    /**
+     * 查询歌曲在分页中的位置
+     * GET /api/musics/{id}/position
+     */
+    getMusicPosition(id: number, pageDTO: PageDTO<MusicQuery>): Promise<AxiosResponse<Result<number>>> {
+        return myAxios({
+            method: 'post',
+            url: `/api/musics/${id}/position`,
+            data: pageDTO
         });
     }
 };

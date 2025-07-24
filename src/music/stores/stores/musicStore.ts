@@ -5,6 +5,7 @@ import type {MusicVO} from '@/music/types/vo/MusicVO';
 import {musicApi} from '@/music/api/musicApi';
 import type {PageDTO} from '@/common/types/dto/PageDTO';
 import type {MusicQuery} from '@/music/types/dto/MusicQuery';
+import logger from "@/common/utils/logger";
 
 export const useMusicStore = defineStore('music', () => {
     const musics = ref<MusicVO[]>([]);
@@ -22,14 +23,14 @@ export const useMusicStore = defineStore('music', () => {
 
     // 分页查询音乐
     const fetchMusicPage = async () => {
-        console.log('分页查询音乐', pageQuery.value);
+        logger.log('分页查询音乐', pageQuery.value);
         loading.value = true;
         try {
             const res = await musicApi.getMusicPage(pageQuery.value);
             musics.value = res.data.data?.rows || [];
             total.value = res.data.data?.total || 0;
 
-            console.log('分页查询音乐成功', res.data);
+            logger.log('分页查询音乐成功', res.data);
             return res.data;
         } finally {
             loading.value = false;
@@ -38,11 +39,11 @@ export const useMusicStore = defineStore('music', () => {
 
     // 获取单个音乐详情
     const fetchMusicById = async (id: number) => {
-        console.log('获取音乐详情', id)
+        logger.log('获取音乐详情', id)
         loading.value = true;
         try {
             const res = await musicApi.getMusicById(id);
-            console.log('获取音乐详情成功', res.data)
+            logger.log('获取音乐详情成功', res.data)
             return res.data;
         } finally {
             loading.value = false;
@@ -51,13 +52,13 @@ export const useMusicStore = defineStore('music', () => {
 
     // 批量上传音乐
     const createMusics = async (files: File[], singer: string, category: string) => {
-        console.log('批量上传音乐')
-        files.forEach(file => console.log(file.name))
+        logger.log('批量上传音乐')
+        files.forEach(file => logger.log(file.name))
         loading.value = true;
         try {
             const res = await musicApi.createMusics(files, singer, category);
             await fetchMusicPage(); // 刷新列表
-            console.log("上传成功", res.data)
+            logger.log("上传成功", res.data)
             return res.data;
         } finally {
             loading.value = false;
@@ -66,12 +67,12 @@ export const useMusicStore = defineStore('music', () => {
 
     // 更新音乐
     const updateMusic = async (music: MusicVO) => {
-        console.log("更新音乐", music)
+        logger.log("更新音乐", music)
         loading.value = true;
         try {
             const res = await musicApi.updateMusic(music);
             musics.value.map(item => item.id === music.id ? music : item)
-            console.log("更新成功", res.data)
+            logger.log("更新成功", res.data)
             return res.data;
         } finally {
             loading.value = false;
@@ -80,13 +81,13 @@ export const useMusicStore = defineStore('music', () => {
 
     // 删除音乐
     const deleteMusic = async (id: number) => {
-        console.log("删除音乐", id)
+        logger.log("删除音乐", id)
         loading.value = true;
         try {
             const res = await musicApi.deleteMusic(id);
             musics.value = musics.value.filter(m => m.id !== id);
             total.value = total.value - 1;
-            console.log("删除成功", res.data)
+            logger.log("删除成功", res.data)
             return res.data;
         } finally {
             loading.value = false;
@@ -95,11 +96,11 @@ export const useMusicStore = defineStore('music', () => {
 
     // 记录播放
     const recordPlay = async (id: number) => {
-        console.log("记录播放", id)
+        logger.log("记录播放", id)
         loading.value = true;
         try {
             const res = await musicApi.recordPlay(id);
-            console.log("记录播放成功", res.data)
+            logger.log("记录播放成功", res.data)
             return res.data;
         } finally {
             loading.value = false;
@@ -108,7 +109,7 @@ export const useMusicStore = defineStore('music', () => {
 
     // 切换收藏状态
     const toggleFavorite = async (id: number) => {
-        console.log("切换收藏状态", id)
+        logger.log("切换收藏状态", id)
         loading.value = true;
         try {
             const res = await musicApi.toggleFavorite(id);
@@ -119,10 +120,10 @@ export const useMusicStore = defineStore('music', () => {
                 music.isFavorite = isFavorite;
             }
 
-            console.log("切换收藏状态成功", isFavorite)
+            logger.log("切换收藏状态成功", isFavorite)
             return res.data;
         } catch (error) {
-            console.error('切换收藏状态失败:', error);
+            logger.error('切换收藏状态失败:', error);
             throw error;
         } finally {
             loading.value = false;
@@ -130,7 +131,7 @@ export const useMusicStore = defineStore('music', () => {
     };
 
     const deleteMusics = async (ids: number[]) => {
-        console.log("批量删除音乐", ids)
+        logger.log("批量删除音乐", ids)
         loading.value = true;
         try {
             const res = await musicApi.deleteMusics(ids);
@@ -138,7 +139,21 @@ export const useMusicStore = defineStore('music', () => {
                 musics.value = musics.value.filter(m => !ids.includes(m.id));
                 total.value = total.value - ids.length;
             }
-            console.log("批量删除成功", res.data)
+            logger.log("批量删除成功", res.data)
+            return res.data;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const getMusicPosition = async (id: number) => {
+        logger.log("获取音乐位置", id)
+        loading.value = true;
+        try {
+            const res = await musicApi.getMusicPosition(id, pageQuery.value);
+            logger.log("获取音乐位置成功", res.data)
+            pageQuery.value.pageNum = res.data.data;
+            await fetchMusicPage()
             return res.data;
         } finally {
             loading.value = false;
@@ -150,15 +165,15 @@ export const useMusicStore = defineStore('music', () => {
      * @param isNext true=下一首，false=上一首
      * @param currentMusicId 当前歌曲 ID
      * @param playMode 播放模式：'order'（正序）、'random'（随机）、'loop'（循环）
+     * @param query 查询参数
      * @returns 下一首/上一首歌曲（MusicVO），如果没有则返回 null
      */
     const getNextMusic = async (
         isNext: boolean,
         currentMusicId: number | null,
-        playMode: 'order' | 'random' | 'loop' = 'order'
+        playMode: 'order' | 'random' | 'loop' = 'order',
+        query: MusicQuery = pageQuery.value.query ?? {},
     ): Promise<MusicVO | null> => {
-        if (musics.value.length === 0) return null;
-
         // 随机模式
         if (playMode === 'random' || currentMusicId === null) {
             const randomIndex = Math.floor(Math.random() * total.value);
@@ -173,8 +188,8 @@ export const useMusicStore = defineStore('music', () => {
 
         const currentIndex = musics.value.findIndex(m => m.id === currentMusicId);
         if (currentIndex === -1) {
-            console.log('通过后端接口获取下一首音乐', currentMusicId, playMode, isNext)
-            const res = await musicApi.getNextMusic(currentMusicId, playMode, isNext)
+            logger.log('通过后端接口获取下一首音乐', currentMusicId, playMode, isNext, query)
+            const res = await musicApi.getNextMusic(currentMusicId, playMode, isNext, query)
             return res.data.data;
         }
 
@@ -224,6 +239,7 @@ export const useMusicStore = defineStore('music', () => {
         recordPlay,
         toggleFavorite,
         deleteMusics,
-        getNextMusic
+        getNextMusic,
+        getMusicPosition
     };
 });

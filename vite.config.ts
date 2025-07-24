@@ -34,6 +34,7 @@ function findHtmlEntries(dir: string): Record<string, string> {
 }
 
 export default defineConfig({
+    base: './',
     server: {
         port: 8050,
         strictPort: true,

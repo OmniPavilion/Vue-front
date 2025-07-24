@@ -170,7 +170,12 @@ onMounted(async () => {
             <el-table-column prop="name" label="分类名称" />
             <el-table-column label="操作" width="180">
               <template #default="scope">
-                <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button
+                    size="small"
+                    @click="handleEdit(scope.row)"
+                >
+                  编辑
+                </el-button>
                 <el-button
                     size="small"
                     type="danger"
@@ -231,6 +236,7 @@ onMounted(async () => {
         title="编辑分类"
         width="400px"
         :close-on-click-modal="false"
+        append-to-body
     >
       <div class="edit-dialog-content">
         <el-form :model="currentCategory" label-width="80px">

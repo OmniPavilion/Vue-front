@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {VideoPlay, Star, Search, Plus, StarFilled, VideoPause, Close} from "@element-plus/icons-vue";
+import {VideoPlay, Star, Search, Plus, StarFilled, VideoPause, Close, Location} from "@element-plus/icons-vue";
 import {useMusicStore, useCategoryStore, useMusicPlayStore, useSingerStore} from "@/music/stores";
 import {onMounted, ref, watch, computed} from "vue";
 import type {UploadFile, UploadFiles} from 'element-plus';
@@ -184,7 +184,23 @@ onMounted(async () => {
     <div class="right-section">
       <!-- 第一行：大字号歌手名称 -->
       <div class="artist-info">
-        <h1 class="artist-name">{{ musicPlayStore.currentMusic?.singerName || '佚名' }}</h1>
+        <h1 class="artist-name">
+          {{ musicPlayStore.currentMusic?.singerName || '佚名' }}
+          <el-tooltip effect="dark" content="定位歌曲" placement="top">
+            <el-button
+                type="info"
+                @click="musicStore.getMusicPosition(musicPlayStore.currentMusic?.id ?? 1)"
+                :disabled="!musicPlayStore.currentMusic"
+                class="location-btn"
+                round
+            >
+              <el-icon>
+                <Location />
+              </el-icon>
+            </el-button>
+          </el-tooltip>
+
+        </h1>
         <h2 class="title-name">{{ musicPlayStore.currentMusic?.title }}</h2>
       </div>
 
@@ -373,6 +389,14 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.location-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 15px;
+  margin: 0;
+}
+
 .song-header {
   display: flex;
   align-items: flex-end;

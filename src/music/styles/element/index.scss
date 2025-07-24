@@ -37,6 +37,18 @@ $border-smoothness: 0.5px; // 边框光滑度控制
   }
 }
 
+// 对话框标题样式
+.el-dialog {
+  &__header {
+    color: rgba(220, 240, 227, 0.9) !important; // 添加文字颜色
+
+    .el-dialog__title {
+      color: inherit !important; // 继承父级颜色
+      text-shadow: 0 0 6px rgba(120, 230, 255, 0.3) !important;
+    }
+  }
+}
+
 .el-menu,
 .el-dropdown-menu {
   background-color: rgba(65, 65, 75, 0.7) !important;
