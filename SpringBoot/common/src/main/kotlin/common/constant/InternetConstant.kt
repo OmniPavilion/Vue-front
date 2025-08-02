@@ -2,6 +2,6 @@ package common.constant
 
 class InternetConstant {
     companion object {
-        const val URL = "http://localhost:8016"
+        const val URL = "http://localhost:8080"
     }
 }
