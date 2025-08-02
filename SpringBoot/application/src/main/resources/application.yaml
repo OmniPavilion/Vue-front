@@ -46,5 +46,6 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值
   mapper-locations: classpath*:/mapper/**/*.xml
 server:
-  port: 8080
+  port: ${PORT}
+  url: ${ip}:${PORT}
 
