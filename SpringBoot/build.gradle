@@ -1,4 +1,5 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.bundling.BootWar
 
 plugins {
     // 应用构建所需的Gradle插件
@@ -51,9 +52,9 @@ subprojects {
         }
     }
 
-    // 禁用所有模块的bootJar任务（后续在主模块中单独启用）
+    // 禁用所有子模块的 bootJar/bootWar（主模块后续单独启用）
     tasks.configureEach { task ->
-        if (task instanceof BootJar) {
+        if (task instanceof BootJar || task instanceof BootWar) {
             task.enabled = false
         }
     }
@@ -148,10 +149,19 @@ springBoot {
 }
 
 // 仅为主模块启用bootJar任务
-project(':application') { // 替换为你的主模块名称
-    tasks.withType(BootJar).tap {
-        configureEach {
-            enabled = true
-        }
+project(':application') {
+    apply plugin: 'war' // 显式应用 war 插件
+    // 启用 bootJar 和 bootWar
+    tasks.withType(BootJar).configureEach { enabled = true }
+    tasks.withType(BootWar).configureEach { enabled = true }
+
+    // 排除内嵌 Tomcat（关键！）
+    dependencies {
+        providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    }
+
+    // 配置 WAR 文件名
+    war {
+        archiveFileName = 'ROOT.war'
     }
 }

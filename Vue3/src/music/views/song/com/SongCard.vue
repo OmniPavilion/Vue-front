@@ -64,11 +64,16 @@ const openEditDialog = async () => {
 
 const submitEdit = async () => {
   try {
+    // if (useMusicPlayStore().currentMusic?.id === props.music.id) {
+    //   ElMessage.error("无法修改正在播放的音乐" as any)
+    //   return
+    // }
     const res = await musicStore.updateMusic(props.music);
     if (res.code === -1) {
       ElMessage.error(res.message as any)
       return
     } else {
+      await musicStore.fetchMusicPage();
       ElMessage.success('歌曲已更新' as any)
     }
     showEditDialog.value = false;

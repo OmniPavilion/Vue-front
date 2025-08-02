@@ -10,6 +10,7 @@ import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import common.utils.MultipartFileUtils
+import lombok.experimental.PackagePrivate
 import music.constant.FIlePathConstant.Companion.`SINGER_IMAGES_STATIC_PATH`
 import music.constant.MusicConstant
 import music.exception.MusicException
@@ -32,7 +33,8 @@ class SingerServiceImpl(
     private val singerMapper: SingerMapper,
     private val singerPictureMapper: SingerPictureMapper,
     private val musicMapper: MusicMapper,
-    private val musicConstant: MusicConstant
+    private val musicConstant: MusicConstant,
+    private val pictureMapper: SingerPictureMapper
 ) : SingerService {
 
 
@@ -76,7 +78,7 @@ class SingerServiceImpl(
                         last("ORDER BY RAND() LIMIT 1") // 随机获取一条默认图片
                     }
                 )
-                path = URL + SINGER_IMAGES_STATIC_PATH + musicConstant.DEFAULT
+                path = URL + SINGER_IMAGES_STATIC_PATH + musicConstant.DEFAULTPATH
                 defaultPicture?.let { listOf(it) } ?: emptyList() // 如果获取到默认图片则使用，否则保持空列表
             }
 
@@ -199,6 +201,11 @@ class SingerServiceImpl(
             val singerPath = musicConstant.singerRootPath + singer.name
             MultipartFileUtils.deleteFolder(singerPath)
         }
+
+        // 删除图片数据库数据
+        singerPictureMapper.delete(KtQueryWrapper(SingerPicture::class.java).apply {
+            eq(SingerPicture::singerId, id)
+        })
 
         // 修改歌手下的所有歌曲为默认
         val wrapper = KtUpdateWrapper(Music::class.java).apply {

@@ -6,7 +6,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'OmniPavilion'
+rootProject.name = 'SpringBoot'
 
 include(
         "application",

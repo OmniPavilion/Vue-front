@@ -59,4 +59,12 @@ class MusicFileController(
         }
         return Result.success(root)
     }
+
+    // 检查是否有冗余文件或者是文件缺失
+    @GetMapping("/check")
+    fun checkMusicFile(): Result<Unit> {
+        logger.info { "检查音乐文件" }
+        musicFileService.checkMusicFile()
+        return Result.success()
+    }
 }

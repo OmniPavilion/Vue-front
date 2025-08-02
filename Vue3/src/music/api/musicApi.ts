@@ -132,5 +132,12 @@ export const musicApi = {
             url: `/api/musics/${id}/position`,
             data: pageDTO
         });
-    }
+    },
+
+    checkFile(): Promise<AxiosResponse<Result<boolean>>> {
+        return myAxios({
+            method: 'get',
+            url: `/api/musicFile/check`,
+        });
+    },
 };

@@ -241,6 +241,8 @@ object MultipartFileUtils {
      */
     @Throws(FileException::class)
     fun getRandomFileFromFolder(folderPath: String): File {
+        validateFolder(folderPath)
+
         val folder = Paths.get(folderPath).toFile()
 
         // 验证文件夹是否存在且可读
@@ -356,6 +358,78 @@ object MultipartFileUtils {
             } catch (e: IOException) {
                 throw FileException("文件移动失败: $sourceFilePath -> $targetFilePath ${e}")
             }
+        }
+    }
+
+    /**
+     * 将文件路径分割为路径组件集合（倒序返回）
+     * @param path 文件路径（如 "src/images/1.png"）
+     * @return 路径组件列表（倒序，如 ["1.png", "images", "src"]）
+     */
+    fun splitPathToComponents(path: String): List<String> {
+        return path.split(File.separatorChar)
+            .filter { it.isNotBlank() }
+            .map { it.trim() }
+            .reversed() // 添加这行实现倒序
+    }
+
+    /**
+     * 遍历文件夹下的所有文件，返回文件绝对路径列表
+     * @param folderPath 文件夹路径
+     * @return 包含所有文件绝对路径的列表
+     * @throws FileException 当文件夹不存在或不可读时抛出
+     */
+    @Throws(FileException::class)
+    fun getFilePathsFromFolder(folderPath: String): List<String> {
+        validateFolder(folderPath)
+        return Paths.get(folderPath).toFile()
+            .walk()
+            .filter { it.isFile }
+            .map { it.absolutePath }
+            .toList()
+    }
+
+    /**
+     * 遍历文件夹下的所有文件，返回分割后的路径组件列表（倒序）
+     * @param folderPath 文件夹路径
+     * @return 包含所有文件路径分割组件（倒序）的列表
+     * @throws FileException 当文件夹不存在或不可读时抛出
+     */
+    @Throws(FileException::class)
+    fun getFilePathsFromFolder(folderPath: String, isFiltered: Boolean): List<List<String>> {
+        validateFolder(folderPath)
+        return Paths.get(folderPath).toFile()
+            .walk()
+            .filter { it.isFile }
+            .map { splitPathToComponents(it.absolutePath) }
+            .toList()
+    }
+
+    /**
+     * 验证文件夹路径是否有效
+     * @param folderPath 文件夹路径
+     * @throws FileException 当文件夹不存在、不是目录或不可读时抛出
+     */
+    @Throws(FileException::class)
+    private fun validateFolder(folderPath: String) {
+        val folder = Paths.get(folderPath).toFile()
+        when {
+            !folder.exists() -> throw FileException("文件夹不存在: $folderPath")
+            !folder.isDirectory -> throw FileException("路径不是文件夹: $folderPath")
+            !folder.canRead() -> throw FileException("文件夹不可读: $folderPath")
+        }
+    }
+
+    /**
+     * 检查文件或目录路径是否存在
+     * @param path 要检查的路径（文件或目录）
+     * @return Boolean - true表示存在，false表示不存在
+     */
+    fun pathExists(path: String): Boolean {
+        return try {
+            Paths.get(path).toFile().exists()
+        } catch (e: Exception) {
+            false // 如果路径非法也返回false
         }
     }
 }

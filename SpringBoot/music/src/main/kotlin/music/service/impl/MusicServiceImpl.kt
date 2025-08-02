@@ -1,7 +1,5 @@
 package music.service.impl
 
-import com.alibaba.fastjson.JSON
-import com.alibaba.fastjson.serializer.SerializerFeature
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
@@ -153,7 +151,7 @@ class MusicServiceImpl(
         }
 
         val path = if (music.singerId == 1.toLong()) {
-            "${musicConstant.musicRootPath}${musicConstant.DEFAULT}$fileName"
+            "${musicConstant.musicRootPath}${musicConstant.DEFAULTPATH}$fileName"
         } else {
             "${musicConstant.musicRootPath}$singer/$fileName"
         }
@@ -186,13 +184,13 @@ class MusicServiceImpl(
         val oldSinger = singerMapper.selectById(existing.singerId)
         // 转移音乐文件
         val oldPath = if (existing.singerId == 1L) {
-            "${musicConstant.musicRootPath}${musicConstant.DEFAULT}${existing.fileName}"
+            "${musicConstant.musicRootPath}${musicConstant.DEFAULTPATH}${existing.fileName}"
         } else {
             "${musicConstant.musicRootPath}${oldSinger.name}/${existing.fileName}"
         }
 
         val newPath = if (singer.id == 1L) {
-            "${musicConstant.musicRootPath}${musicConstant.DEFAULT}${existing.fileName}"
+            "${musicConstant.musicRootPath}${musicConstant.DEFAULTPATH}${existing.fileName}"
         } else {
             "${musicConstant.musicRootPath}${singer.name}/${existing.fileName}"
         }
@@ -223,7 +221,7 @@ class MusicServiceImpl(
         val singer = singerMapper.selectById(music.singerId) ?: throw MusicException("歌手不存在")
 
         val path = if (music.singerId == 1.toLong()) {
-            "${musicConstant.musicRootPath}${musicConstant.DEFAULT}${music.fileName}"
+            "${musicConstant.musicRootPath}${musicConstant.DEFAULTPATH}${music.fileName}"
         } else {
             "${musicConstant.musicRootPath}$singer/${music.fileName}"
         }
@@ -363,13 +361,13 @@ class MusicServiceImpl(
 
         val pictureUrl = if (selectOne.singerId == 1L) {
 
-            "$URL$SINGER_IMAGES_STATIC_PATH${musicConstant.DEFAULT}${selectOne.fileName}"
+            "$URL$SINGER_IMAGES_STATIC_PATH${musicConstant.DEFAULTPATH}${selectOne.fileName}"
         } else {
             "$URL$SINGER_IMAGES_STATIC_PATH$singerName/${selectOne.fileName}"
         }
 
         val url = if (music.singerId == 1L) {
-            "$URL$MUSIC_FILE_STATIC_PATH${musicConstant.DEFAULT}${music.fileName}"
+            "$URL$MUSIC_FILE_STATIC_PATH${musicConstant.DEFAULTPATH}${music.fileName}"
         } else {
             "$URL$MUSIC_FILE_STATIC_PATH$singerName/${music.fileName}"
         }

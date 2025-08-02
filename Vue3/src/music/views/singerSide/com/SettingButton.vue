@@ -1,11 +1,12 @@
 <script setup>
 import {ref, onMounted} from 'vue'
-import {Setting, Edit, Check, Close, RefreshRight, Clock} from '@element-plus/icons-vue'
+import {Setting, Edit, Check, Close, RefreshRight, Clock, DocumentChecked} from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
-import {useMusicPlayStore, usePlayStore} from '@/music/stores'
+import {useMusicPlayStore, useMusicStore, usePlayStore} from '@/music/stores'
 
 const playStore = usePlayStore()
 const musicPlayStore = useMusicPlayStore()
+const musicStore = useMusicStore()
 const drawerVisible = ref(false)
 const direction = ref('rtl')
 const musicRootPath = ref('')
@@ -41,6 +42,19 @@ const handleFileSelect = (event) => {
     const path = files[0].webkitRelativePath.split('/')[0]
     musicRootPath.value = path
     event.target.value = ''
+  }
+}
+
+const checkFile = async () => {
+  try {
+    const res = await musicStore.checkFile()
+    if (res.code !== 1) {
+      ElMessage.error(res.message)
+      return
+    }
+    ElMessage.success('检查完成, 文件保存完整')
+  } catch (error) {
+    ElMessage.error('检查文件失败: ' + error.message)
   }
 }
 
@@ -181,6 +195,17 @@ const formatPlayTime = (seconds) => {
                 </el-button>
               </el-button-group>
             </div>
+          </div>
+
+          <div class="check-file-container">
+            <el-tooltip effect="dark" content="检查文件完整性" placement="top">
+              <el-button
+                  @click="checkFile"
+                  class="check-file-btn"
+                  :icon="DocumentChecked"
+                  circle
+              />
+            </el-tooltip>
           </div>
         </div>
 
@@ -335,6 +360,40 @@ const formatPlayTime = (seconds) => {
     .neon-icon {
       color: rgba(120, 230, 255, 1);
       filter: drop-shadow(0 0 6px rgba(120, 230, 255, 0.6));
+    }
+  }
+}
+
+.check-file-container {
+  margin-top: 16px;
+  text-align: center;
+
+  .check-file-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    background: rgba(65, 65, 75, 0.6);
+    border: 0.5px solid rgba(120, 230, 255, 0.2);
+    color: rgba(180, 220, 255, 0.9);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    &:hover {
+      background: rgba(70, 70, 80, 0.7);
+      border-color: rgba(120, 230, 255, 0.4);
+      color: rgba(120, 230, 255, 1);
+      transform: translateY(-2px);
+      box-shadow:
+          0 2px 12px rgba(120, 230, 255, 0.15),
+          inset 0 0 8px rgba(120, 230, 255, 0.1);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .el-icon {
+      filter: drop-shadow(0 0 4px rgba(120, 230, 255, 0.3));
     }
   }
 }

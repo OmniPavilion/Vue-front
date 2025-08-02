@@ -160,6 +160,17 @@ export const useMusicStore = defineStore('music', () => {
         }
     };
 
+    const checkFile = async () => {
+        loading.value = true;
+        try {
+            const res = await musicApi.checkFile();
+            logger.log("检查文件成功", res.data)
+            return res.data;
+        } finally {
+            loading.value = false;
+        }
+    };
+
     /**
      * 根据规则获取下一首/上一首歌曲
      * @param isNext true=下一首，false=上一首
@@ -240,6 +251,7 @@ export const useMusicStore = defineStore('music', () => {
         toggleFavorite,
         deleteMusics,
         getNextMusic,
-        getMusicPosition
+        getMusicPosition,
+        checkFile,
     };
 });
