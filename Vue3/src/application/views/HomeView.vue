@@ -49,7 +49,6 @@ import {features} from '@/application/assets/data/features'
   position:  absolute;
   width: 100vw;
   height: 100vh;
-  top: 250px;
   z-index: 1;
 }
 

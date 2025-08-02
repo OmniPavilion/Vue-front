@@ -1,3 +1,3 @@
 export const InternetConstant = {
-    URL: "http://localhost:8016",
+    URL: "http://localhost:8080",
 }
