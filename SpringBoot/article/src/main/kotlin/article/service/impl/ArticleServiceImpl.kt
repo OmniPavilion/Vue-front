@@ -51,7 +51,7 @@ class ArticleServiceImpl(
         }
 
         // 处理分类关联
-        saveArticleCategories(po.id!!, article.categoryIds)
+        saveArticleCategories(po.id!!, article.tagIds)
 
         // 创建空文件
         val path = "${articleConstant.rootPath}/${po.fileName}"
@@ -69,7 +69,7 @@ class ArticleServiceImpl(
         val categoryIds = articleCategoryMapper.selectList(
             KtQueryWrapper(ArticleCategory::class.java)
                 .eq(ArticleCategory::articleId, id)
-        ).map { it.categoryId }
+        ).map { it.tagId }
 
         return ArticleVO(
             id = article.id,
@@ -77,7 +77,7 @@ class ArticleServiceImpl(
             fileName = article.fileName,
             weather = article.weather,
             writtenAt = article.writtenAt,
-            categoryIds = categoryIds
+            tagIds = categoryIds
         )
     }
 
@@ -105,7 +105,7 @@ class ArticleServiceImpl(
         val queryWrapper = KtQueryWrapper(ArticleCategory::class.java)
             .eq(ArticleCategory::articleId, article.id)
         articleCategoryMapper.delete(queryWrapper)
-        saveArticleCategories(article.id, article.categoryIds)
+        saveArticleCategories(article.id, article.tagIds)
     }
 
     @Transactional
@@ -151,7 +151,7 @@ class ArticleServiceImpl(
             val categoryIds = articleCategoryMapper.selectList(
                 KtQueryWrapper(ArticleCategory::class.java)
                     .eq(ArticleCategory::articleId, article.id)
-            ).map { it.categoryId }
+            ).map { it.tagId }
 
             ArticleVO(
                 id = article.id,
@@ -159,7 +159,7 @@ class ArticleServiceImpl(
                 fileName = article.fileName,
                 weather = article.weather,
                 writtenAt = article.writtenAt,
-                categoryIds = categoryIds
+                tagIds = categoryIds
             )
         }
 
@@ -222,7 +222,7 @@ class ArticleServiceImpl(
             val relations = categoryIds.map { categoryId ->
                 ArticleCategory(
                     articleId = articleId,
-                    categoryId = categoryId,
+                    tagId = categoryId,
                     createdAt = LocalDateTime.now()
                 )
             }

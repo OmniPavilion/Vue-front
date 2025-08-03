@@ -1,8 +1,8 @@
 package article.mapper
 
-import article.pojo.po.Category
+import article.pojo.po.Tag
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import org.apache.ibatis.annotations.Mapper
 
 @Mapper
-interface ArticlesCategoryMapper : BaseMapper<Category>
+interface TagMapper : BaseMapper<Tag>

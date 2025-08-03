@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 import java.time.LocalDateTime
 
 @TableName
-data class Category(
+data class Tag(
     @TableId
     val id: Long? = null,
     val name: String,

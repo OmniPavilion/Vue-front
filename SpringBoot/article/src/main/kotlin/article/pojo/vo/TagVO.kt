@@ -2,7 +2,7 @@ package article.pojo.vo
 
 import com.baomidou.mybatisplus.annotation.TableId
 
-data class CategoryVO(
+data class TagVO(
     @TableId
     val id: Long?,
     val name: String

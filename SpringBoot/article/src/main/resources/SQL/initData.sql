@@ -6,7 +6,7 @@ USE article;
 
 
 -- 创建分类表（允许文章不关联分类）
-CREATE TABLE t_category
+CREATE TABLE t_tag
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
     name       VARCHAR(50) NOT NULL UNIQUE,
@@ -29,20 +29,20 @@ CREATE TABLE t_article
   DEFAULT CHARSET = utf8mb4;
 
 -- 创建可选的分类关联表
-CREATE TABLE t_article_category
+CREATE TABLE t_article_tag
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     article_id  BIGINT    NOT NULL,
-    category_id BIGINT    NOT NULL,
+    tag_id BIGINT    NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (article_id) REFERENCES t_article (id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES t_category (id) ON DELETE CASCADE,
-    UNIQUE KEY (article_id, category_id)
+    FOREIGN KEY (tag_id) REFERENCES t_tag (id) ON DELETE CASCADE,
+    UNIQUE KEY (article_id, tag_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
 -- 插入分类数据（可选）
-INSERT INTO t_category (name)
+INSERT INTO t_tag (name)
 VALUES ('技术文章'),
        ('生活随笔'),
        ('旅行日记'),
@@ -60,7 +60,7 @@ VALUES ('技术文章'),
 # -- 不关联分类的文章
 
 # -- 选择性关联分类（不是必须操作）
-# INSERT INTO t_article_category (article_id, category_id)
+# INSERT INTO t_article_tag (article_id, tag_id)
 # VALUES (1, 1), -- MySQL优化技巧 -> 技术文章
 #        (2, 2), -- 春日游记 -> 生活随笔
 #        (2, 3), -- 春日游记 -> 旅行日记（多分类）

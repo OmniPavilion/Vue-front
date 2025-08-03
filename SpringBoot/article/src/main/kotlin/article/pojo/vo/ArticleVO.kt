@@ -12,5 +12,5 @@ data class ArticleVO(
     val weather: String,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val writtenAt: LocalDateTime,
-    val categoryIds: List<Long> = emptyList() // 关联分类ID列表
+    val tagIds: List<Long> = emptyList() // 关联分类ID列表
 )

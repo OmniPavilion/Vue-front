@@ -9,6 +9,6 @@ data class ArticleCategory (
     @TableId
     val id: Long? = null,
     val articleId: Long,
-    val categoryId: Long,
+    val tagId: Long,
     val createdAt: LocalDateTime,
 )
