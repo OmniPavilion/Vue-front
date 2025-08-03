@@ -13,7 +13,7 @@ HSET music:player: play_mode "RANDOM"
 HSET music:player: play_duration "0"
 
 ---- 设置music配置
-HSET music:file: default_root_path "./library"
+HSET music:file: default_root_path "./data/library"
 HSET music:file: root_path "./library"
 HSET music:file: music_root_path "/music/"
 HSET music:file: singer_root_path "/singer/"
