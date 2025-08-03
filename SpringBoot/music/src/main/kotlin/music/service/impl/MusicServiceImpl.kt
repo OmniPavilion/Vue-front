@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import common.annotation.Datasource
-import common.constant.InternetConstant.Companion.URL
+import common.constant.InternetConstant
 import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
@@ -42,8 +42,10 @@ class MusicServiceImpl(
     private val categoryMapper: CategoryMapper,
     private val resourceFileUtils: MultipartFileUtils,
     private val singerPictureMapper: SingerPictureMapper,
-    private val musicConstant: MusicConstant
+    private val musicConstant: MusicConstant,
+    internetConstant: InternetConstant
 ) : MusicService {
+    val url = internetConstant.url
 
     private val logger = KotlinLogging.logger { }
 
@@ -361,15 +363,15 @@ class MusicServiceImpl(
 
         val pictureUrl = if (selectOne.singerId == 1L) {
 
-            "$URL$SINGER_IMAGES_STATIC_PATH${musicConstant.DEFAULTPATH}${selectOne.fileName}"
+            "$url$SINGER_IMAGES_STATIC_PATH${musicConstant.DEFAULTPATH}${selectOne.fileName}"
         } else {
-            "$URL$SINGER_IMAGES_STATIC_PATH$singerName/${selectOne.fileName}"
+            "$url$SINGER_IMAGES_STATIC_PATH$singerName/${selectOne.fileName}"
         }
 
         val url = if (music.singerId == 1L) {
-            "$URL$MUSIC_FILE_STATIC_PATH${musicConstant.DEFAULTPATH}${music.fileName}"
+            "$url$MUSIC_FILE_STATIC_PATH${musicConstant.DEFAULTPATH}${music.fileName}"
         } else {
-            "$URL$MUSIC_FILE_STATIC_PATH$singerName/${music.fileName}"
+            "$url$MUSIC_FILE_STATIC_PATH$singerName/${music.fileName}"
         }
 
 

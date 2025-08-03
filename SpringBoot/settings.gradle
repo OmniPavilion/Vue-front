@@ -12,6 +12,7 @@ include(
         "application",
         "common",
         "diary",
-        "music"
+        "music",
+        "article"
 )
 

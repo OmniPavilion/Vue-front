@@ -4,14 +4,13 @@ import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import common.annotation.Datasource
-import common.constant.InternetConstant.Companion.URL
+import common.constant.InternetConstant
 import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import common.utils.MultipartFileUtils
-import lombok.experimental.PackagePrivate
-import music.constant.FIlePathConstant.Companion.`SINGER_IMAGES_STATIC_PATH`
+import music.constant.FIlePathConstant.Companion.SINGER_IMAGES_STATIC_PATH
 import music.constant.MusicConstant
 import music.exception.MusicException
 import music.mapper.MusicMapper
@@ -34,8 +33,10 @@ class SingerServiceImpl(
     private val singerPictureMapper: SingerPictureMapper,
     private val musicMapper: MusicMapper,
     private val musicConstant: MusicConstant,
-    private val pictureMapper: SingerPictureMapper
+    private val pictureMapper: SingerPictureMapper,
+    internetConstant: InternetConstant
 ) : SingerService {
+    val url = internetConstant.url
 
 
     override fun getSingerPage(pageDTO: PageDTO<String>, isContainDefaultSinger: Boolean): PageVO<SingerVO> {
@@ -69,7 +70,7 @@ class SingerServiceImpl(
 
             val selectList: List<SingerPicture> = singerPictureMapper.selectList(wrapper)
 
-            var path = URL + SINGER_IMAGES_STATIC_PATH + singer.name + "/"
+            var path = url + SINGER_IMAGES_STATIC_PATH + singer.name + "/"
 
             val finalList = selectList.ifEmpty {
                 val defaultPicture = singerPictureMapper.selectOne(
@@ -78,7 +79,7 @@ class SingerServiceImpl(
                         last("ORDER BY RAND() LIMIT 1") // 随机获取一条默认图片
                     }
                 )
-                path = URL + SINGER_IMAGES_STATIC_PATH + musicConstant.DEFAULTPATH
+                path = url + SINGER_IMAGES_STATIC_PATH + musicConstant.DEFAULTPATH
                 defaultPicture?.let { listOf(it) } ?: emptyList() // 如果获取到默认图片则使用，否则保持空列表
             }
 

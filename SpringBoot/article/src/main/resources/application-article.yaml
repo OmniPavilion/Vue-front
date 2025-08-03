@@ -3,11 +3,11 @@ spring:
     import:
       - optional:classpath:args.yaml
   application:
-    name: music
+    name: article
   datasource:
-    music:
+    article:
       driver-class-name: com.mysql.cj.jdbc.Driver # 数据库驱动
-      jdbc-url: jdbc:mysql://${MYSQL-URL}/music # 数据库地址
+      jdbc-url: jdbc:mysql://${MYSQL-URL}/article # 数据库地址
       username: ${MYSQL-USERNAME} #   用户
       password: ${MYSQL-PASSWORD} # 密码
       type: com.zaxxer.hikari.HikariDataSource
