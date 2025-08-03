@@ -23,30 +23,30 @@ class ArticleFileController(
     private val logger = KotlinLogging.logger {}
 
     @GetMapping("/file/{id}")
-    fun getArticleFile(@PathVariable id: Long): common.pojo.vo.Result<String> {
+    fun getArticleFile(@PathVariable id: Long): Result<String> {
         logger.info { "获取文章文件: $id" }
         val file = articleService.getArticleFile(id)
-        return common.pojo.vo.Result.success(file)
+        return Result.success(file)
     }
 
     @PutMapping("/file/{id}")
-    fun updateArticleFile(@PathVariable id: Long, @RequestParam("file") file: String): common.pojo.vo.Result<Unit> {
+    fun updateArticleFile(@PathVariable id: Long, @RequestParam("file") file: String): Result<Unit> {
         logger.info { "更新文章文件: $id" }
         articleService.updateArticleFile(id, file)
-        return common.pojo.vo.Result.success()
+        return Result.success()
     }
 
     // 修改根文件夹
     @PutMapping("/root")
-    fun updateRoot(@RequestParam path: String) : common.pojo.vo.Result<Unit> {
+    fun updateRoot(@RequestParam path: String) : Result<Unit> {
         logger.info { "将音乐文件根文件夹修改为： $path" }
         articleService.updateRoot(path)
-        return common.pojo.vo.Result.success()
+        return Result.success()
     }
 
     // 重置音乐文件根文件夹
     @PutMapping("/resetRoot")
-    fun resetRoot() : common.pojo.vo.Result<Unit> {
+    fun resetRoot() : Result<Unit> {
         logger.info { "将音乐文件根文件夹重置为默认值" }
         val defaultPath = stringRedisTemplate.opsForHash<String, String>()
             .get(ArticleRedisConstant.FILE_KEY, ArticleRedisConstant.DEFAULT_ROOT_FIELD)

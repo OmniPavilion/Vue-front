@@ -1,14 +1,12 @@
 package article.controller
 
-import article.constant.ArticleRedisConstant
+import article.pojo.dto.ArticleQuery
 import article.pojo.vo.ArticleVO
 import article.service.ArticleService
-import common.exception.FileException
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
 import common.pojo.vo.Result
 import mu.KotlinLogging
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -47,7 +45,7 @@ class ArticleController(
     }
 
     @PostMapping("/page")
-    fun getArticlePage(@RequestBody pageDTO: PageDTO<Unit>): Result<PageVO<ArticleVO>> {
+    fun getArticlePage(@RequestBody pageDTO: PageDTO<ArticleQuery>): Result<PageVO<ArticleVO>> {
         logger.info { "分页查询文章: $pageDTO" }
         val page = articleService.getArticlePage(pageDTO)
         return Result.success(page)

@@ -3,10 +3,13 @@ package article.service.impl
 import article.constant.ArticleConstant
 import article.constant.ArticleRedisConstant
 import article.exception.ArticleException
+import article.exception.TagException
 import article.mapper.ArticleCategoryMapper
 import article.mapper.ArticleMapper
+import article.mapper.TagMapper
+import article.pojo.dto.ArticleQuery
 import article.pojo.po.Article
-import article.pojo.po.ArticleCategory
+import article.pojo.po.ArticleTag
 import article.pojo.vo.ArticleVO
 import article.service.ArticleService
 import common.annotation.Datasource
@@ -28,6 +31,7 @@ import java.time.LocalDateTime
 class ArticleServiceImpl(
     private val articleMapper: ArticleMapper,
     private val articleCategoryMapper: ArticleCategoryMapper,
+    private val tagMapper: TagMapper,
     private val articleConstant: ArticleConstant,
     private val stringRedisTemplate: StringRedisTemplate,
 ) : ArticleService {
@@ -67,8 +71,8 @@ class ArticleServiceImpl(
 
         // 查询关联分类
         val categoryIds = articleCategoryMapper.selectList(
-            KtQueryWrapper(ArticleCategory::class.java)
-                .eq(ArticleCategory::articleId, id)
+            KtQueryWrapper(ArticleTag::class.java)
+                .eq(ArticleTag::articleId, id)
         ).map { it.tagId }
 
         return ArticleVO(
@@ -102,8 +106,8 @@ class ArticleServiceImpl(
         }
 
         // 更新分类关联
-        val queryWrapper = KtQueryWrapper(ArticleCategory::class.java)
-            .eq(ArticleCategory::articleId, article.id)
+        val queryWrapper = KtQueryWrapper(ArticleTag::class.java)
+            .eq(ArticleTag::articleId, article.id)
         articleCategoryMapper.delete(queryWrapper)
         saveArticleCategories(article.id, article.tagIds)
     }
@@ -117,8 +121,8 @@ class ArticleServiceImpl(
         }
 
         // 先删除关联关系
-        val queryWrapper = KtQueryWrapper(ArticleCategory::class.java)
-            .eq(ArticleCategory::articleId, id)
+        val queryWrapper = KtQueryWrapper(ArticleTag::class.java)
+            .eq(ArticleTag::articleId, id)
         articleCategoryMapper.delete(queryWrapper)
 
         if (articleMapper.deleteById(id) != 1) {
@@ -130,27 +134,51 @@ class ArticleServiceImpl(
         MultipartFileUtils.deleteFile(path)
     }
 
-    override fun getArticlePage(pageDTO: PageDTO<Unit>): PageVO<ArticleVO> {
+    override fun getArticlePage(pageDTO: PageDTO<ArticleQuery>): PageVO<ArticleVO> {
         val page = Page<Article>(
             pageDTO.pageNum.toLong(),
             pageDTO.pageSize.toLong()
         )
 
         val queryWrapper = KtQueryWrapper(Article::class.java).apply {
+           pageDTO.query?.let { query ->
+               query.title?.let {
+                   like(Article::title, query.title)
+               }
+               query.startTime?.let {
+                   ge(Article::writtenAt, query.startTime)
+               }
+               query.endTime?.let {
+                   le(Article::writtenAt, query.endTime)
+               }
+           }
             when (pageDTO.order) {
-                SortDirection.ASC -> orderByAsc(Article::id)
-                SortDirection.DESC -> orderByDesc(Article::id)
+                SortDirection.ASC -> orderByAsc(Article::writtenAt)
+                SortDirection.DESC -> orderByDesc(Article::writtenAt)
                 SortDirection.RANDOM -> last("ORDER BY RAND()")
             }
         }
 
         val result = articleMapper.selectPage(page, queryWrapper)
 
+        // 筛选不满足分类的文章
+        val articleTagList = articleCategoryMapper.selectList(
+            KtQueryWrapper(ArticleTag::class.java).apply {
+                pageDTO.query?.tagId?.let {
+                    eq(ArticleTag::tagId, it)
+                }
+            }
+        )
+
+        result.records = result.records.filter { article ->
+            articleTagList.any { it.articleId == article.id }
+        }
+
         // 转换为VO列表
         val voList = result.records.map { article ->
             val categoryIds = articleCategoryMapper.selectList(
-                KtQueryWrapper(ArticleCategory::class.java)
-                    .eq(ArticleCategory::articleId, article.id)
+                KtQueryWrapper(ArticleTag::class.java)
+                    .eq(ArticleTag::articleId, article.id)
             ).map { it.tagId }
 
             ArticleVO(
@@ -218,9 +246,16 @@ class ArticleServiceImpl(
     }
 
     private fun saveArticleCategories(articleId: Long, categoryIds: List<Long>) {
+        val existingTagIds = tagMapper.selectBatchIds(categoryIds).map { it.id }.toSet()
+        val nonExistingTags = categoryIds.filterNot { existingTagIds.contains(it) }
+
+        if (nonExistingTags.isNotEmpty()) {
+            throw TagException("以下标签ID不存在: ${nonExistingTags.joinToString()}")
+        }
+
         if (categoryIds.isNotEmpty()) {
             val relations = categoryIds.map { categoryId ->
-                ArticleCategory(
+                ArticleTag(
                     articleId = articleId,
                     tagId = categoryId,
                     createdAt = LocalDateTime.now()

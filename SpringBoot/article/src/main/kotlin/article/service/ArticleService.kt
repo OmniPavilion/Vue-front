@@ -1,6 +1,7 @@
 package article.service
 
 import article.exception.ArticleException
+import article.pojo.dto.ArticleQuery
 import article.pojo.vo.ArticleVO
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
@@ -19,7 +20,7 @@ interface ArticleService {
     fun deleteArticle(id: Long)
 
     @Throws(ArticleException::class)
-    fun getArticlePage(pageDTO: PageDTO<Unit>): PageVO<ArticleVO>
+    fun getArticlePage(pageDTO: PageDTO<ArticleQuery>): PageVO<ArticleVO>
 
     @Throws(ArticleException::class)
     fun getArticleFile(id: Long) :  String
