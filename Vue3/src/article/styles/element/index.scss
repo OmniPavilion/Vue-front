@@ -1,0 +1,433 @@
+// 复古笔记本风格主题
+$notebook-bg: #f5e8d0;
+$notebook-edge: #b8a07a;
+$notebook-grid: rgba(0, 0, 0, 0.07);
+
+// 主色调调整
+$primary-color: #8b6b4a;
+$success-color: #6b8b47;
+$warning-color: #d4a017;
+$danger-color: #b85c5c;
+$info-color: #5c7cb8;
+
+// 文本颜色
+$text-primary: #3a3226;
+$text-secondary: #5a5246;
+$text-light: #8a8276;
+
+// 边框设置
+$border-width: 1px;
+$border-style: solid;
+$border-color: rgba($notebook-edge, 0.3);
+
+.el-container,
+.el-header,
+.el-main,
+.el-footer,
+.el-aside {
+  background-color: rgba($notebook-bg, 0.9) !important;
+  border: $border-width $border-style $border-color !important;
+  box-shadow: none !important;
+  transition: all 0.3s ease !important;
+  border-radius: 0 !important;
+}
+
+.el-card,
+.el-dialog,
+.el-drawer {
+  background-color: rgba($notebook-bg, 0.95) !important;
+  border: $border-width $border-style $border-color !important;
+  box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.1),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 0 !important;
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.15),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.6) !important;
+  }
+}
+
+.el-dialog {
+  &__header {
+    color: $text-primary !important;
+    border-bottom: $border-width $border-style $border-color !important;
+
+    .el-dialog__title {
+      color: inherit !important;
+      text-shadow: none !important;
+    }
+  }
+}
+
+.el-menu,
+.el-dropdown-menu {
+  background-color: rgba($notebook-bg, 0.98) !important;
+  border: $border-width $border-style $border-color !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0 !important;
+}
+
+.el-menu-item,
+.el-dropdown-menu__item {
+  color: $text-primary !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    background-color: rgba($notebook-edge, 0.1) !important;
+    color: darken($primary-color, 10%) !important;
+  }
+}
+
+// 按钮样式
+.el-button {
+  border: $border-width $border-style $border-color !important;
+  background-color: rgba($notebook-bg, 0.9) !important;
+  color: $text-primary !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  font-weight: normal !important;
+
+  &:hover {
+    transform: none !important;
+    background-color: rgba($notebook-edge, 0.1) !important;
+  }
+
+  &:active {
+    transform: translateY(1px) !important;
+  }
+
+  &.is-disabled {
+    opacity: 0.6 !important;
+    background-color: rgba($notebook-bg, 0.6) !important;
+  }
+}
+
+// 主按钮
+.el-button--primary {
+  background-color: $primary-color !important;
+  color: #fff !important;
+  border-color: darken($primary-color, 10%) !important;
+
+  &:hover {
+    background-color: lighten($primary-color, 5%) !important;
+  }
+
+  &:active {
+    background-color: darken($primary-color, 5%) !important;
+  }
+}
+
+// 成功按钮
+.el-button--success {
+  background-color: $success-color !important;
+  color: #fff !important;
+  border-color: darken($success-color, 10%) !important;
+
+  &:hover {
+    background-color: lighten($success-color, 5%) !important;
+  }
+}
+
+// 警告按钮
+.el-button--warning {
+  background-color: $warning-color !important;
+  color: #fff !important;
+  border-color: darken($warning-color, 10%) !important;
+
+  &:hover {
+    background-color: lighten($warning-color, 5%) !important;
+  }
+}
+
+// 危险按钮
+.el-button--danger {
+  background-color: $danger-color !important;
+  color: #fff !important;
+  border-color: darken($danger-color, 10%) !important;
+
+  &:hover {
+    background-color: lighten($danger-color, 5%) !important;
+  }
+}
+
+// 信息按钮
+.el-button--info {
+  background-color: $info-color !important;
+  color: #fff !important;
+  border-color: darken($info-color, 10%) !important;
+
+  &:hover {
+    background-color: lighten($info-color, 5%) !important;
+  }
+}
+
+// 输入框样式
+.el-input {
+  .el-input__wrapper {
+    background-color: rgba($notebook-bg, 0.95) !important;
+    border: $border-width $border-style $border-color !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    .el-input__inner {
+      color: $text-primary !important;
+      &::placeholder {
+        color: $text-light !important;
+      }
+    }
+  }
+
+  &.is-focus {
+    .el-input__wrapper {
+      border-color: $primary-color !important;
+      box-shadow: 0 0 0 1px rgba($primary-color, 0.3) !important;
+    }
+  }
+}
+
+.el-textarea {
+  .el-textarea__inner {
+    background-color: rgba($notebook-bg, 0.95) !important;
+    border: $border-width $border-style $border-color !important;
+    color: $text-primary !important;
+    border-radius: 0 !important;
+
+    &:focus {
+      border-color: $primary-color !important;
+      box-shadow: 0 0 0 1px rgba($primary-color, 0.3) !important;
+    }
+
+    &::placeholder {
+      color: $text-light !important;
+    }
+  }
+}
+
+// 表单样式
+.el-form {
+  .el-form-item__label {
+    color: $text-primary !important;
+  }
+
+  .el-form-item__error {
+    color: $danger-color !important;
+  }
+}
+
+// 表格样式
+.el-table {
+  background-color: rgba($notebook-bg, 0.95) !important;
+  border: $border-width $border-style $border-color !important;
+  color: $text-primary !important;
+  border-radius: 0 !important;
+
+  th {
+    background-color: rgba($notebook-edge, 0.1) !important;
+    color: $text-primary !important;
+    border-bottom: $border-width $border-style $border-color !important;
+  }
+
+  tr {
+    background-color: transparent !important;
+
+    &:hover {
+      background-color: rgba($notebook-edge, 0.05) !important;
+    }
+
+    td {
+      border-bottom: $border-width $border-style $border-color !important;
+    }
+  }
+}
+
+// 分页样式
+.el-pagination {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  .el-pager {
+    li {
+      background: transparent !important;
+      color: $text-primary !important;
+      border: $border-width $border-style $border-color !important;
+      border-radius: 0 !important;
+
+      &:hover {
+        color: $primary-color !important;
+      }
+
+      &.active {
+        background-color: rgba($primary-color, 0.1) !important;
+        color: $primary-color !important;
+        border-color: $primary-color !important;
+      }
+    }
+  }
+
+  .btn-prev,
+  .btn-next {
+    background: transparent !important;
+    color: $text-primary !important;
+    border: $border-width $border-style $border-color !important;
+    border-radius: 0 !important;
+
+    &:hover:not(.disabled) {
+      color: $primary-color !important;
+      border-color: $primary-color !important;
+    }
+  }
+}
+
+// 选择器样式
+.el-select {
+  .el-select__wrapper {
+    background-color: rgba($notebook-bg, 0.95) !important;
+    border: $border-width $border-style $border-color !important;
+    border-radius: 0 !important;
+
+    .el-select__inner {
+      color: $text-primary !important;
+    }
+  }
+
+  .el-select-dropdown {
+    background-color: rgba($notebook-bg, 0.98) !important;
+    border: $border-width $border-style $border-color !important;
+    border-radius: 0 !important;
+
+    .el-select-dropdown__item {
+      color: $text-primary !important;
+
+      &:hover {
+        background-color: rgba($notebook-edge, 0.1) !important;
+      }
+
+      &.selected {
+        color: $primary-color !important;
+        background-color: rgba($primary-color, 0.1) !important;
+      }
+    }
+  }
+}
+
+// 开关样式
+.el-switch {
+  .el-switch__core {
+    background-color: rgba($notebook-edge, 0.3) !important;
+    border: $border-width $border-style $border-color !important;
+    border-radius: 0 !important;
+  }
+
+  &.is-checked {
+    .el-switch__core {
+      background-color: $primary-color !important;
+      border-color: $primary-color !important;
+    }
+  }
+}
+
+// 上传组件
+.el-upload {
+  .el-upload-dragger {
+    background-color: rgba($notebook-bg, 0.9) !important;
+    border: 1px dashed $border-color !important;
+    border-radius: 0 !important;
+
+    &:hover {
+      border-color: $primary-color !important;
+    }
+  }
+}
+
+// 全局调整
+* {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba($notebook-edge, 0.4);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: rgba($notebook-edge, 0.1);
+  }
+}
+
+// 下拉框整体样式 - 复古笔记本风格
+.el-select-dropdown {
+  background-color: rgba($notebook-bg, 0.98) !important;
+  border: $border-width $border-style $border-color !important;
+  box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.1),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 0 !important;
+  transition: all 0.3s ease !important;
+
+  // 下拉项样式
+  .el-select-dropdown__item {
+    color: $text-primary !important;
+    background: transparent !important;
+    transition: all 0.2s ease !important;
+
+    // 悬停状态
+    &:hover,
+    &.hover {
+      background-color: rgba($notebook-edge, 0.1) !important;
+      color: darken($primary-color, 10%) !important;
+    }
+
+    // 选中状态
+    &.selected {
+      background-color: rgba($primary-color, 0.1) !important;
+      color: $primary-color !important;
+      font-weight: normal !important;
+    }
+
+    // 激活状态
+    &.is-active {
+      background-color: rgba($primary-color, 0.05) !important;
+    }
+  }
+
+  // 下拉框箭头样式
+  .el-popper__arrow::before {
+    background-color: rgba($notebook-bg, 0.98) !important;
+    border: $border-width $border-style $border-color !important;
+  }
+}
+
+// 选择器输入框样式保持与主题一致
+.el-select {
+  .el-select__wrapper {
+    background-color: rgba($notebook-bg, 0.95) !important;
+    border: $border-width $border-style $border-color !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    &:hover {
+      background-color: rgba($notebook-edge, 0.1) !important;
+    }
+
+    .el-select__placeholder {
+      color: $text-light !important;
+    }
+
+    .el-select__inner {
+      color: $text-primary !important;
+    }
+  }
+
+  &.is-focus {
+    .el-select__wrapper {
+      border-color: $primary-color !important;
+      box-shadow: 0 0 0 1px rgba($primary-color, 0.3) !important;
+    }
+  }
+}

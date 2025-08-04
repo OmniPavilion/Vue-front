@@ -162,17 +162,20 @@ class ArticleServiceImpl(
         val result = articleMapper.selectPage(page, queryWrapper)
 
         // 筛选不满足分类的文章
-        val articleTagList = articleCategoryMapper.selectList(
-            KtQueryWrapper(ArticleTag::class.java).apply {
-                pageDTO.query?.tagId?.let {
-                    eq(ArticleTag::tagId, it)
+        if (pageDTO.query?.tagId != null) {
+            val articleTagList = articleCategoryMapper.selectList(
+                KtQueryWrapper(ArticleTag::class.java).apply {
+                    pageDTO.query?.tagId.let {
+                        eq(ArticleTag::tagId, it)
+                    }
                 }
-            }
-        )
+            )
 
-        result.records = result.records.filter { article ->
-            articleTagList.any { it.articleId == article.id }
+            result.records = result.records.filter { article ->
+                articleTagList.any { it.articleId == article.id }
+            }
         }
+
 
         // 转换为VO列表
         val voList = result.records.map { article ->
@@ -246,6 +249,8 @@ class ArticleServiceImpl(
     }
 
     private fun saveArticleCategories(articleId: Long, categoryIds: List<Long>) {
+        if (categoryIds.isEmpty()) return
+
         val existingTagIds = tagMapper.selectBatchIds(categoryIds).map { it.id }.toSet()
         val nonExistingTags = categoryIds.filterNot { existingTagIds.contains(it) }
 

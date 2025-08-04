@@ -15,6 +15,7 @@
     "animejs": "^4.0.2",
     "axios": "^1.9.0",
     "bootstrap-icons": "^1.13.1",
+    "dompurify": "^3.2.6",
     "element-plus": "^2.9.9",
     "gsap": "^3.13.0",
     "loglevel": "^1.9.2",
