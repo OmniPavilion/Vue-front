@@ -33,6 +33,17 @@
           </el-icon>
           保存
         </el-button>
+        <el-button
+            type="primary"
+            plain
+            @click="handleDownload"
+            :disabled="!fileStore.currentArticle || !fileStore.fileContent"
+        >
+          <el-icon>
+            <Download/>
+          </el-icon>
+          下载
+        </el-button>
         <el-button @click="togglePreview">
           <el-icon>
             <View v-if="showPreview"/>
@@ -155,9 +166,10 @@
 
 <script setup lang="ts">
 import {ref, reactive, computed, watchEffect, onMounted, onUnmounted} from 'vue'
-import {Check, View, Hide, DocumentAdd, Sunny, Calendar, Edit} from '@element-plus/icons-vue'
+import {Check, View, Hide, DocumentAdd, Sunny, Calendar, Edit, Download} from '@element-plus/icons-vue'
 import {useArticleFileStore} from '@/article/stores'
 import {useArticleStore} from '@/article/stores'
+import {useReadStore} from '@/article/stores'
 import {useTagStore} from '@/article/stores'
 import {marked} from 'marked'
 import DOMPurify from 'dompurify'
@@ -166,6 +178,7 @@ import type {ArticleVO} from '@/article/types/vo/ArticleVO'
 
 const fileStore = useArticleFileStore()
 const articleStore = useArticleStore()
+const readStore = useReadStore()
 const tagStore = useTagStore()
 const compiledHtml = ref('<p>加载中...</p>')
 const showPreview = ref(true)
@@ -205,6 +218,7 @@ watchEffect(() => {
 
 // 内容变化处理
 const handleContentChange = () => {
+  if (fileStore.currentArticle === null) return
   fileStore.isSave = false
 }
 
@@ -295,6 +309,7 @@ const handleDeleteArticle = async () => {
 
     // 用户确认删除
     await articleStore.deleteArticle(fileStore.currentArticle!.id!)
+    readStore.chatMessages = []
     ElMessage.success('删除成功' as any)
 
     fileStore.currentArticle = null
@@ -321,18 +336,20 @@ const handleCreateArticle = async () => {
     await articleFormRef.value.validate()
 
     const newArticle: ArticleVO = {
+      id: fileStore.currentArticle?.id!,
       ...articleForm.value,
       fileName: `${Date.now()}.md`, // 生成唯一文件名
     }
 
-    var res
-    if (isCreating) {
+    let res;
+    if (isCreating.value) {
       res = await articleStore.createArticle(newArticle)
     } else {
       res = await articleStore.updateArticle(newArticle)
     }
     if (res.code === 1) {
-      if (isCreating) {
+      if (isCreating.value) {
+
         newArticle.id = res.data!
         fileStore.fileContent = ''
       }
@@ -340,11 +357,21 @@ const handleCreateArticle = async () => {
       fileStore.currentArticle = newArticle
       fileStore.isSave = true
       showCreateDialog.value = false
+      await articleStore.fetchArticlePage()
       ElMessage.success(isCreating ? '新建文章成功' : '保存成功' as any)
     }
   } catch (error) {
     console.error('创建文章失败:', error)
   }
+}
+
+// 添加下载处理函数
+const handleDownload = () => {
+  if (!fileStore.currentArticle || !fileStore.fileContent) {
+    ElMessage.warning('没有可下载的内容' as any)
+    return
+  }
+  fileStore.downloadArticleFile()
 }
 
 // 新增日期格式化方法

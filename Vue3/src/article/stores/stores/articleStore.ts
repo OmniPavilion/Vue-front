@@ -20,6 +20,7 @@ export const useArticleStore = defineStore('article', () => {
 
     // 获取单个文章
     const fetchArticle = async (id: number) => {
+        logger.log('获取文章', id)
         loading.value = true;
         try {
             const res = await articleApi.getArticle(id);
@@ -45,6 +46,7 @@ export const useArticleStore = defineStore('article', () => {
 
     // 更新文章
     const updateArticle = async (article: ArticleVO) => {
+        logger.log('更新文章', article)
         loading.value = true;
         try {
             const res = await articleApi.updateArticle(article);
@@ -56,6 +58,7 @@ export const useArticleStore = defineStore('article', () => {
 
     // 删除文章
     const deleteArticle = async (id: number) => {
+        logger.log('删除文章', id)
         loading.value = true;
         try {
             const res = await articleApi.deleteArticle(id);
@@ -68,6 +71,7 @@ export const useArticleStore = defineStore('article', () => {
 
     // 分页查询文章
     const fetchArticlePage = async () => {
+        logger.log('分页查询文章', pageQuery.value)
         loading.value = true;
         try {
             const response = await articleApi.getArticlePage(pageQuery.value);
@@ -76,6 +80,12 @@ export const useArticleStore = defineStore('article', () => {
         } finally {
             loading.value = false;
         }
+    };
+
+    // 获取当前文章
+    const getCurrentArticle = async () => {
+        const res = await articleApi.getCurrentArticle();
+        return res.data;
     };
 
     return {
@@ -89,5 +99,6 @@ export const useArticleStore = defineStore('article', () => {
         updateArticle,
         deleteArticle,
         fetchArticlePage,
+        getCurrentArticle
     };
 });

@@ -2,6 +2,8 @@ package article.controller
 
 import article.pojo.dto.ArticleQuery
 import article.pojo.vo.ArticleVO
+import article.repository.ArticleRepository.Companion.currentArticleId
+import article.service.ArticleAiMemoryService
 import article.service.ArticleService
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.serializer.SerializerFeature
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/article/articles")
 class ArticleController(
     private val articleService: ArticleService,
+    private val articleAiService: ArticleAiMemoryService,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -43,6 +46,7 @@ class ArticleController(
     fun deleteArticle(@PathVariable id: Long): Result<Unit> {
         logger.info { "删除文章: $id" }
         articleService.deleteArticle(id)
+        articleAiService.removeByArticleId(id)
         return Result.success()
     }
 
@@ -51,5 +55,10 @@ class ArticleController(
         logger.info { "分页查询文章: ${JSON.toJSONString( pageDTO, SerializerFeature.PrettyFormat)}" }
         val page = articleService.getArticlePage(pageDTO)
         return Result.success(page)
+    }
+
+    @GetMapping("/current/id")
+    fun getCurrentArticle(): Result<Long> {
+        return Result.success(currentArticleId)
     }
 }

@@ -1,6 +1,7 @@
 package article.controller
 
 import article.constant.ArticleRedisConstant
+import article.repository.ArticleRepository.Companion.currentArticleId
 import article.service.ArticleService
 import common.exception.FileException
 import common.pojo.vo.Result
@@ -25,6 +26,7 @@ class ArticleFileController(
     @GetMapping("/file/{id}")
     fun getArticleFile(@PathVariable id: Long): Result<String> {
         logger.info { "获取文章文件: $id" }
+        currentArticleId = id
         val file = articleService.getArticleFile(id)
         return Result.success(file)
     }

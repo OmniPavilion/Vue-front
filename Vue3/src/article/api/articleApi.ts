@@ -49,4 +49,11 @@ export const articleApi = {
             data: pageDTO,
         });
     },
+
+    getCurrentArticle(): Promise<AxiosResponse<Result<number>>> {
+        return myAxios({
+            method: 'get',
+            url: '/article/articles/current/id',
+        });
+    }
 };
