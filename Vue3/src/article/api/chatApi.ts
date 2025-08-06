@@ -20,13 +20,15 @@ export const chatApi = {
         title: string
     ): Promise<Response> {
         return myFetch({
-            method: "GET",
+            method: "POST",
             url: '/article/read/chat',
             params: {
                 articleId,
-                article,
                 prompt,
                 title,
+            },
+            data: {
+                article,
             },
         });
     },

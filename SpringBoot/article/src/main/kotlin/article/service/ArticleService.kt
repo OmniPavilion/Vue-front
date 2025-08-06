@@ -5,6 +5,8 @@ import article.pojo.dto.ArticleQuery
 import article.pojo.vo.ArticleVO
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
+import org.springframework.core.io.Resource
+import org.springframework.http.ResponseEntity
 
 interface ArticleService {
     @Throws(ArticleException::class)
@@ -30,4 +32,10 @@ interface ArticleService {
 
     @Throws(ArticleException::class)
     fun updateRoot(path: String)
+
+    @Throws(ArticleException::class)
+    fun getRootPath(): String
+
+    @Throws(ArticleException::class)
+    fun downloadAllArticles(): Resource
 }

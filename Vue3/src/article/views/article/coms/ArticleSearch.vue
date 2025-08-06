@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue'
-import { useArticleStore } from '@/article/stores'
-import { useTagStore } from '@/article/stores'
+import {useArticleStore} from '@/article/stores'
+import {useTagStore} from '@/article/stores'
 import EditTagButton from "@/article/views/article/coms/EditTagButton.vue";
+import SettingButton from "@/article/views/article/coms/SettingButton.vue";
 
 const articleStore = useArticleStore()
 const tagStore = useTagStore()
@@ -44,7 +45,10 @@ init()
   <el-card class="search-container">
     <el-form :model="queryParams" label-width="80px">
       <el-row :gutter="20">
-        <el-col :span="12">
+        <el-col :span="2">
+          <SettingButton></SettingButton>
+        </el-col>
+        <el-col :span="10">
           <el-form-item label="文章名称">
             <el-input
                 v-model="queryParams.title"

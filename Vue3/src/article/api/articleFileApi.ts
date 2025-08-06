@@ -11,13 +11,25 @@ export const articleFileApi = {
         });
     },
 
+
     // 更新文章文件内容
     updateArticleFile(id: number, file: string): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
             url: `/article/files/file/${id}`,
-            params: { file },
+            data: file,
+            headers: {
+                'Content-Type': 'text/plain'
+            }
         });
+    },
+
+    // 获取跟文件夹路径
+    getRootPath(): Promise<AxiosResponse<Result<string>>> {
+        return myAxios({
+            method: 'get',
+            url: '/article/files/rootPath'
+        })
     },
 
     // 修改根文件夹路径
@@ -34,6 +46,15 @@ export const articleFileApi = {
         return myAxios({
             method: 'put',
             url: '/article/files/resetRoot',
+        });
+    },
+
+    // 备份文件
+    downloadAll(): Promise<AxiosResponse<Blob>> {
+        return myAxios({
+            method: 'get',
+            url: '/article/files/downloadAll',
+            responseType: 'blob'
         });
     },
 };

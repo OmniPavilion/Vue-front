@@ -12,19 +12,26 @@ import article.pojo.po.Article
 import article.pojo.po.ArticleTag
 import article.pojo.vo.ArticleVO
 import article.service.ArticleService
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import common.annotation.Datasource
 import common.enumerate.DataSourceType
 import common.enumerate.SortDirection
+import common.exception.FileException
 import common.pojo.dto.PageDTO
 import common.pojo.vo.PageVO
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page
-import common.exception.FileException
 import common.utils.MultipartFileUtils
+import org.springframework.core.io.InputStreamResource
+import org.springframework.core.io.Resource
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.io.*
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @Service
 @Datasource(DataSourceType.ARTICLE)
@@ -248,6 +255,76 @@ class ArticleServiceImpl(
         articleConstant.init()
     }
 
+    override fun getRootPath(): String {
+        return articleConstant.rootPath
+    }
+
+    override fun downloadAllArticles(): Resource {
+        val rootPath = articleConstant.rootPath
+        val zipFileName = "articles_${System.currentTimeMillis()}.zip"
+        val tempDir = "./temp/"
+        val zipFilePath = "$tempDir/$zipFileName"
+
+        // 确保临时目录存在
+        File(tempDir).mkdirs()
+        val zipFile = File(zipFilePath)
+
+        try {
+            val articles = articleMapper.selectList(null)
+            if (articles.isEmpty()) {
+                throw ArticleException("没有找到可下载的文章")
+            }
+
+            FileOutputStream(zipFilePath).use { fileOut ->
+                ZipOutputStream(BufferedOutputStream(fileOut)).use { zipOut ->
+                    val dateFormat = DateTimeFormatter.ofPattern("yyyy年MM月dd日")
+                    val dayOfWeekFormat = DateTimeFormatter.ofPattern("EEEE", Locale.CHINA)
+
+                    articles.forEach { article ->
+                        val sourceFile = File("$rootPath/${article.fileName}")
+                        if (!sourceFile.exists()) return@forEach
+
+                        // 读取原始文件内容
+                        val originalContent = sourceFile.readText()
+
+                        // 添加页脚信息
+                        val footer = """
+                        
+                        ---
+                        ${article.writtenAt.format(dateFormat)}  
+                        ${article.writtenAt.format(dayOfWeekFormat)}  ${article.weather}
+                    """.trimIndent()
+
+                        val contentWithFooter = originalContent + footer
+
+                        // 创建带中文的文件名
+                        val zipEntryName = (article.title.replace("[<>:\"/\\\\|?*\\x00-\\x1F]".toRegex(), "_") + ".md"
+                            .takeIf { it.isNotBlank() })
+
+                        // 写入ZIP
+                        zipOut.putNextEntry(ZipEntry(zipEntryName))
+                        zipOut.write(contentWithFooter.toByteArray(Charsets.UTF_8))
+                    }
+                }
+            }
+
+            if (File(zipFilePath).length() == 0L) {
+                throw ArticleException("没有有效的文章文件可下载")
+            }
+
+            zipFile.deleteOnExit() // 在JVM退出时删除文件
+            // 设置文件在JVM退出时删除
+
+            // 返回一个会在流关闭后删除文件的资源
+            return AutoDeleteFileResource(zipFile)
+
+        } catch (e: Exception) {
+            zipFile.delete() // 发生异常时立即删除
+            throw ArticleException("创建压缩包失败: ${e.message}")
+        } finally {
+
+        }
+    }
     private fun saveArticleCategories(articleId: Long, categoryIds: List<Long>) {
         if (categoryIds.isEmpty()) return
 
@@ -268,5 +345,23 @@ class ArticleServiceImpl(
             }
             articleCategoryMapper.insert(relations)
         }
+    }
+
+    // 自定义Resource实现（会自动删除文件）
+    class AutoDeleteFileResource(private val file: File) : InputStreamResource(FileInputStream(file)) {
+        override fun getInputStream(): InputStream {
+            val inputStream = super.getInputStream()
+            return object : FilterInputStream(inputStream) {
+                override fun close() {
+                    try {
+                        super.close()
+                    } finally {
+                        file.delete() // 流关闭时立即删除文件
+                    }
+                }
+            }
+        }
+        override fun contentLength(): Long = file.length()
+        override fun getFilename(): String? = file.name
     }
 }

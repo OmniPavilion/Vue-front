@@ -153,6 +153,7 @@
           <Calendar/>
         </el-icon>
         <span>{{ formatDateTime(fileStore.currentArticle.writtenAt) }}</span>
+        <span>{{ formatDateTimeWithWeekday(fileStore.currentArticle.writtenAt) }}</span>
       </div>
       <div class="status-item">
         <el-icon>
@@ -181,7 +182,7 @@ const articleStore = useArticleStore()
 const readStore = useReadStore()
 const tagStore = useTagStore()
 const compiledHtml = ref('<p>加载中...</p>')
-const showPreview = ref(true)
+const showPreview = ref(false)
 
 // 配置 marked
 marked.setOptions({
@@ -358,7 +359,7 @@ const handleCreateArticle = async () => {
       fileStore.isSave = true
       showCreateDialog.value = false
       await articleStore.fetchArticlePage()
-      ElMessage.success(isCreating ? '新建文章成功' : '保存成功' as any)
+      ElMessage.success(isCreating.value ? '新建文章成功' : '保存成功' as any)
     }
   } catch (error) {
     console.error('创建文章失败:', error)
@@ -385,6 +386,15 @@ const formatDateTime = (isoString: string) => {
     hour: '2-digit',
     minute: '2-digit'
   }).replace(/\//g, '-')
+}
+
+const formatDateTimeWithWeekday = (dateString: string) => {
+  const date = new Date(dateString);
+  const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  const weekday = weekdays[date.getDay()];
+
+  // 保持原有格式并添加星期
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${weekday}`;
 }
 
 // 快捷键保存功能
@@ -484,6 +494,15 @@ onUnmounted(() => {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.6;
   color: $text-primary;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+
+  // 确保所有文本元素都能正确换行
+  p, li, td, th, div {
+    word-break: break-word;
+    white-space: normal;
+  }
 
   :deep() {
     h1, h2, h3, h4, h5, h6 {
@@ -501,6 +520,11 @@ onUnmounted(() => {
       padding: 10px;
       border-radius: 3px;
       overflow: auto;
+      // 代码块也允许换行
+      code {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
     }
 
     code {
@@ -508,6 +532,7 @@ onUnmounted(() => {
       background-color: rgba($notebook-edge, 0.1);
       padding: 2px 4px;
       border-radius: 3px;
+      white-space: pre-wrap;
     }
 
     blockquote {

@@ -25,6 +25,7 @@ class ArticleController(
     fun createArticle(@RequestBody article: ArticleVO): Result<Long> {
         logger.info { "创建空文章: ${JSON.toJSONString( article, SerializerFeature.PrettyFormat)}" }
         val id = articleService.createArticle(article)
+        currentArticleId = id
         return Result.success(id)
     }
 

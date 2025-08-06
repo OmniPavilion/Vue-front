@@ -39,6 +39,19 @@ export const useArticleFileStore = defineStore('articleFile', () => {
         }
     };
 
+    // 获取根文件夹路径
+    const getRoot = async () => {
+        logger.debug('获取根目录');
+        loading.value = true;
+        try {
+            const res = await articleFileApi.getRootPath();
+            rootPath.value = res.data.data;
+            return res.data;
+        } finally {
+            loading.value = false;
+        }
+    }
+
     // 修改根文件夹路径
     const updateRoot = async (path: string) => {
         logger.debug('修改根文件夹路径');
@@ -65,6 +78,40 @@ export const useArticleFileStore = defineStore('articleFile', () => {
         }
     };
 
+    const downloadAll = async () => {
+        logger.debug('开始备份文章文件');
+        loading.value = true;
+        try {
+            const response = await articleFileApi.downloadAll();
+
+            // 从响应头获取文件名
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = 'articles.zip';
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename\*=UTF-8''(.+?)(;|$)/);
+                filename = match ? decodeURIComponent(match[1]) : filename;
+            }
+
+            // 创建下载链接
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+
+            // 清理
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+
+            logger.log('备份成功');
+        } catch (error) {
+            logger.error('备份失败:', error);
+        } finally {
+            loading.value = false;
+        }
+    };
+
     // 下载文章文件
     const downloadArticleFile = () => {
         if (!currentArticle.value || !fileContent.value) {
@@ -76,9 +123,13 @@ export const useArticleFileStore = defineStore('articleFile', () => {
 
         // 获取文章元数据
         const article = currentArticle.value;
-        const writtenDate = article.writtenAt ?
-            new Date(article.writtenAt).toLocaleDateString('zh-CN') :
-            new Date().toLocaleDateString('zh-CN');
+        const date = article.writtenAt ? new Date(article.writtenAt) : new Date();
+
+        // 格式化日期并添加星期
+        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const weekday = weekdays[date.getDay()];
+        const writtenDate = date.toLocaleDateString('zh-CN') + ` ${weekday}`;
+
         const weather = article.weather || "无天气记录";
 
         // 在内容末尾添加元数据
@@ -114,6 +165,8 @@ export const useArticleFileStore = defineStore('articleFile', () => {
         updateArticleFile,
         updateRoot,
         resetRoot,
-        downloadArticleFile
+        downloadArticleFile,
+        getRoot,
+        downloadAll
     };
 });

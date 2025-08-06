@@ -224,6 +224,7 @@ watch(() => articleFileStore.currentArticle, (newArticle) => {
   height: 100%;
   margin: 0 auto;
   max-width: 800px;
+  min-width: 400px;
   background-color: rgba($notebook-bg, 0.95);
   border: $border-width $border-style $border-color;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);

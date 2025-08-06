@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestBody
 import java.time.LocalDate
 
 @RestController
@@ -31,7 +32,7 @@ class AiReadController(
 
     // 读取文章
     @RequestMapping("/chat", produces = ["text/html;charset=utf-8"])
-    fun readArticle(article: String, prompt: String, articleId: Long, title: String): Flux<String> {
+    fun readArticle(@RequestBody article: String, prompt: String, articleId: Long, title: String): Flux<String> {
         logger.info("文章id: $articleId -> chat: $prompt")
         return articleChatClient
             .prompt()

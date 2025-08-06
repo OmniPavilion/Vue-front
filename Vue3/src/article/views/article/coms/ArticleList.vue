@@ -33,13 +33,13 @@ const initExpandedStates = () => {
   // 初始化年份和月份的展开状态（默认收缩）
   years.forEach(year => {
     if (!(year in expandedYears.value)) {
-      expandedYears.value[year] = false
+      expandedYears.value[year] = true
     }
   })
 
   months.forEach(month => {
     if (!(month in expandedMonths.value)) {
-      expandedMonths.value[month] = false
+      expandedMonths.value[month] = true
     }
   })
 }
