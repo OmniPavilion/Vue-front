@@ -45,19 +45,23 @@ init()
   <el-card class="search-container">
     <el-form :model="queryParams" label-width="80px">
       <el-row :gutter="20">
-        <el-col :span="2">
-          <SettingButton></SettingButton>
-        </el-col>
-        <el-col :span="10">
+        <el-col :span="12">
           <el-form-item label="文章名称">
-            <el-input
-                v-model="queryParams.title"
-                placeholder="请输入文章名称"
-                clearable
-            />
-          </el-form-item>
-        </el-col>
+            <div style="display: flex; gap: 10px; align-items: center; width: 100%">
+              <el-input
+                  v-model="queryParams.title"
+                  placeholder="请输入文章名称"
+                  clearable
+                  style="min-width: 150px;"
 
+              />
+              <SettingButton></SettingButton>
+            </div>
+          </el-form-item>
+
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="文章分类">
             <div style="display: flex; gap: 10px; align-items: center; width: 100%">
@@ -65,6 +69,7 @@ init()
                   v-model="queryParams.tagId"
                   placeholder="请选择分类"
                   clearable
+                  style="min-width: 150px;"
               >
                 <el-option
                     v-for="tag in tagStore.allTags"
@@ -76,9 +81,7 @@ init()
               <EditTagButton></EditTagButton>
             </div>
           </el-form-item>
-
         </el-col>
-
       </el-row>
     </el-form>
   </el-card>

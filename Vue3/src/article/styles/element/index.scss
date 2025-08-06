@@ -431,3 +431,104 @@ $border-color: rgba($notebook-edge, 0.3);
     }
   }
 }
+
+// 日期选择器全局样式
+.el-date-picker {
+  background-color: rgba($notebook-bg, 0.98) !important;
+  border: $border-width $border-style $border-color !important;
+  box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.1),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 0 !important;
+
+  // 头部年月选择区域
+  .el-picker-panel__header {
+    color: $text-primary !important;
+    border-bottom: $border-width $border-style $border-color !important;
+  }
+
+  // 日期单元格
+  .el-date-table {
+    th {
+      color: $text-secondary !important;
+    }
+    td {
+      &.available {
+        color: $text-primary !important;
+        &:hover {
+          background-color: rgba($notebook-edge, 0.1) !important;
+        }
+      }
+      &.current:not(.disabled) {
+        background-color: rgba($primary-color, 0.1) !important;
+        color: $primary-color !important;
+      }
+      &.today {
+        color: $danger-color !important;
+      }
+    }
+  }
+
+  // 底部操作按钮
+  .el-picker-panel__footer {
+    border-top: $border-width $border-style $border-color !important;
+    .el-button {
+      color: $text-primary !important;
+      &:hover {
+        color: $primary-color !important;
+      }
+    }
+  }
+}
+
+// 日期输入框
+.el-date-editor {
+  .el-input__wrapper {
+    background-color: rgba($notebook-bg, 0.95) !important;
+    border: $border-width $border-style $border-color !important;
+    &:hover {
+      background-color: rgba($notebook-edge, 0.1) !important;
+    }
+  }
+  &.is-active {
+    .el-input__wrapper {
+      border-color: $primary-color !important;
+    }
+  }
+}
+
+// 多选Select全局样式
+.el-select {
+  &.is-multiple {
+    // 已选标签样式
+    .el-select__tags {
+      .el-tag {
+        background-color: rgba($primary-color, 0.1) !important;
+        border-color: rgba($primary-color, 0.3) !important;
+        color: $primary-color !important;
+        .el-tag__close {
+          color: $primary-color !important;
+          &:hover {
+            background-color: rgba($primary-color, 0.2) !important;
+          }
+        }
+      }
+    }
+
+    // 下拉框多选项样式
+    .el-select-dropdown__item {
+      &.selected {
+        background-color: transparent !important;
+        color: $primary-color !important;
+        &::after {
+          color: $primary-color !important;
+        }
+      }
+    }
+  }
+
+  // 多选输入框的placeholder
+  .el-select__placeholder {
+    color: $text-light !important;
+  }
+}

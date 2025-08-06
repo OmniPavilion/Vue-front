@@ -161,13 +161,19 @@
         </el-icon>
         <span>{{ fileStore.currentArticle.weather || '无天气信息' }}</span>
       </div>
+      <div class="status-item">
+        <el-icon>
+          <Document />
+        </el-icon>
+        <span>{{ wordCount }} 字</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {ref, reactive, computed, watchEffect, onMounted, onUnmounted} from 'vue'
-import {Check, View, Hide, DocumentAdd, Sunny, Calendar, Edit, Download} from '@element-plus/icons-vue'
+import {Check, View, Hide, DocumentAdd, Sunny, Calendar, Edit, Download, Document} from '@element-plus/icons-vue'
 import {useArticleFileStore} from '@/article/stores'
 import {useArticleStore} from '@/article/stores'
 import {useReadStore} from '@/article/stores'
@@ -244,6 +250,11 @@ const handleSave = async () => {
 
 // 新建文章对话框相关
 const handOpenCreateDialog = () => {
+  if (!fileStore.isSave) {
+    ElMessage.warning('请保存当前文章' as any)
+    return
+  }
+
   articleForm.value = {
     title: '',
     weather: '',
@@ -394,7 +405,7 @@ const formatDateTimeWithWeekday = (dateString: string) => {
   const weekday = weekdays[date.getDay()];
 
   // 保持原有格式并添加星期
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${weekday}`;
+  return `${weekday}`;
 }
 
 // 快捷键保存功能
@@ -402,9 +413,22 @@ const handleKeyDown = (e: KeyboardEvent) => {
   // 检查是否按下 Ctrl/Cmd + S
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault() // 阻止浏览器默认保存行为
+
+    if (fileStore.isSave) return
+
     handleSave() // 调用保存方法
   }
 }
+
+
+// 计算字数（中文字符+单词）
+const wordCount = computed(() => {
+  if (!fileStore.fileContent) return 0
+
+  const chineseChars = fileStore.fileContent || []
+
+  return chineseChars.length
+})
 
 // 添加和移除键盘事件监听
 onMounted(() => {

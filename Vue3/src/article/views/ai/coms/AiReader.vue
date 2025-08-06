@@ -223,7 +223,7 @@ watch(() => articleFileStore.currentArticle, (newArticle) => {
   flex-direction: column;
   height: 100%;
   margin: 0 auto;
-  max-width: 800px;
+  max-width: 700px;
   min-width: 400px;
   background-color: rgba($notebook-bg, 0.95);
   border: $border-width $border-style $border-color;

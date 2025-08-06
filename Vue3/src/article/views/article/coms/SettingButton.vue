@@ -95,19 +95,17 @@ const copyFile = async () => {
 </script>
 
 <template>
-  <div class="setting-button-container">
-    <el-tooltip effect="dark" content="Markdown文件设置" placement="bottom">
-      <el-button
-          class="setting-btn"
-          :icon="Setting"
-          circle
-          @click="openSettings"
-      />
-    </el-tooltip>
+  <div>
+    <el-button
+        class="setting-btn"
+        :icon="Setting"
+        circle
+        @click="openSettings"
+    />
 
     <el-drawer
         v-model="drawerVisible"
-        title="Markdown文件设置"
+        title="设置"
         :direction="direction"
         size="360px"
         append-to-body
@@ -302,9 +300,8 @@ const copyFile = async () => {
       border-color: rgba(120, 230, 255, 0.4);
       color: rgba(120, 230, 255, 1);
       transform: translateY(-2px);
-      box-shadow:
-          0 2px 12px rgba(120, 230, 255, 0.15),
-          inset 0 0 8px rgba(120, 230, 255, 0.1);
+      box-shadow: 0 2px 12px rgba(120, 230, 255, 0.15),
+      inset 0 0 8px rgba(120, 230, 255, 0.1);
     }
 
     &:active {

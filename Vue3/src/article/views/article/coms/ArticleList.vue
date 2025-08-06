@@ -25,57 +25,90 @@ const initExpandedStates = () => {
   articles.value.forEach(article => {
     const date = new Date(article.writtenAt)
     const year = date.getFullYear().toString()
-    const month = `${year}-${date.getMonth() + 1}`
+    const month = `${year}-${(date.getMonth() + 1).toString().padStart(2, '0')}` // 补零保持一致
     years.add(year)
     months.add(month)
   })
 
-  // 初始化年份和月份的展开状态（默认收缩）
+  // 默认展开所有年份和月份
   years.forEach(year => {
-    if (!(year in expandedYears.value)) {
-      expandedYears.value[year] = true
-    }
+    expandedYears.value[year] = true
   })
 
   months.forEach(month => {
-    if (!(month in expandedMonths.value)) {
-      expandedMonths.value[month] = true
-    }
+    expandedMonths.value[month] = true
+  })
+
+  console.log('展开状态初始化完成', {
+    years: [...years],
+    months: [...months],
+    expandedYears: expandedYears.value,
+    expandedMonths: expandedMonths.value
   })
 }
-
 // 按年份和月份分组文章（不再修改 expandedYears/expandedMonths）
 const groupedArticles = computed(() => {
-  const groups: Record<string, { total: number; months: Record<string, ArticleVO[]> }> = {}
+  // 1. 首先按时间正序排序所有文章（确保日正序）
+  const sortedArticles = [...articles.value].sort((a, b) =>
+      new Date(a.writtenAt).getTime() - new Date(b.writtenAt).getTime()
+  );
 
-  articles.value.forEach(article => {
-    const date = new Date(article.writtenAt)
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
+  // 2. 创建分组结构
+  const result: {
+    year: string;
+    total: number;
+    months: {
+      month: string;
+      articles: ArticleVO[];
+    }[];
+  }[] = [];
 
-    if (!groups[year]) {
-      groups[year] = { total: 0, months: {} }
+  // 3. 临时存储年份索引
+  const yearIndexMap: Record<string, number> = {};
+  const monthIndexMap: Record<string, Record<string, number>> = {};
+
+  // 4. 进行分组
+  sortedArticles.forEach(article => {
+    const date = new Date(article.writtenAt);
+    const year = date.getFullYear().toString();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 补零
+
+    // 处理年份
+    if (yearIndexMap[year] === undefined) {
+      yearIndexMap[year] = result.length;
+      result.push({
+        year,
+        total: 0,
+        months: []
+      });
+
+      // 初始化月份的索引映射
+      monthIndexMap[year] = {};
     }
 
-    if (!groups[year].months[month]) {
-      groups[year].months[month] = []
+    // 处理月份
+    if (monthIndexMap[year][month] === undefined) {
+      monthIndexMap[year][month] = result[yearIndexMap[year]].months.length;
+      result[yearIndexMap[year]].months.push({
+        month,
+        articles: []
+      });
     }
 
-    groups[year].months[month].push(article)
-    groups[year].total++
-  })
+    // 添加文章（日正序）
+    result[yearIndexMap[year]].months[monthIndexMap[year][month]].articles.push(article);
+    result[yearIndexMap[year]].total++;
+  });
 
-  // 按时间倒序排序
-  for (const year in groups) {
-    for (const month in groups[year].months) {
-      groups[year].months[month].sort((a, b) =>
-          new Date(b.writtenAt).getTime() - new Date(a.writtenAt).getTime()
-      )
-    }
-  }
+  // 5. 年倒序、月正序排序
+  result.sort((a, b) => Number(b.year) - Number(a.year)); // 年倒序
 
-  return groups
-})
+  result.forEach(yearGroup => {
+    yearGroup.months.sort((a, b) => Number(a.month) - Number(b.month)); // 月正序
+  });
+
+  return result;
+});
 
 // 监听 articles 变化，初始化展开状态
 watch(articles, () => {
@@ -136,31 +169,31 @@ init()
     <!-- 时间轴内容 -->
     <div v-else class="timeline-container">
       <!-- 按年份分组 -->
-      <div v-for="(yearGroup, year) in groupedArticles" :key="year" class="year-group">
-        <div class="year-header" @click="toggleYear(year)">
-          <el-icon :class="{ 'rotate-icon': expandedYears[year] }">
+      <div v-for="yearGroup in groupedArticles" :key="yearGroup.year" class="year-group">
+        <div class="year-header" @click="toggleYear(yearGroup.year)">
+          <el-icon :class="{ 'rotate-icon': expandedYears[yearGroup.year] }">
             <ArrowRight />
           </el-icon>
-          <span class="year-title">{{ year }}年</span>
+          <span class="year-title">{{ yearGroup.year }}年</span>
           <span class="article-count">({{ yearGroup.total }}篇)</span>
         </div>
 
         <!-- 按月分组 -->
         <el-collapse-transition>
-          <div v-show="expandedYears[year]" class="month-groups">
-            <div v-for="(monthGroup, month) in yearGroup.months" :key="month" class="month-group">
-              <div class="month-header" @click="toggleMonth(year, month)">
-                <el-icon :class="{ 'rotate-icon': expandedMonths[`${year}-${month}`] }">
+          <div v-show="expandedYears[yearGroup.year]" class="month-groups">
+            <div v-for="monthGroup in yearGroup.months" :key="monthGroup.month" class="month-group">
+              <div class="month-header" @click="toggleMonth(yearGroup.year, monthGroup.month)">
+                <el-icon :class="{ 'rotate-icon': expandedMonths[`${yearGroup.year}-${monthGroup.month}`] }">
                   <ArrowRight />
                 </el-icon>
-                <span class="month-title">{{ month }}月</span>
-                <span class="article-count">({{ monthGroup.length }}篇)</span>
+                <span class="month-title">{{ monthGroup.month }}月</span>
+                <span class="article-count">({{ monthGroup.articles.length }}篇)</span>
               </div>
 
               <!-- 文章列表 -->
               <el-collapse-transition>
-                <ul v-show="expandedMonths[`${year}-${month}`]" class="article-list">
-                  <li v-for="article in monthGroup" :key="article.id!" class="article-item">
+                <ul v-show="expandedMonths[`${yearGroup.year}-${monthGroup.month}`]" class="article-list">
+                  <li v-for="article in monthGroup.articles" :key="article.id!" class="article-item">
                     <div class="article-date">{{ formatDay(article.writtenAt) }}</div>
                     <div class="article-title" @click="handleArticleClick(article)">
                       {{ article.title }}
@@ -179,8 +212,7 @@ init()
             </div>
           </div>
         </el-collapse-transition>
-      </div>
-    </div>
+      </div>    </div>
   </div>
 </template>
 
