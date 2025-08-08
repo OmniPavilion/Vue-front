@@ -43,6 +43,45 @@ object MultipartFileUtils {
     }
 
     /**
+     * 创建空文件
+     * @param filePath 文件路径（相对路径或绝对路径）
+     * @return 创建的文件对象
+     * @throws FileException 当文件已存在或创建失败时抛出
+     */
+    @Throws(FileException::class)
+    fun createEmptyFile(filePath: String): File {
+        val file = Paths.get(filePath).toFile()
+
+        // 检查文件是否已存在
+        if (file.exists()) {
+            throw FileException("文件已存在: $filePath")
+        }
+
+        // 创建父目录（如果不存在）
+        file.parentFile?.mkdirs()
+
+        // 创建空文件
+        if (!file.createNewFile()) {
+            throw FileException("文件创建失败: $filePath")
+        }
+
+        return file
+    }
+
+    /**
+     * 安全创建空文件（不抛出异常）
+     * @param filePath 文件路径
+     * @return 创建的文件对象，如果失败则返回null
+     */
+    fun createEmptyFileSafely(filePath: String): File? {
+        return try {
+            createEmptyFile(filePath)
+        } catch (e: FileException) {
+            null
+        }
+    }
+
+    /**
      * 添加/创建文件
      * @param sourceFile 源文件（用于复制内容）
      * @param targetPath 目标路径（相对路径或绝对路径）
@@ -139,7 +178,7 @@ object MultipartFileUtils {
     }
 
     /**
-     * 写入字符串内容到文件
+     * 写入字符串内容到文件,会覆盖
      * @param path 文件路径
      * @param content 要写入的内容
      * @param charset 字符集（默认 UTF-8）
