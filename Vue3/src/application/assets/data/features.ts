@@ -32,11 +32,11 @@ export const features: Feature[] = [
         available: true
     },
     {
-        name: 'PDF阅读器',
-        desc: '即将推出：支持PDF文档阅读、标注和书签功能，提升您的阅读体验。',
+        name: 'Ai阅读器',
+        desc: '支持PDF文档阅读、标注和书签功能，提升您的阅读体验。',
         icon: Document,
-        link: '/pdf',
-        available: false
+        link: '/bibliophile',
+        available: true
     },
     {
         name: '游戏盒子',
