@@ -3,5 +3,6 @@ dependencies {
     implementation project(':diary')
     implementation project(':music')
     implementation project(':article')
+    implementation project(':bibliophile')
 }
 

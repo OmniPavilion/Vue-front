@@ -4,6 +4,7 @@ spring:
       - optional:classpath:application-diary.yaml
       - optional:classpath:application-music.yaml
       - optional:classpath:application-article.yaml
+      - optional:classpath:application-bibliophile.yaml
   servlet:
     multipart:
       max-file-size: 1024MB #  设置上传文件大小
