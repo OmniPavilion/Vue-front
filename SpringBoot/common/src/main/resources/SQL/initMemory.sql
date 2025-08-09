@@ -1,5 +1,3 @@
-USE article;
-
 DROP TABLE IF EXISTS `spring_ai_chat_memory`;
 
 CREATE TABLE `spring_ai_chat_memory`

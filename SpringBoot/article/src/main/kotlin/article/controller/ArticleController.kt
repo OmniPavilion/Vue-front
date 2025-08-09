@@ -47,7 +47,7 @@ class ArticleController(
     fun deleteArticle(@PathVariable id: Long): Result<Unit> {
         logger.info { "删除文章: $id" }
         articleService.deleteArticle(id)
-        articleAiService.removeByArticleId(id)
+        articleAiService.removeByConversationId(id)
         return Result.success()
     }
 

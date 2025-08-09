@@ -2,28 +2,25 @@ package common.service.impl
 
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
-import common.annotation.Datasource
-import common.enumerate.DataSourceType
 import common.mapper.AiMemoryMapper
 import common.pojo.po.SpringAiChatMemory
 import common.service.AiMemoryService
 import org.springframework.stereotype.Service
 import java.io.File
-import java.time.LocalDateTime
+import java.io.FileWriter
 import java.time.format.DateTimeFormatter
 
 @Service
-@Datasource(DataSourceType.ARTICLE)
 class AiMemoryServiceImpl(
     private val aiMemoryMapper: AiMemoryMapper,
 ) : ServiceImpl<AiMemoryMapper, SpringAiChatMemory>(), AiMemoryService {
-    override fun removeByArticleId(conversationId: Long) {
+    override fun removeByConversationId(conversationId: Long) {
         aiMemoryMapper.delete(KtQueryWrapper(SpringAiChatMemory::class.java).apply {
             eq(SpringAiChatMemory::conversationId, conversationId.toString())
         })
     }
 
-    override fun listByArticleId(conversationId: Long): List<SpringAiChatMemory> {
+    override fun listByConversationId(conversationId: Long): List<SpringAiChatMemory> {
         return aiMemoryMapper.selectList(KtQueryWrapper(SpringAiChatMemory::class.java).apply {
             eq(SpringAiChatMemory::conversationId, conversationId.toString())
             orderByAsc(SpringAiChatMemory::timestamp)
@@ -48,5 +45,53 @@ class AiMemoryServiceImpl(
         tempFile.renameTo(renamedFile)
 
         return renamedFile
+    }
+
+    override fun downloadChatByArticle(conversationId: Long): File {
+        val chats = listByConversationId(conversationId)
+        val markdownContent = convertToMarkdown(chats)
+
+        return createMarkdownFile(conversationId, markdownContent)
+    }
+
+    private fun convertToMarkdown(chats: List<SpringAiChatMemory>): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val markdownBuilder = StringBuilder("# 聊天记录\n\n")
+
+        chats.forEach { chat ->
+            val role = when (chat.type) {
+                "USER" -> "用户"
+                "ASSISTANT" -> "AI助手"
+                else -> "系统"
+            }
+            val time = chat.timestamp.format(formatter)
+
+            markdownBuilder.append(
+                """
+## $role ($time)
+
+${chat.content}
+
+---
+---
+---
+
+""".trimIndent())
+        }
+
+        return markdownBuilder.toString()
+    }
+
+    private fun createMarkdownFile(articleId: Long, content: String): File {
+        val fileName = "chat_article_${articleId}_${System.currentTimeMillis()}.md"
+        val file = File.createTempFile("chat_", ".md").apply {
+            deleteOnExit()
+        }
+
+        FileWriter(file).use { writer ->
+            writer.write(content)
+        }
+
+        return file
     }
 }
