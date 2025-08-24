@@ -12,6 +12,10 @@ MYSQL-USERNAME: root
 # 密码
 MYSQL-PASSWORD: ""
 
-PORT: 8080
 
-IP: http://localhost
+internet:
+  PORT: 8080
+
+  IPS:
+    - "http://192.168.117.83:"
+    - "http://localhost:"

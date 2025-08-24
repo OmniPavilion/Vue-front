@@ -37,6 +37,7 @@ export default defineConfig({
     base: './',
     server: {
         port: 80,
+        host: '0.0.0.0',
         strictPort: true,
     },
     build: {

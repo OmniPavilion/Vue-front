@@ -1,4 +1,4 @@
-import {InternetConstant} from "@/common/constants/InternetConstant";
+import {InternetConstant} from "@/common/utils/urlUtils";
 
 interface ChatHttpRequest {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -8,7 +8,7 @@ interface ChatHttpRequest {
 }
 
 async function myFetch(obj: ChatHttpRequest): Promise<Response> {
-  const http =  InternetConstant.URL;
+  const http =  InternetConstant.URL();
   // 解构赋值（添加类型注解）
   const { method, url, params, data } = obj;
 

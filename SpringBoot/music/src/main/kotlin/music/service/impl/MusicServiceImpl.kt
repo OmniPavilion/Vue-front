@@ -43,9 +43,9 @@ class MusicServiceImpl(
     private val resourceFileUtils: MultipartFileUtils,
     private val singerPictureMapper: SingerPictureMapper,
     private val musicConstant: MusicConstant,
-    internetConstant: InternetConstant
+    private val internetConstant: InternetConstant
 ) : MusicService {
-    val url = internetConstant.url
+    var url = internetConstant.url
 
     private val logger = KotlinLogging.logger { }
 
@@ -345,6 +345,8 @@ class MusicServiceImpl(
     }
 
     private fun toVO(music: Music): MusicVO {
+        url = internetConstant.url
+
         val singerName = music.singerId?.let { singerMapper.selectById(it)?.name }
         val categoryName = music.categoryId?.let { categoryMapper.selectById(it)?.name }
 
