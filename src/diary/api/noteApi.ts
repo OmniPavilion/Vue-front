@@ -11,7 +11,7 @@ export const noteApi = {
     createNote(note: NoteVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'post',
-            url: '/api/notes',
+            url: '/diary/notes',
             data: note,
         });
     },
@@ -20,7 +20,7 @@ export const noteApi = {
     getNote(id: number): Promise<AxiosResponse<Result<NoteVO>>> {
         return myAxios({
             method: 'get',
-            url: `/api/notes/${id}`,
+            url: `/diary/notes/${id}`,
         });
     },
 
@@ -28,7 +28,7 @@ export const noteApi = {
     updateNote(note: NoteVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/notes',
+            url: '/diary/notes',
             data: note,
         });
     },
@@ -37,7 +37,7 @@ export const noteApi = {
     deleteNote(id: number): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: `/api/notes/${id}`,
+            url: `/diary/notes/${id}`,
         });
     },
 
@@ -45,7 +45,7 @@ export const noteApi = {
     getNotesByStatus(status: Status): Promise<AxiosResponse<Result<NoteVO[]>>> {
         return myAxios({
             method: 'get',
-            url: `/api/notes/status/${status}`,
+            url: `/diary/notes/status/${status}`,
         });
     },
 
@@ -53,7 +53,7 @@ export const noteApi = {
     getNotePage(pageDTO: PageDTO<Status | null>): Promise<AxiosResponse<Result<PageVO<NoteVO>>>> {
         return myAxios({
             method: 'post',
-            url: '/api/notes/page',
+            url: '/diary/notes/page',
             data: pageDTO,
         });
     },

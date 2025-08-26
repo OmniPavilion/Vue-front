@@ -371,6 +371,8 @@ const handleCreateArticle = async () => {
       showCreateDialog.value = false
       await articleStore.fetchArticlePage()
       ElMessage.success(isCreating.value ? '新建文章成功' : '保存成功' as any)
+    } else {
+      ElMessage.error(res.message as any)
     }
   } catch (error) {
     console.error('创建文章失败:', error)

@@ -16,7 +16,7 @@ export const singerApi = {
     getSingers: function (pageDTO: PageDTO<string>, isContainDefaultSinger: boolean = true): Promise<AxiosResponse<Result<PageVO<SingerVO>>>> {
         return myAxios({
             method: 'post',
-            url: '/api/singers/page',
+            url: '/music/singers/page',
             data: pageDTO,
             params: {isContainDefaultSinger}
         });
@@ -29,7 +29,7 @@ export const singerApi = {
     getSingerList(): Promise<AxiosResponse<Result<Record<number, string>>>> {
         return myAxios({
             method: 'get',
-            url: '/api/singers/list'
+            url: '/music/singers/list'
         });
     },
 
@@ -41,7 +41,7 @@ export const singerApi = {
     getSingerById(id: number): Promise<AxiosResponse<Result<SingerVO>>> {
         return myAxios({
             method: 'get',
-            url: `/api/singers/${id}`
+            url: `/music/singers/${id}`
         });
     },
 
@@ -53,7 +53,7 @@ export const singerApi = {
     createSinger(singer: SingerVO): Promise<AxiosResponse<Result<number>>> {
         return myAxios({
             method: 'post',
-            url: '/api/singers',
+            url: '/music/singers',
             data: singer
         });
     },
@@ -66,7 +66,7 @@ export const singerApi = {
     updateSinger(singer: SingerVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/singers',
+            url: '/music/singers',
             data: singer
         });
     },
@@ -79,7 +79,7 @@ export const singerApi = {
     deleteSinger(id: number): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: `/api/singers/${id}`
+            url: `/music/singers/${id}`
         });
     }
 };

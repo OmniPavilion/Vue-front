@@ -15,7 +15,7 @@ export const categoryApi = {
     getCategories(params: PageDTO<string>): Promise<AxiosResponse<Result<PageVO<CategoryVO>>>> {
         return myAxios({
             method: 'post',
-            url: '/api/categories/page',
+            url: '/music/categories/page',
             data: params
         });
     },
@@ -27,7 +27,7 @@ export const categoryApi = {
     getCategoryList(): Promise<AxiosResponse<Result<Record<number, string>>>> {
         return myAxios({
             method: 'get',
-            url: '/api/categories/list'
+            url: '/music/categories/list'
         });
     },
 
@@ -39,7 +39,7 @@ export const categoryApi = {
     getCategoryById(id: number): Promise<AxiosResponse<Result<CategoryVO>>> {
         return myAxios({
             method: 'get',
-            url: `/api/categories/${id}`
+            url: `/music/categories/${id}`
         });
     },
 
@@ -51,7 +51,7 @@ export const categoryApi = {
     createCategory(category: CategoryVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'post',
-            url: '/api/categories',
+            url: '/music/categories',
             data: category
         });
     },
@@ -64,7 +64,7 @@ export const categoryApi = {
     updateCategory(category: CategoryVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/categories',
+            url: '/music/categories',
             data: category
         });
     },
@@ -77,7 +77,7 @@ export const categoryApi = {
     deleteCategory(id: number): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: `/api/categories/${id}`
+            url: `/music/categories/${id}`
         });
     }
 };

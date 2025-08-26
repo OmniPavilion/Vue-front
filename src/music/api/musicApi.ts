@@ -15,7 +15,7 @@ export const musicApi = {
     getMusicPage(params: PageDTO<MusicQuery>): Promise<AxiosResponse<Result<PageVO<MusicVO>>>> {
         return myAxios({
             method: 'post',
-            url: '/api/musics/page',
+            url: '/music/musics/page',
             data: params
         });
     },
@@ -27,7 +27,7 @@ export const musicApi = {
     getMusicById(id: number): Promise<AxiosResponse<Result<MusicVO>>> {
         return myAxios({
             method: 'get',
-            url: `/api/musics/${id}`
+            url: `/music/musics/${id}`
         });
     },
 
@@ -43,7 +43,7 @@ export const musicApi = {
 
         return myAxios({
             method: 'post',
-            url: '/api/musics/batch',
+            url: '/music/musics/batch',
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -56,7 +56,7 @@ export const musicApi = {
     updateMusic(music: MusicVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/musics',
+            url: '/music/musics',
             data: music
         });
     },
@@ -68,7 +68,7 @@ export const musicApi = {
     deleteMusic(id: number): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: `/api/musics/${id}`
+            url: `/music/musics/${id}`
         });
     },
 
@@ -79,7 +79,7 @@ export const musicApi = {
     deleteMusics(ids: number[]): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: '/api/musics/batch',
+            url: '/music/musics/batch',
             data: ids
         });
     },
@@ -91,7 +91,7 @@ export const musicApi = {
     recordPlay(id: number): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'post',
-            url: `/api/musics/${id}/play`
+            url: `/music/musics/${id}/play`
         });
     },
 
@@ -102,7 +102,7 @@ export const musicApi = {
     toggleFavorite(id: number): Promise<AxiosResponse<Result<boolean>>> {
         return myAxios({
             method: 'post',
-            url: `/api/musics/${id}/favorite`
+            url: `/music/musics/${id}/favorite`
         });
     },
 
@@ -113,7 +113,7 @@ export const musicApi = {
     getNextMusic(id: number, playMode: string, isNext: boolean, query : MusicQuery) : Promise<AxiosResponse<Result<MusicVO>>> {
         return myAxios({
             method: 'post',
-            url: `/api/musics/${id}/next`,
+            url: `/music/musics/${id}/next`,
             params: {
                 playMode,
                 isNext,
@@ -129,7 +129,7 @@ export const musicApi = {
     getMusicPosition(id: number, pageDTO: PageDTO<MusicQuery>): Promise<AxiosResponse<Result<number>>> {
         return myAxios({
             method: 'post',
-            url: `/api/musics/${id}/position`,
+            url: `/music/musics/${id}/position`,
             data: pageDTO
         });
     },
@@ -137,7 +137,7 @@ export const musicApi = {
     checkFile(): Promise<AxiosResponse<Result<boolean>>> {
         return myAxios({
             method: 'get',
-            url: `/api/musicFile/check`,
+            url: `/music/musicFile/check`,
         });
     },
 };

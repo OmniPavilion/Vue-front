@@ -186,26 +186,27 @@ onMounted(async () => {
   max-height: 95%;
   overflow-y: auto;
   padding-right: 12px;
-}
+  height: 100%;
 
-.scroll-container::-webkit-scrollbar {
-  width: 8px;
-}
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
 
-.scroll-container::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 4px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 
-.scroll-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.6);
-}
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+  }
 
-.scroll-container::-webkit-scrollbar-track {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  &::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
 }
 
 /* 主题适配 */

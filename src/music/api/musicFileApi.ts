@@ -11,7 +11,7 @@ export const musicFileApi = {
     updateRoot(path: string): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/musicFile/root',
+            url: '/music/musicFile/root',
             params: { path }
         });
     },
@@ -23,7 +23,7 @@ export const musicFileApi = {
     resetRoot(): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/musicFile/resetRoot'
+            url: '/music/musicFile/resetRoot'
         });
     },
 
@@ -35,7 +35,7 @@ export const musicFileApi = {
     getRoot() {
         return myAxios({
             method: 'get',
-            url: '/api/musicFile/root'
+            url: '/music/musicFile/root'
         });
     }
 };

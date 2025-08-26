@@ -147,7 +147,11 @@ const handleSendMessage = async () => {
 // 清除聊天记录
 const clearChat = async () => {
   try {
-    await readStore.deleteChatHistory()
+    const res = await readStore.deleteChatHistory()
+    if (res.code !== 1) {
+      ElMessage.error(res.message as any)
+      return
+    }
     ElMessage.success('聊天记录已清除' as any)
   } catch (err) {
     ElMessage.error('清除聊天记录失败' as any)
@@ -174,7 +178,11 @@ const handleDeleteMessage = async (messageId: number) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    await readStore.deleteChatsById(messageId)
+    const res = await readStore.deleteChatsById(messageId)
+    if (res.code !== 1) {
+      ElMessage.error(res.message as any)
+      return
+    }
     ElMessage.success('消息删除成功' as any)
   } catch (error) {
     if (error !== 'cancel') {

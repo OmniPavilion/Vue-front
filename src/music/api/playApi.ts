@@ -11,7 +11,7 @@ export const playApi = {
     getPlayArg: function (): Promise<AxiosResponse<Result<PlayArg>>> {
         return myAxios({
             method: 'get',
-            url: '/api/play/arg',
+            url: '/music/play/arg',
         });
     },
 
@@ -23,7 +23,7 @@ export const playApi = {
     setPlayArg(playArg: PlayArg): Promise<AxiosResponse<Result<null>>> {
         return myAxios({
             method: 'post',
-            url: '/api/play/arg',
+            url: '/music/play/arg',
             data: playArg
         });
     },

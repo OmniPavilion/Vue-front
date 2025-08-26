@@ -19,7 +19,7 @@ export const singerPictureApi = {
 
         return myAxios({
             method: 'put',
-            url: `/api/singers/${singerId}/pictures`,
+            url: `/music/singers/${singerId}/pictures`,
             data: formData,
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -39,7 +39,7 @@ export const singerPictureApi = {
     ): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: `/api/singers/${singerId}/picture`,
+            url: `/music/singers/${singerId}/picture`,
             params: { pictureId }
         });
     }

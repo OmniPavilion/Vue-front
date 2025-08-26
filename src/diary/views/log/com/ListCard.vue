@@ -258,6 +258,7 @@ const monthToChinese = (month: number) => {
   max-height: 95%;
   overflow-y: auto;
   padding-right: 12px;
+  height: 100%;
 
   &::-webkit-scrollbar {
     width: 8px;

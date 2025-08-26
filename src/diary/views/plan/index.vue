@@ -5,12 +5,15 @@ import Search from "@/diary/views/plan/com/Search.vue";
 </script>
 
 <template>
-  <div>
+  <div class="plan-container">
     <Search></Search>
     <ListCard></ListCard>
   </div>
 </template>
 
 <style scoped>
+.plan-container {
+  height: 100%;
+}
 
 </style>

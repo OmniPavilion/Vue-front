@@ -12,7 +12,7 @@ export const logApi = {
     createLog(dailyLog: DailyLogVO): Promise<AxiosResponse<Result<number>>> {
         return myAxios({
             method: 'post',
-            url: '/api/logs',
+            url: '/diary/logs',
             data: dailyLog
         });
     },
@@ -21,7 +21,7 @@ export const logApi = {
     deleteLog(id: number): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'delete',
-            url: `/api/logs/${id}`
+            url: `/diary/logs/${id}`
         });
     },
 
@@ -29,7 +29,7 @@ export const logApi = {
     updateLog(dailyLog: DailyLogVO): Promise<AxiosResponse<Result<void>>> {
         return myAxios({
             method: 'put',
-            url: '/api/logs',
+            url: '/diary/logs',
             data: dailyLog
         });
     },
@@ -38,7 +38,7 @@ export const logApi = {
     getLog(id: number): Promise<AxiosResponse<Result<DailyLogVO>>> {
         return myAxios({
             method: 'get',
-            url: `/api/logs/${id}`
+            url: `/diary/logs/${id}`
         });
     },
 
@@ -46,7 +46,7 @@ export const logApi = {
     getLogsByPage(params: PageDTO<LogQuery>): Promise<AxiosResponse<Result<PageVO<DailyLogVO>>>> {
         return myAxios({
             method: 'post',
-            url: '/api/logs/page',
+            url: '/diary/logs/page',
             data: params
         });
     }

@@ -4,12 +4,15 @@ import Search from "@/diary/views/log/com/Search.vue";
 </script>
 
 <template>
-  <div>
+  <div class="log-container">
     <Search></Search>
     <ListCard></ListCard>
   </div>
 </template>
 
 <style scoped>
+.log-container {
+  height: 100%;
+}
 
 </style>

@@ -98,15 +98,19 @@ export const useReadStore = defineStore('ReadStore', () => {
     const deleteChatHistory = async () => {
         logger.log("删除当前文章的所有聊天记录", currentArticleId.value)
 
-        if (!currentArticleId.value) return
+        if (!currentArticleId.value) return {
+            code: -1,
+            message: "未选择文章",
+            data: null
+        }
 
         isLoading.value = true
         try {
-            await chatApi.deleteChatsByArticleId(currentArticleId.value)
-            chatMessages.value = []
-        } catch (err) {
-            logger.error("删除聊天记录失败:", err)
-            error.value = "删除聊天记录失败"
+            const res = await chatApi.deleteChatsByArticleId(currentArticleId.value)
+            if (res.data.code === 1) {
+                chatMessages.value = []
+            }
+            return res.data
         } finally {
             isLoading.value = false
         }
@@ -116,11 +120,11 @@ export const useReadStore = defineStore('ReadStore', () => {
         logger.log("删除聊天记录", id)
         isLoading.value = true
         try {
-            await chatApi.deleteChatsById(id)
-            chatMessages.value = chatMessages.value.filter(msg => msg.id !== id)
-        } catch (err) {
-            logger.error("删除聊天记录失败:", err)
-            error.value = "删除聊天记录失败"
+            const res = await chatApi.deleteChatsById(id)
+            if (res.data.code === 1) {
+                chatMessages.value = chatMessages.value.filter(msg => msg.id !== id)
+            }
+            return res.data
         } finally {
             isLoading.value = false
         }

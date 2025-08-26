@@ -37,7 +37,9 @@ export const useArticleStore = defineStore('article', () => {
         loading.value = true;
         try {
             const res = await articleApi.createArticle(article);
-            articles.value.push(article);
+            if (res.data.code === 1) {
+                articles.value.push(article);
+            }
             return res.data;
         } finally {
             loading.value = false;
