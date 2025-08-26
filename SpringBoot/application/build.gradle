@@ -1,8 +1,0 @@
-dependencies {
-    implementation project(':common')
-    implementation project(':diary')
-    implementation project(':music')
-    implementation project(':article')
-    implementation project(':bibliophile')
-}
-

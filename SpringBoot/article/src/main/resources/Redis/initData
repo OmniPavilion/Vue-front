@@ -1,7 +1,0 @@
-FLUSHDB
-
----- 设置music配置
-HSET article:file: default_root_path "./data/article"
-HSET article:file: root_path "./data/article"
-
-
