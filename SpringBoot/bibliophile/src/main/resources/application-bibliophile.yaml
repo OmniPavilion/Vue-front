@@ -1,0 +1,21 @@
+spring:
+  config:
+    import:
+      - optional:classpath:args.yaml
+  application:
+    name: bibliophile
+  datasource:
+    bibliophile:
+      driver-class-name: com.mysql.cj.jdbc.Driver # 数据库驱动
+      jdbc-url: jdbc:mysql://${MYSQL-URL}/bibliophile # 数据库地址
+      username: ${MYSQL-USERNAME} #   用户
+      password: ${MYSQL-PASSWORD} # 密码
+      type: com.zaxxer.hikari.HikariDataSource
+
+  ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            schema: classpath:/SQL/initMemory.sql
+

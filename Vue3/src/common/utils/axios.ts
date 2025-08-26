@@ -1,22 +1,31 @@
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import axios from 'axios';
-
 import type {Result} from '@/common/types/vo/Result'
-import {InternetConstant} from "@/common/constants/InternetConstant";
+import {InternetConstant} from "@/common/utils/urlUtils";
 
-// 创建 axios 实例
+// 创建基础实例
 const myAxios: AxiosInstance = axios.create({
-    baseURL: InternetConstant.URL,
+    baseURL: '', // 先设为空
     timeout: 500000,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// 请求拦截器
+let baseURLCache: string | null = null;
+
+// 请求拦截器 - 动态设置 baseURL
 myAxios.interceptors.request.use(
-    (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-        // 添加认证 token 示例
+    async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+        // 动态设置 baseURL
+        if (!config.baseURL) {
+            if (!baseURLCache) {
+                baseURLCache = await InternetConstant.URL();
+            }
+            config.baseURL = baseURLCache;
+        }
+
+        // 添加认证 token
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -28,7 +37,7 @@ myAxios.interceptors.request.use(
     }
 );
 
-// 响应拦截器
+// 响应拦截器（保持不变）
 myAxios.interceptors.response.use(
     <T>(response: AxiosResponse<Result<T>>): AxiosResponse<Result<T>> => {
         if (response.data.code != 1) {
@@ -37,9 +46,7 @@ myAxios.interceptors.response.use(
         return response;
     },
     (error: AxiosError): Promise<AxiosError> => {
-        // 统一错误处理
         if (error.response?.status === 401) {
-            // 处理未授权
             console.error('Unauthorized, redirect to login');
         }
         return Promise.reject(error);

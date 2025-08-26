@@ -1,9 +1,6 @@
-package article.controller
+package bibliophile.controller
 
-import article.advise.ArticleAdvisor
-import article.service.ArticleAiMemoryService
-import common.annotation.Datasource
-import common.enumerate.DataSourceType
+import bibliophile.service.AiReaderFileAiMemoryService
 import common.pojo.po.SpringAiChatMemory
 import mu.KotlinLogging
 import org.springframework.ai.chat.client.ChatClient
@@ -19,31 +16,31 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestBody
 import java.time.LocalDate
 
 @RestController
-@RequestMapping("/article/read")
-class AiReadController(
-    private val articleChatClient: ChatClient,
-    private val articleAiMemoryService: ArticleAiMemoryService
+@RequestMapping("/bibliophile/read")
+class BibliophileAiReadController(
+    private val bibliophileChatClient: ChatClient,
+    private val aiReaderFileAiMemoryService: AiReaderFileAiMemoryService
 ) {
     private val logger = KotlinLogging.logger { }
 
     // 读取文章
     @RequestMapping("/chat", produces = ["text/html;charset=utf-8"])
-    fun readArticle(@RequestBody article: String, prompt: String, articleId: Long, title: String): Flux<String> {
-        logger.info("文章id: $articleId -> chat: $prompt")
-        return articleChatClient
+    fun readFile(prompt: String, fileId: Long): Flux<String> {
+        logger.info(" 文件id: $fileId -> chat: $prompt")
+        // 将文件存入向量数据库
+        aiReaderFileAiMemoryService.setFileIntoVectorStore(fileId)
+
+        return bibliophileChatClient
             .prompt()
             // 仅将问题存入记忆，文章内容作为临时上下文
-            .user(prompt)
+            .user("无")
             // 在advisors中传递文章内容作为临时参数，而非记忆内容
             .advisors { a ->
                 a.params(mapOf(
-                    ChatMemory.CONVERSATION_ID to articleId.toString(),
-                    ArticleAdvisor.ARTICLE_CONTEXT to article,  // 作为临时上下文参数
-                    ArticleAdvisor.ARTICLE_TITLE to title
+                    ChatMemory.CONVERSATION_ID to fileId.toString(),
                 ))
             }
             .stream()
@@ -53,15 +50,15 @@ class AiReadController(
     // 删除所有聊天
     @DeleteMapping
     fun deleteAll(): Result<Unit> {
-        articleAiMemoryService.remove(null)
+        aiReaderFileAiMemoryService.remove(null)
         return Result.success()
     }
 
     // 根据文章id删除聊天
-    @DeleteMapping("/articleId/{articleId}")
-    fun deleteByArticleId(@PathVariable articleId: Long): Result<Unit> {
-        logger.info("删除文章id为{}的聊天", articleId)
-        articleAiMemoryService.removeByArticleId(articleId)
+    @DeleteMapping("/fileId/{fileId}")
+    fun deleteByFileId(@PathVariable fileId: Long): Result<Unit> {
+        logger.info("删除文章id为{}的聊天", fileId)
+        aiReaderFileAiMemoryService.removeByConversationId(fileId)
         return Result.success()
     }
 
@@ -69,34 +66,42 @@ class AiReadController(
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): Result<Unit> {
         logger.info("删除id为{}的聊天", id)
-        articleAiMemoryService.removeById(id)
+        aiReaderFileAiMemoryService.removeById(id)
         return Result.success()
     }
 
     // 根据文章id获取聊天
-    @GetMapping("articleId/{articleId}")
-    fun getChatByArticleId(@PathVariable articleId: Long): Result<List<SpringAiChatMemory>> {
-        logger.info("获取文章id为{}的聊天", articleId)
-        val chatMemories = articleAiMemoryService.listByArticleId(articleId)
+    @GetMapping("fileId/{fileId}")
+    fun getChatByFileId(@PathVariable fileId: Long): Result<List<SpringAiChatMemory>> {
+        logger.info("获取文章id为{}的聊天", fileId)
+        val chatMemories = aiReaderFileAiMemoryService.listByConversationId(fileId)
         return Result.success(chatMemories)
     }
 
     // 根据id获取聊天
-    @GetMapping("/{id}")
+    @GetMapping("id/{id}")
     fun getChat(@PathVariable id: Long): Result<SpringAiChatMemory> {
-        val chatMemory = articleAiMemoryService.getById(id)
+        val chatMemory = aiReaderFileAiMemoryService.getById(id)
         return Result.success(chatMemory)
     }
 
     // 下载聊天记录（md格式）
     @GetMapping("/download/{id}")
     fun downloadChat(@PathVariable id: Long): ResponseEntity<Resource> {
-        val markdownFile = articleAiMemoryService.downloadChatByArticle(id)
+        val markdownFile = aiReaderFileAiMemoryService.downloadChatByArticle(id)
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, "text/markdown; charset=UTF-8")
             .header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"chat_${id}_${LocalDate.now()}.md\"")
             .body(FileSystemResource(markdownFile))
+    }
+
+    // 清空向量数据库
+    @DeleteMapping("/vectorStore")
+    fun deleteVectorStore(): Result<Unit> {
+        aiReaderFileAiMemoryService.deleteVectorStore()
+
+        return Result.success()
     }
 }

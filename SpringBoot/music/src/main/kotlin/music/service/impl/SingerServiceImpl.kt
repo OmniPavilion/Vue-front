@@ -34,12 +34,14 @@ class SingerServiceImpl(
     private val musicMapper: MusicMapper,
     private val musicConstant: MusicConstant,
     private val pictureMapper: SingerPictureMapper,
-    internetConstant: InternetConstant
+    private val internetConstant: InternetConstant
 ) : SingerService {
-    val url = internetConstant.url
+    var url = internetConstant.url
 
 
     override fun getSingerPage(pageDTO: PageDTO<String>, isContainDefaultSinger: Boolean): PageVO<SingerVO> {
+        url = internetConstant.url
+
         val page = Page<Singer>(
             pageDTO.pageNum.toLong(),
             pageDTO.pageSize.toLong()

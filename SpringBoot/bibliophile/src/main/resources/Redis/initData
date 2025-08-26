@@ -1,0 +1,7 @@
+FLUSHDB
+
+---- 设置file配置
+HSET ai_reader_file:file: default_root_path "./data/file"
+HSET ai_reader_file:file: root_path "./data/file"
+
+

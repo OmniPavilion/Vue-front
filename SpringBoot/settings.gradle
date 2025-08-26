@@ -13,6 +13,7 @@ include(
         "common",
         "diary",
         "music",
-        "article"
+        "article",
+        "bibliophile"
 )
 
