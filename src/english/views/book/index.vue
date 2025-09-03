@@ -1,8 +1,9 @@
 <script setup lang="ts">
+
 </script>
 
 <template>
-  <RouterView></RouterView>
+<div>book</div>
 </template>
 
 <style scoped>
