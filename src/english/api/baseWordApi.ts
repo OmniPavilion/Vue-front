@@ -6,6 +6,7 @@ import type { PageVO } from '@/common/types/vo/PageVO';
 import type { AxiosResponse } from 'axios';
 import type { BaseWordQuery } from '@/english/types/dto/BaseWordQuery';
 import type { BaseWord } from '@/english/types/vo/BaseWord';
+import type {WordText} from "@/english/types/vo/WordText";
 
 export const wordApi = {
     // 分页查询单词
@@ -22,6 +23,14 @@ export const wordApi = {
         return myAxios({
             method: 'get',
             url: '/english/words/category'
+        });
+    },
+
+    // 获取单词选择测试题
+    getTest(): Promise<AxiosResponse<Result<WordText>>> {
+        return myAxios({
+            method: 'get',
+            url: '/english/words/test'
         });
     }
 };

@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import Header from "@/english/views/header/index.vue"
 import Aside from "@/english/views/aside/index.vue"
+import AiChatDialog from "@/english/components/AiChatDialog.vue";
 
 const transitionName = ref('slide-down')
 
@@ -10,6 +11,7 @@ const transitionName = ref('slide-down')
 </script>
 
 <template>
+  <AiChatDialog></AiChatDialog>
 
   <div class="common-layout">
     <el-container>

@@ -6,6 +6,7 @@ import type { PageVO } from '@/common/types/vo/PageVO';
 import type { AxiosResponse } from 'axios';
 import type { VocabularyQuery } from '@/english/types/dto/VocabularyQuery';
 import type { Vocabulary } from '@/english/types/vo/detailWord/Vocabulary';
+import type {WordText} from "@/english/types/vo/WordText";
 
 export const vocabularyApi = {
     // 分页查询单词
@@ -74,5 +75,23 @@ export const vocabularyApi = {
             method: 'get',
             url: '/english/vocabularies/phonetic'
         });
+    },
+
+    // 获取单词选择测试题
+    getTest(): Promise<AxiosResponse<Result<WordText>>> {
+        return myAxios({
+            method: 'get',
+            url: '/english/vocabularies/test'
+        });
+    },
+
+    // 批量删除单词
+    deleteByIds(ids: number[]) {
+        return myAxios({
+            method: 'delete',
+            url: '/english/vocabularies/batch',
+            data: ids
+        });
+
     }
 };

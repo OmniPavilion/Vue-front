@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { englishAiApi } from '@/english/api/aiChatApi';
 import logger from '@/common/utils/logger';
+import {markDownIt} from '@/common/utils/tools';
 
 type ChatMode = 'ADD_WORD' | 'TRANSLATE';
 
@@ -19,6 +20,7 @@ export const useAiChatStore = defineStore('aiChat', () => {
     const isLoading = ref<boolean>(false);
     const isStreaming = ref<boolean>(false);
     const error = ref<string | null>(null);
+    const isOpen = ref<boolean>(false);
 
     /**
      * AI聊天函数
@@ -26,7 +28,7 @@ export const useAiChatStore = defineStore('aiChat', () => {
      * @param mode - 聊天模式：ADD_WORD（添加单词）或 TRANSLATE（翻译）
      * @returns 如果是翻译模式，返回翻译内容；否则返回void
      */
-    const chat = async (prompt: string, mode: ChatMode): Promise<string | void> => {
+    const chat = async (prompt: string, mode: ChatMode = 'ADD_WORD'): Promise<string | void> => {
         logger.info(`AI聊天 - 模式: ${mode}, 内容:`, prompt);
 
         if (isLoading.value || isStreaming.value) {
@@ -138,6 +140,14 @@ export const useAiChatStore = defineStore('aiChat', () => {
         error.value = null;
     }
 
+    const openChat = () => {
+        isOpen.value = true
+    }
+
+    const closeChat = () => {
+        isOpen.value = false
+    }
+
     /**
      * 获取添加单词模式的聊天记录
      */
@@ -184,7 +194,7 @@ export const useAiChatStore = defineStore('aiChat', () => {
     const updateAssistantMessage = (messageId: number, content: string) => {
         const message = chatMessages.value.find(m => m.id === messageId);
         if (message && message.type === 'ASSISTANT') {
-            message.content = content;
+            message.content =   markDownIt.render(content);
         }
     }
 
@@ -192,10 +202,12 @@ export const useAiChatStore = defineStore('aiChat', () => {
         chatMessages,
         isLoading,
         isStreaming,
-        error,
+        isOpen,
         chat,
         clearChat,
         clearError,
-        getWordChatMessages
+        getWordChatMessages,
+        openChat,
+        closeChat,
     };
 });

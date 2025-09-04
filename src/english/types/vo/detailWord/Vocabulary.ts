@@ -3,7 +3,7 @@ import type { Detail } from './Detail';
 
 export interface Vocabulary {
     id?: number;
-    status?: number;
+    status: number;
     english: string;
     phonetic: string;
     details?: Detail[];

@@ -37,11 +37,23 @@ export const useBaseWordStore = defineStore('baseWord', () => {
         loading.value = true;
         try {
             const response = await wordApi.getCategory();
-            return response.data.data;
+            return response.data;
         } finally {
             loading.value = false;
         }
     };
+
+    // 获取单词测试题
+    const getTest = async () => {
+        logger.log('获取单词测试题');
+        loading.value = true;
+        try {
+            const response = await wordApi.getTest();
+            return response.data;
+        } finally {
+            loading.value = false;
+        }
+    }
 
     return {
         words,
@@ -50,5 +62,6 @@ export const useBaseWordStore = defineStore('baseWord', () => {
         total,
         fetchWordPage,
         fetchCategory,
+        getTest,
     };
 });

@@ -58,6 +58,19 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         }
     };
 
+    // 根据id数组批量删除单词
+    const deleteVocabularies = async (ids: number[]) => {
+        logger.log('根据id数组批量删除单词', ids);
+        loading.value = true;
+        try {
+            const response = await vocabularyApi.deleteByIds(ids);
+            vocabularies.value = vocabularies.value.filter(vocab => !ids.includes(<number>vocab.id));
+            return response.data;
+        } finally {
+            loading.value = false;
+        }
+    }
+
     // 添加单词
     const createVocabulary = async (word: Vocabulary) => {
         logger.log('添加单词', word);
@@ -97,6 +110,10 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         loading.value = true;
         try {
             const response = await vocabularyApi.updateWordStatus(status, wordId);
+            const index = vocabularies.value.findIndex(v => v.id === wordId)
+            if (index !== -1) {
+                vocabularies.value[index].status = status;
+            }
             return response.data;
         } finally {
             loading.value = false;
@@ -109,7 +126,7 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         loading.value = true;
         try {
             const response = await vocabularyApi.getStatus();
-            return response.data.data;
+            return response.data;
         } finally {
             loading.value = false;
         }
@@ -121,32 +138,23 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         loading.value = true;
         try {
             const response = await vocabularyApi.getPartOfSpeech();
-            return response.data.data;
+            return response.data;
         } finally {
             loading.value = false;
         }
     };
 
-    // 重置查询条件
-    const resetQuery = () => {
-        pageQuery.value = {
-            pageNum: 1,
-            pageSize: 99999,
-            order: 'DESC',
-            query: {},
-        };
-    };
-
-    // 设置查询条件
-    const setQuery = (query: VocabularyQuery) => {
-        pageQuery.value.query = query;
-    };
-
-    // 设置分页参数
-    const setPagination = (pageNum: number, pageSize: number) => {
-        pageQuery.value.pageNum = pageNum;
-        pageQuery.value.pageSize = pageSize;
-    };
+    // 获取单词测试题
+    const getTest = async () => {
+        logger.log('获取单词测试题');
+        loading.value = true;
+        try {
+            const response = await vocabularyApi.getTest();
+            return response.data;
+        } finally {
+            loading.value = false;
+        }
+    }
 
     return {
         vocabularies,
@@ -162,8 +170,7 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         updateVocabularyStatus,
         fetchStatusDict,
         fetchPartOfSpeechDict,
-        resetQuery,
-        setQuery,
-        setPagination
+        deleteVocabularies,
+        getTest
     };
 });

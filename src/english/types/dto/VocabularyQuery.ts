@@ -1,6 +1,6 @@
 // VocabularyQuery.ts
 export interface VocabularyQuery {
-    english?: string;
-    chinese?: string;
-    status?: number;
+    english?: string | null;
+    chinese?: string | null;
+    status?: number | null;
 }
