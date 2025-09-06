@@ -171,6 +171,27 @@ const handleDelete = async (id: number) => {
   }
 }
 
+// 批量删除单词
+const idList = ref<number[]>([])
+
+const handleBatchDelete = async () => {
+  const res = await vocabularyStore.deleteVocabularies(idList.value)
+  if (res.code === 1) {
+    ElMessage.success('批量删除成功' as any)
+    isDialogShow.value = false
+    await vocabularyStore.fetchVocabularyPage()
+  } else {
+    ElMessage.error(res.message || '批量删除失败' as any)
+  }
+
+  idList.value = []
+}
+
+// 处理选择变化
+const handleSelectionChange = (val: Vocabulary[]) => {
+  idList.value = val.map(item => item.id!).filter(id => id !== undefined)
+}
+
 const changeStatus = async (vocabulary: Vocabulary) => {
   if (vocabulary.status === undefined || vocabulary.id == null) {
     ElMessage.error('单词状态不能为空' as any)
@@ -207,13 +228,32 @@ onMounted(async () => {
 
 <template>
   <div class="word-table-container">
+    <!-- 批量操作工具栏 -->
+    <div class="batch-toolbar" v-if="idList.length > 0">
+      <span class="selected-count">已选择 {{ idList.length }} 个单词</span>
+      <el-button
+          type="danger"
+          size="small"
+          @click="handleBatchDelete"
+          :loading="loading"
+      >
+        批量删除
+      </el-button>
+    </div>
     <el-table
         :data="vocabularies"
         v-loading="loading"
         style="width: 100%; height: 700px;"
         :default-sort="{ prop: 'id', order: 'descending' }"
         stripe
+        @selection-change="handleSelectionChange"
     >
+      <!-- 添加选择列 -->
+      <el-table-column
+          type="selection"
+          width="55"
+          align="center"
+      />
       <el-table-column
           label="序号"
           width="80"
@@ -521,5 +561,26 @@ onMounted(async () => {
 
 .inline-form-item :deep(.el-form-item__content) {
   flex: 1;
+}
+
+/* 添加批量工具栏样式 */
+.batch-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff3f3 0%, #ffe6e6 100%);
+  border: 1px solid #ffd0d0;
+  border-radius: 8px;
+}
+
+.selected-count {
+  color: #f56c6c;
+  font-weight: 500;
+}
+
+.batch-toolbar .el-button {
+  margin-left: 12px;
 }
 </style>

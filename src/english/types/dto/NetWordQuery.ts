@@ -1,5 +1,5 @@
 // NetWordQuery.ts
 export interface NetWordQuery {
-    word?: string;
-    posId?: number;
+    word?: string | null;
+    posId?: number | null;
 }

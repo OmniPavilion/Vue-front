@@ -9,17 +9,17 @@ export interface NetWord {
     // 词义
     definitions: NetDefinition[];
     // 相关的成语或短语
-    idioms: Set<string>;
+    idioms: string[];
     // 同义词
-    synonyms: Set<string>;
+    synonyms: string[];
     // 反义词
-    antonyms: Set<string>;
+    antonyms: string[];
     // 上位词
-    hypernyms: Set<string>;
+    hypernyms: string[];
     // 下位词
-    hyponyms: Set<string>;
+    hyponyms: string[];
     // 整体词（Holonyms） - 表示该词是其中一部分的事物
-    holonyms: Set<string>;
+    holonyms: string[];
     // 部分词（Meronyms） - 表示组成该词的部分
-    meronyms: Set<string>;
+    meronyms: string[];
 }

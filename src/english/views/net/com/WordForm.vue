@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useBaseWordStore, useAiChatStore } from '@/english/stores';
+import {useAiChatStore, useWordNetStore} from '@/english/stores';
+import type {WordBasicInfo} from "@/english/types/vo/netWord/WordBasicInfo";
 
 // 使用Pinia store
-const baseWordStore = useBaseWordStore();
+const wordNetStore = useWordNetStore();
 const aiChatStore = useAiChatStore();
 
+
 // 计算属性获取单词列表和加载状态
-const words = computed(() => baseWordStore.words);
-const loading = computed(() => baseWordStore.loading);
+const wordBasicInfos = computed(() => wordNetStore.wordBasicInfos);
+const loading = computed(() => wordNetStore.loading);
+
+const handleShowDetails = (row: WordBasicInfo) => {
+  wordNetStore.fetchWordNet(row.word)
+};
 
 const handleSearch = (english: string) => {
   aiChatStore.chat( "查询单词" + english)
@@ -24,9 +30,9 @@ const handleAdd = (english: string) => {
 <template>
   <div class="word-table-container">
     <el-table
-        :data="words"
+        :data="wordBasicInfos"
         v-loading="loading"
-        style="width: 100%; height: 700px;"
+        style="width: 100%; height: 100%;"
         :default-sort="{ prop: 'id', order: 'descending' }"
         stripe
     >
@@ -37,37 +43,39 @@ const handleAdd = (english: string) => {
           :index="(index: number) => index + 1"
       />
       <el-table-column
-          prop="english"
+          prop="word"
           label="英文"
           min-width="120"
           sortable
       />
       <el-table-column
-          prop="chinese"
-          label="中文"
-          min-width="120"
-          sortable
-      />
-      <el-table-column
-          prop="phonetic"
-          label="音标"
+          prop="pos"
+          label="词性"
           min-width="150"
       >
         <template #default="{ row }">
-          <span v-if="row.phonetic">/{{ row.phonetic }}/</span>
+          <span v-if="row.pos">/{{ row.pos }}/</span>
           <span v-else class="no-phonetic">---</span>
         </template>
       </el-table-column>
       <el-table-column
           label="操作"
-          width="180"
+          width="220"
           fixed="right"
       >
         <template #default="{ row }">
           <div class="action-buttons">
             <el-button
+                type="primary"
                 size="small"
-                @click="handleSearch(row.english)"
+                @click="handleShowDetails(row)"
+                class="detail-btn"
+            >
+              查看详情
+            </el-button>
+            <el-button
+                size="small"
+                @click="handleSearch(row.word)"
                 class="search-btn"
             >
               查询
@@ -75,7 +83,7 @@ const handleAdd = (english: string) => {
             <el-button
                 size="small"
                 type="primary"
-                @click="handleAdd(row.english)"
+                @click="handleAdd(row.word)"
                 class="add-btn"
             >
               添加
@@ -92,6 +100,7 @@ const handleAdd = (english: string) => {
 .word-table-container {
   padding: 24px;
   background: #ffffff;
+  height: 100%;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   margin-bottom: 20px;
@@ -177,6 +186,26 @@ const handleAdd = (english: string) => {
 .add-btn:hover {
   background: linear-gradient(135deg, #337ecc 0%, #2a6cb5 100%);
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+}
+
+.detail-btn {
+  background: linear-gradient(135deg, #409EFF 0%, #337ecc 100%);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.3);
+}
+
+.detail-btn:hover {
+  background: linear-gradient(135deg, #337ecc 0%, #2a6cb5 100%);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.detail-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(64, 158, 255, 0.3);
 }
 
 /* 调整表格单元格内边距 */

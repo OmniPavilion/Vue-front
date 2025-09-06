@@ -27,7 +27,15 @@ const minHeight = 400
 
 // 发送消息
 const sendMessage = async () => {
-  if (!inputMessage.value.trim() || aiStore.isLoading) return
+  if (!inputMessage.value.trim() || aiStore.isLoading) {
+    ElMessage.warning('请输入内容' as any)
+    return
+  }
+
+  if (aiStore.isStreaming) {
+    ElMessage.warning('请等待AI处理完成' as any)
+    return
+  }
 
   await aiStore.chat(inputMessage.value)
   inputMessage.value = ''

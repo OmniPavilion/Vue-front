@@ -10,11 +10,12 @@ import logger from "@/common/utils/logger";
 
 export const useWordNetStore = defineStore('wordNet', () => {
     const wordBasicInfos = ref<WordBasicInfo[]>([]);
-    const currentNetWord = ref<NetWord | null>(null);
+    const currentNetWords = ref<NetWord[]>([]);
+    const currentShowNetWord = ref<NetWord | null>(null);
     const total = ref(0);
     const pageQuery = ref<PageDTO<NetWordQuery>>({
         pageNum: 1,
-        pageSize: 99999,
+        pageSize: 10,
         order: 'DESC',
         query: {},
     });
@@ -35,11 +36,19 @@ export const useWordNetStore = defineStore('wordNet', () => {
 
     // 获取单词完整信息
     const fetchWordNet = async (word: string) => {
+        const index = currentNetWords.value.findIndex(item => item.word === word);
+        if ( index !== -1) {
+            currentShowNetWord.value = currentNetWords.value[index];
+            return;
+        }
+
         logger.log('获取单词完整信息', word);
         loading.value = true;
         try {
             const response = await wordNetApi.getWordNet(word);
-            currentNetWord.value = response.data.data;
+            currentNetWords.value.push(response.data.data);
+            currentShowNetWord.value = response.data.data;
+            logger.log('展示单词',  currentShowNetWord.value)
             return response.data;
         } finally {
             loading.value = false;
@@ -52,7 +61,7 @@ export const useWordNetStore = defineStore('wordNet', () => {
         loading.value = true;
         try {
             const response = await wordNetApi.getPos();
-            return response.data.data;
+            return response.data;
         } finally {
             loading.value = false;
         }
@@ -64,7 +73,7 @@ export const useWordNetStore = defineStore('wordNet', () => {
         loading.value = true;
         try {
             const response = await wordNetApi.getStatistics();
-            return response.data.data;
+            return response.data;
         } finally {
             loading.value = false;
         }
@@ -74,7 +83,7 @@ export const useWordNetStore = defineStore('wordNet', () => {
     const resetQuery = () => {
         pageQuery.value = {
             pageNum: 1,
-            pageSize: 99999,
+            pageSize: 10,
             order: 'DESC',
             query: {},
         };
@@ -93,12 +102,27 @@ export const useWordNetStore = defineStore('wordNet', () => {
 
     // 清空当前单词信息
     const clearCurrentNetWord = () => {
-        currentNetWord.value = null;
+        currentNetWords.value = [];
+        currentShowNetWord.value = null;
     };
+
+    const clearCurrentNetWordByWord = (word: string) => {
+        if (currentShowNetWord.value?.word === word) {
+            const length = currentNetWords.value.length;
+            if (length > 1) {
+                const index = currentNetWords.value.findIndex(item => item.word === word);
+                currentShowNetWord.value = currentNetWords.value[(index + 1) % length];
+            } else {
+                currentShowNetWord.value = null;
+            }
+        }
+        currentNetWords.value = currentNetWords.value.filter(item => item.word !== word);
+
+    }
 
     return {
         wordBasicInfos,
-        currentNetWord,
+        currentNetWords,
         loading,
         pageQuery,
         total,
@@ -109,6 +133,8 @@ export const useWordNetStore = defineStore('wordNet', () => {
         resetQuery,
         setQuery,
         setPagination,
-        clearCurrentNetWord
+        clearCurrentNetWord,
+        clearCurrentNetWordByWord,
+        currentShowNetWord
     };
 });
