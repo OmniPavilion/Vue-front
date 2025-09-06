@@ -23,8 +23,21 @@ function setLogLevel(level: LogLevel): void {
 function createLogMethod(level: LogLevel) {
     return function(...args: any[]) {
         if (logLevelPriority[level] >= logLevelPriority[currentLogLevel]) {
+            // 打印标题
             console.groupCollapsed(`→ ${args[0]}`);
-            console.trace('调用栈位置'); // 这会自动创建可点击的源码链接
+
+            // 打印调用栈
+            console.trace('调用位置');
+
+            // 打印额外参数（从第二个参数开始）
+            if (args.length > 1) {
+                console.log('参数:');
+                // 循环输出所有额外参数
+                for (let i = 1; i < args.length; i++) {
+                    console.log(args[i]);
+                }
+            }
+
             console.groupEnd();
         }
     };

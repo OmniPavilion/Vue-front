@@ -39,6 +39,7 @@ export default defineConfig({
         port: 80,
         host: '0.0.0.0',
         strictPort: true,
+        allowedHosts: ['955276lmna42.vicp.fun']
     },
     build: {
         rollupOptions: {
