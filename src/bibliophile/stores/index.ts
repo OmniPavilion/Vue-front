@@ -1,1 +1,2 @@
-export {textStore} from '@/template/stores/stores/text'
+export {useFileStore} from '@/bibliophile/stores/stores/fileStore'
+export {useAiReadStore} from '@/bibliophile/stores/stores/readerStore'
