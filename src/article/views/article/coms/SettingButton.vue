@@ -1,87 +1,15 @@
 <script setup>
-import {ref, onMounted} from 'vue'
-import {Setting, Edit, Check, Close, RefreshRight, DocumentChecked} from '@element-plus/icons-vue'
+import {ref} from 'vue'
+import {Setting, DocumentChecked} from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
 import {useArticleFileStore} from '@/article/stores'
 
 const articleFileStore = useArticleFileStore()
 const drawerVisible = ref(false)
 const direction = ref('rtl')
-const fileInput = ref(null)
-const isEditing = ref(false)
-const tempPath = ref('')
-
-onMounted(async () => {
-  await loadCurrentPath()
-})
-
-const loadCurrentPath = async () => {
-  try {
-    const res = await articleFileStore.getRoot()
-    if (res.code === 1) {
-      tempPath.value = res.data
-    } else {
-      ElMessage.error(res.message)
-    }
-  } catch (error) {
-    ElMessage.error('获取目录失败: ' + error.message)
-  }
-}
 
 const openSettings = async () => {
-  await loadCurrentPath()
   drawerVisible.value = true
-}
-
-const openFilePicker = () => {
-  fileInput.value.click()
-}
-
-const handleFileSelect = (event) => {
-  const files = event.target.files
-  if (files.length > 0) {
-    const path = files[0].webkitRelativePath.split('/')[0]
-    articleFileStore.rootPath = path
-    event.target.value = ''
-  }
-}
-
-const startEditing = () => {
-  tempPath.value = articleFileStore.rootPath
-  isEditing.value = true
-}
-
-const saveEditing = async () => {
-  isEditing.value = false
-  await saveSettings()
-}
-
-const cancelEditing = () => {
-  articleFileStore.rootPath = tempPath.value
-  isEditing.value = false
-}
-
-const saveSettings = async () => {
-  try {
-    if (!articleFileStore.rootPath) {
-      ElMessage.warning('请先选择Markdown文件目录')
-      return
-    }
-    await articleFileStore.updateRoot(articleFileStore.rootPath)
-    ElMessage.success('目录设置成功')
-  } catch (error) {
-    ElMessage.error('保存目录失败: ' + error.message)
-  }
-}
-
-const resetRootPath = async () => {
-  try {
-    await articleFileStore.resetRoot()
-    await loadCurrentPath()
-    ElMessage.success('目录已重置为默认值')
-  } catch (error) {
-    ElMessage.error('重置目录失败: ' + error.message)
-  }
 }
 
 const copyFile = async () => {
@@ -113,60 +41,6 @@ const copyFile = async () => {
     >
       <div class="setting-content">
         <div class="setting-item">
-          <div class="input-container">
-            <el-input
-                v-model="articleFileStore.rootPath"
-                placeholder="请输入Markdown文件目录路径"
-                :readonly="!isEditing"
-                class="path-input"
-            />
-            <div class="action-buttons">
-              <el-button-group>
-                <el-button
-                    v-if="!isEditing"
-                    @click="startEditing"
-                    class="action-btn"
-                    title="编辑"
-                >
-                  <el-icon>
-                    <Edit/>
-                  </el-icon>
-                </el-button>
-                <template v-else>
-                  <el-button
-                      @click="saveEditing"
-                      type="success"
-                      class="action-btn"
-                      title="保存"
-                  >
-                    <el-icon>
-                      <Check/>
-                    </el-icon>
-                  </el-button>
-                  <el-button
-                      @click="cancelEditing"
-                      class="action-btn"
-                      title="取消"
-                  >
-                    <el-icon>
-                      <Close/>
-                    </el-icon>
-                  </el-button>
-                </template>
-                <el-button
-                    @click="resetRootPath"
-                    :disabled="!articleFileStore.rootPath"
-                    class="action-btn"
-                    title="重置"
-                >
-                  <el-icon>
-                    <RefreshRight/>
-                  </el-icon>
-                </el-button>
-              </el-button-group>
-            </div>
-          </div>
-
           <div class="check-file-container">
             <el-tooltip effect="dark" content="备份文件" placement="top">
               <el-button
@@ -180,14 +54,6 @@ const copyFile = async () => {
         </div>
       </div>
     </el-drawer>
-
-    <input
-        type="file"
-        ref="fileInput"
-        style="display: none"
-        @change="handleFileSelect"
-        webkitdirectory
-    />
   </div>
 </template>
 

@@ -49,21 +49,39 @@ const themes: Record<string, ThemeConfig> = {
   }
 };
 
+/**
+ * 计算当前主题配置
+ * 根据传入的 theme 属性值，从 themes 对象中获取对应的主题配置
+ */
 const currentTheme = computed(() => themes[props.theme]);
 
+/**
+ * 计算背景样式
+ * 根据当前主题和组件属性动态生成 CSS 变量和背景样式
+ */
 const backgroundStyles = computed(() => {
+  // 获取当前主题配置
   const theme = currentTheme.value;
+
+  // 初始化样式对象，设置基础的 CSS 变量
   const styles: Record<string, string> = {
+    // 背景颜色变量，用于设置页面背景色
     '--bg-color': theme.backgroundColor,
+    // 装饰边颜色变量，用于设置左右装饰边的颜色
     '--edge-color': theme.edgeColor,
+    // 网格动画变量，根据 enableAnimations 属性决定是否启用网格流动动画
     '--grid-animation': props.enableAnimations ? 'gridFlow 15s linear infinite' : 'none'
   };
 
+  // 当同时启用网格显示和当前主题支持网格时，添加网格背景样式
   if (props.showGrid && theme.showGrid) {
+    // 设置网格背景图像：由两个线性渐变组成，形成横纵交叉的网格线
     styles['background-image'] = `linear-gradient(${theme.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridColor} 1px, transparent 1px)`;
+    // 设置背景尺寸为 24x24 像素的网格
     styles['background-size'] = `24px 24px`;
   }
 
+  // 返回计算后的样式对象
   return styles;
 });
 </script>
@@ -74,7 +92,6 @@ const backgroundStyles = computed(() => {
       :class="theme"
       :style="backgroundStyles"
   >
-    <!-- 仅保留装饰性边缘 -->
     <div
         v-if="showDecorativeEdge"
         class="decorative-edge left"

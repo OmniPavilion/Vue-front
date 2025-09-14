@@ -8,7 +8,6 @@ import logger from '@/common/utils/logger'
 export const useArticleFileStore = defineStore('articleFile', () => {
     const fileContent = ref<string>('');
     const currentArticle = ref<ArticleVO | null>(null);
-    const rootPath = ref<string>('');
     const loading = ref(false);
     const isSave = ref(true);
 
@@ -33,45 +32,6 @@ export const useArticleFileStore = defineStore('articleFile', () => {
         try {
             const res = await articleFileApi.updateArticleFile(id, content);
             fileContent.value = content; // 更新本地状态
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
-    };
-
-    // 获取根文件夹路径
-    const getRoot = async () => {
-        logger.debug('获取根目录');
-        loading.value = true;
-        try {
-            const res = await articleFileApi.getRootPath();
-            rootPath.value = res.data.data;
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
-    }
-
-    // 修改根文件夹路径
-    const updateRoot = async (path: string) => {
-        logger.debug('修改根文件夹路径');
-        loading.value = true;
-        try {
-            const res = await articleFileApi.updateRootPath(path);
-            rootPath.value = path;
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
-    };
-
-    // 重置根文件夹路径
-    const resetRoot = async () => {
-        logger.debug('重置根文件夹路径');
-        loading.value = true;
-        try {
-            const res = await articleFileApi.resetRootPath();
-            // 注意：这里需要从接口获取重置后的路径，或者通过其他方式更新rootPath
             return res.data;
         } finally {
             loading.value = false;
@@ -157,16 +117,12 @@ export const useArticleFileStore = defineStore('articleFile', () => {
 
     return {
         fileContent,
-        rootPath,
         loading,
         currentArticle,
         isSave,
         fetchArticleFile,
         updateArticleFile,
-        updateRoot,
-        resetRoot,
         downloadArticleFile,
-        getRoot,
         downloadAll
     };
 });

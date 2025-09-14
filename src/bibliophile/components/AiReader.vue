@@ -218,12 +218,12 @@ onMounted(() => {
                   <el-button
                       v-if="message.type !== 'SYSTEM'"
                       size="small"
-                      :icon="Delete"
                       @click.stop="handleDeleteMessage(message.id)"
                       :disabled="aiReadStore.isLoading"
                       circle
                       class="delete-btn"
-                  />
+                  >
+                  </el-button>
                 </el-tooltip>
               </div>
               <div class="message-text" v-html="markDownIt.render(message.content)"></div>
@@ -431,6 +431,10 @@ onMounted(() => {
   padding: 20px;
   background: rgba(249, 247, 255, 0.8);
   transition: all 0.3s ease;
+}
+
+.chat-messages::-webkit-scrollbar {
+ display: none;
 }
 
 .ai-reader-container.dark-mode .chat-messages {
@@ -731,27 +735,6 @@ onMounted(() => {
   text-align: center;
 }
 
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .main-layout {
-    flex-direction: column;
-  }
-
-  .pdf-section {
-    width: 100%;
-    min-width: unset;
-    height: 40%;
-  }
-
-  .chat-section {
-    border-right: none;
-    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-  }
-
-  .ai-reader-container.dark-mode .chat-section {
-    border-bottom-color: rgba(200, 220, 255, 0.2);
-  }
-}
 
 @media (max-width: 768px) {
   .chat-header {

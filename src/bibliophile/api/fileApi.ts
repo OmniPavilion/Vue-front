@@ -42,22 +42,5 @@ export const fileApi = {
             url: '/bibliophile/files',
         });
     },
-
-    // 修改根文件夹路径
-    updateRootPath(path: string): Promise<AxiosResponse<Result<void>>> {
-        return myAxios({
-            method: 'put',
-            url: '/bibliophile/files/root',
-            params: { path },
-        });
-    },
-
-    // 重置根文件夹路径
-    resetRootPath(): Promise<AxiosResponse<Result<void>>> {
-        return myAxios({
-            method: 'put',
-            url: '/bibliophile/files/resetRoot',
-        });
-    },
 };
 

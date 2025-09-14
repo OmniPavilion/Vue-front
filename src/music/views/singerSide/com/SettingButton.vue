@@ -1,48 +1,17 @@
 <script setup>
-import {ref, onMounted} from 'vue'
-import {Setting, Edit, Check, Close, RefreshRight, Clock, DocumentChecked} from '@element-plus/icons-vue'
+import {ref} from 'vue'
+import {Setting, Clock, DocumentChecked} from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
-import {useMusicPlayStore, useMusicStore, usePlayStore} from '@/music/stores'
+import {useMusicPlayStore, useMusicStore} from '@/music/stores'
 
-const playStore = usePlayStore()
 const musicPlayStore = useMusicPlayStore()
 const musicStore = useMusicStore()
 const drawerVisible = ref(false)
 const direction = ref('rtl')
-const musicRootPath = ref('')
-const fileInput = ref(null)
-const isEditing = ref(false)
-const tempPath = ref('')
 
-onMounted(async () => {
-  await loadCurrentPath()
-})
-
-const loadCurrentPath = async () => {
-  try {
-    await playStore.getRootPath()
-    musicRootPath.value = playStore.rootPath
-  } catch (error) {
-    ElMessage.error('获取目录失败: ' + error.message)
-  }
-}
 
 const openSettings = async () => {
-  await loadCurrentPath()
   drawerVisible.value = true
-}
-
-const openFilePicker = () => {
-  fileInput.value.click()
-}
-
-const handleFileSelect = (event) => {
-  const files = event.target.files
-  if (files.length > 0) {
-    const path = files[0].webkitRelativePath.split('/')[0]
-    musicRootPath.value = path
-    event.target.value = ''
-  }
 }
 
 const checkFile = async () => {
@@ -55,48 +24,6 @@ const checkFile = async () => {
     ElMessage.success('检查完成, 文件保存完整')
   } catch (error) {
     ElMessage.error('检查文件失败: ' + error.message)
-  }
-}
-
-const startEditing = () => {
-  tempPath.value = musicRootPath.value
-  isEditing.value = true
-}
-
-const saveEditing = async () => {
-  isEditing.value = false
-  await saveSettings()
-}
-
-const cancelEditing = () => {
-  musicRootPath.value = tempPath.value
-  isEditing.value = false
-}
-
-const saveSettings = async () => {
-  try {
-    if (!musicRootPath.value) {
-      ElMessage.warning('请先选择音乐目录')
-      return
-    }
-    const res = await playStore.setRootPath(musicRootPath.value)
-    if (res.code !== 1) {
-      ElMessage.error(res.message)
-      return
-    }
-    ElMessage.success('目录设置成功')
-  } catch (error) {
-    ElMessage.error('保存目录失败: ' + error.message)
-  }
-}
-
-const resetRootPath = async () => {
-  try {
-    await playStore.resetRootPath()
-    await loadCurrentPath()
-    ElMessage.success('目录已重置为默认值')
-  } catch (error) {
-    ElMessage.error('重置目录失败: ' + error.message)
   }
 }
 
@@ -143,60 +70,6 @@ const formatPlayTime = (seconds) => {
             </span>
           </div>
 
-          <div class="input-container">
-            <el-input
-                v-model="musicRootPath"
-                placeholder="请输入音乐目录路径"
-                :readonly="!isEditing"
-                class="path-input"
-            />
-            <div class="action-buttons">
-              <el-button-group>
-                <el-button
-                    v-if="!isEditing"
-                    @click="startEditing"
-                    class="action-btn"
-                    title="编辑"
-                >
-                  <el-icon>
-                    <Edit/>
-                  </el-icon>
-                </el-button>
-                <template v-else>
-                  <el-button
-                      @click="saveEditing"
-                      type="success"
-                      class="action-btn"
-                      title="保存"
-                  >
-                    <el-icon>
-                      <Check/>
-                    </el-icon>
-                  </el-button>
-                  <el-button
-                      @click="cancelEditing"
-                      class="action-btn"
-                      title="取消"
-                  >
-                    <el-icon>
-                      <Close/>
-                    </el-icon>
-                  </el-button>
-                </template>
-                <el-button
-                    @click="resetRootPath"
-                    :disabled="!musicRootPath"
-                    class="action-btn"
-                    title="重置"
-                >
-                  <el-icon>
-                    <RefreshRight/>
-                  </el-icon>
-                </el-button>
-              </el-button-group>
-            </div>
-          </div>
-
           <div class="check-file-container">
             <el-tooltip effect="dark" content="检查文件完整性" placement="top">
               <el-button
@@ -208,27 +81,8 @@ const formatPlayTime = (seconds) => {
             </el-tooltip>
           </div>
         </div>
-
-        <div class="footer-actions">
-          <el-button
-              @click="saveSettings"
-              type="primary"
-              :disabled="!musicRootPath"
-              class="save-btn"
-          >
-            保存设置
-          </el-button>
-        </div>
       </div>
     </el-drawer>
-
-    <input
-        type="file"
-        ref="fileInput"
-        style="display: none"
-        @change="handleFileSelect"
-        webkitdirectory
-    />
   </div>
 </template>
 

@@ -11,24 +11,32 @@ onMounted(async () => {
 
 // 按年月分组日志
 const groupedLogs = computed(() => {
+  // 初始化分组对象，结构为: { 年份: { 月份: [日志数组] } }
+  // Record<string, Record<string, any[]>> 表示外层键为字符串（年份），
+  // 内层值为另一个对象，其键为字符串（月份），值为日志对象数组
   const groups: Record<string, Record<string, any[]>> = {};
 
+  // 遍历日志列表中的每一条日志
   logStore.logList.forEach(log => {
     const date = new Date(log.date);
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // 月份从0开始
+    const month = date.getMonth() + 1;
 
+    // 如果当前年份在分组中不存在，则初始化该年份的对象
     if (!groups[year]) {
       groups[year] = {};
     }
 
+    // 如果当前月份在该年份下不存在，则初始化该月份的数组
     if (!groups[year][month]) {
       groups[year][month] = [];
     }
 
+    // 将当前日志添加到对应的年月分组中
     groups[year][month].push(log);
   });
 
+  // 返回分组后的结果
   return groups;
 });
 

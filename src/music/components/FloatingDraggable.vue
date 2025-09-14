@@ -8,9 +8,9 @@ const isDragging = ref(false)
 const startPos = ref({ x: 0, y: 0 })
 const container = ref(null)
 const containerSize = ref({ width: 0, height: 0 })
-const velocity = ref({ x: 0, y: 0 }) // 新增：速度跟踪
-const lastPosition = ref({ x: 0, y: 0 }) // 新增：最后位置记录
-const animationFrameId = ref(null) // 新增：动画帧ID
+const velocity = ref({ x: 0, y: 0 }) // 速度跟踪
+const lastPosition = ref({ x: 0, y: 0 }) // 最后位置记录
+const animationFrameId = ref(null) // 动画帧ID
 
 const containerStyle = computed(() => ({
   left: `${position.value.x}px`,
@@ -26,7 +26,7 @@ const handleStyle = computed(() => ({
   cursor: isDragging.value ? 'grabbing' : 'grab'
 }))
 
-// 新增：惯性动画函数
+// 惯性动画函数
 const animateInertia = () => {
   // 如果速度很小，停止动画
   if (Math.abs(velocity.value.x) < 0.1 && Math.abs(velocity.value.y) < 0.1) {
@@ -62,6 +62,7 @@ const animateInertia = () => {
   animationFrameId.value = requestAnimationFrame(animateInertia)
 }
 
+// 当用户开始拖拽（mousedown 或 touchstart）后，鼠标或手指可能会非常快速地移动到可拖拽元素的外部
 onMounted(() => {
   window.addEventListener('mousemove', handleDrag)
   window.addEventListener('touchmove', handleDrag, { passive: false })
@@ -108,7 +109,7 @@ const handleDrag = (e) => {
   // 计算速度（当前位置 - 上次位置）
   if (lastPosition.value.x && lastPosition.value.y) {
     velocity.value = {
-      x: (clientX - lastPosition.value.x) * 1.5, // 乘以系数增加速度感
+      x: (clientX - lastPosition.value.x) * 1.5,
       y: (clientY - lastPosition.value.y) * 1.5
     }
   }

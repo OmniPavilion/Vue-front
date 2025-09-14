@@ -18,6 +18,8 @@ const router = useRouter();
 const props = defineProps({
   // 书签配置数组
   bookmarks: {
+    // 在 Vue 3 的 defineProps 中，当需要为数组或对象指定详细的内部结构时，
+    // 单纯使用 type: Array 或 type: Object 无法满足类型检查需求。
     type: Array as () => Array<{
       name: string;
       routeName: string;
@@ -82,17 +84,33 @@ const props = defineProps({
   }
 });
 
+/**
+ * 当前激活的书签索引，null表示没有激活的书签
+ */
 const activeIndex = ref<number | null>(null);
+
+/**
+ * 窗口高度和宽度的响应式数据
+ */
 const windowHeight = ref(window.innerHeight);
 const windowWidth = ref(window.innerWidth);
 
+/**
+ * 更新窗口尺寸的函数
+ * 当窗口大小改变时调用，更新windowHeight和windowWidth的值
+ */
 const updateWindowSize = () => {
   windowHeight.value = window.innerHeight;
   windowWidth.value = window.innerWidth;
 };
 
+/**
+ * 组件挂载时的初始化操作
+ */
 onMounted(() => {
+  // 监听窗口大小变化事件
   window.addEventListener('resize', updateWindowSize);
+
   // 初始化时根据当前路由设置活动书签
   const currentRouteName = router.currentRoute.value.name;
   const index = props.bookmarks.findIndex(b => b.routeName === currentRouteName);
@@ -101,47 +119,84 @@ onMounted(() => {
   }
 });
 
+/**
+ * 组件卸载时的清理操作
+ */
 onUnmounted(() => {
+  // 移除窗口大小变化事件监听器
   window.removeEventListener('resize', updateWindowSize);
 });
 
-// 计算书签高度（响应式）
+/**
+ * 计算书签高度（响应式）
+ * 根据窗口尺寸和书签数量动态计算每个书签的高度
+ * 高度在minHeight和maxHeight之间调整
+ */
 const bookmarkHeight = computed(() => {
-  const minHeight = 40;
-  const maxHeight = 80;
+  const minHeight = 40;   // 最小高度40px
+  const maxHeight = 80;   // 最大高度80px
+
+  // 基础尺寸计算：取窗口宽高中较小值，除以书签数量的1.5倍
   const baseSize = Math.min(windowHeight.value, windowWidth.value) / (props.bookmarks.length * 1.5);
+
+  // 限制在最小和最大高度之间，并添加'px'单位
   return `${Math.max(minHeight, Math.min(maxHeight, baseSize / 2))}px`;
 });
 
-// 计算动态间距（更精细地控制）
+/**
+ * 计算动态间距（更精细地控制）
+ * 根据窗口尺寸、书签数量和spacingVWWeight属性计算书签之间的间距
+ * 间距在minSpacing和maxSpacing之间调整
+ */
 const dynamicSpacing = computed(() => {
-  const minSpacing = 8;
-  const maxSpacing = 20;
+  const minSpacing = 8;   // 最小间距8px
+  const maxSpacing = 20;  // 最大间距20px
 
   // 基于视窗尺寸和书签数量的动态计算
   const baseSpacing = Math.min(windowHeight.value, windowWidth.value) / (props.bookmarks.length * 2);
   const spacing = Math.max(minSpacing, Math.min(maxSpacing, baseSpacing));
 
-  // 混合vw和vh单位
-  const vhRatio = (1 - props.spacingVWWeight) * spacing;
-  const vwRatio = props.spacingVWWeight * spacing;
+  // 混合vw和vh单位计算
+  const vhRatio = (1 - props.spacingVWWeight) * spacing;  // vh权重部分
+  const vwRatio = props.spacingVWWeight * spacing;        // vw权重部分
 
+  // 返回计算后的间距值，使用calc表达式
   return `calc(${vhRatio}px + ${vwRatio}px)`;
 });
 
-// 改进的动态居中计算
+/**
+ * 改进的动态居中计算
+ * 根据书签高度、间距和数量计算书签组的起始位置
+ * 实现书签组在垂直方向上的居中对齐
+ */
 const startPosition = computed(() => {
+  // 解析书签高度和间距的数值部分
   const heightValue = parseFloat(bookmarkHeight.value);
   const spacingValue = parseFloat(dynamicSpacing.value.replace('calc(', '').replace(')', ''));
+
+  // 计算所有书签的总高度（书签高度*数量 + 间距*(数量-1)）
   const totalHeight = props.bookmarks.length * heightValue + (props.bookmarks.length - 1) * spacingValue;
 
+  // 使用verticalOffset属性和总高度计算居中位置
   return `calc(${props.verticalOffset}% - ${totalHeight / 2}px)`;
 });
 
+/**
+ * 切换书签状态的函数
+ * @param index - 被点击书签的索引
+ *
+ * 功能：
+ * 1. 如果点击的是当前激活的书签，则取消激活（设为null）
+ * 2. 如果点击的是其他书签，则激活该书签
+ * 3. 跳转到对应书签的路由
+ */
 const toggleBookmark = (index: number) => {
   const bookmark = props.bookmarks[index];
   if (bookmark) {
+    // 切换激活状态：如果当前已激活则设为null，否则设为当前索引
     activeIndex.value = activeIndex.value === index ? null : index;
+
+    // 使用vue-router进行页面跳转
     router.push({ name: bookmark.routeName });
   }
 };

@@ -17,10 +17,8 @@ export const useMusicStore = defineStore('music', () => {
         order: 'DESC',
         query: {}
     });
-
     const deleteMusicIds = ref<number[]>([]);
     const isDeleteMode = ref(false);
-
     // 分页查询音乐
     const fetchMusicPage = async () => {
         logger.log('分页查询音乐', pageQuery.value);
@@ -36,7 +34,6 @@ export const useMusicStore = defineStore('music', () => {
             loading.value = false;
         }
     };
-
     // 获取单个音乐详情
     const fetchMusicById = async (id: number) => {
         logger.log('获取音乐详情', id)
@@ -49,7 +46,6 @@ export const useMusicStore = defineStore('music', () => {
             loading.value = false;
         }
     };
-
     // 批量上传音乐
     const createMusics = async (files: File[], singer: string, category: string) => {
         logger.log('批量上传音乐')
@@ -64,7 +60,6 @@ export const useMusicStore = defineStore('music', () => {
             loading.value = false;
         }
     };
-
     // 更新音乐
     const updateMusic = async (music: MusicVO) => {
         logger.log("更新音乐", music)
@@ -78,7 +73,6 @@ export const useMusicStore = defineStore('music', () => {
             loading.value = false;
         }
     };
-
     // 删除音乐
     const deleteMusic = async (id: number) => {
         logger.log("删除音乐", id)
@@ -93,7 +87,6 @@ export const useMusicStore = defineStore('music', () => {
             loading.value = false;
         }
     };
-
     // 记录播放
     const recordPlay = async (id: number) => {
         logger.log("记录播放", id)
@@ -106,7 +99,6 @@ export const useMusicStore = defineStore('music', () => {
             loading.value = false;
         }
     };
-
     // 切换收藏状态
     const toggleFavorite = async (id: number) => {
         logger.log("切换收藏状态", id)
