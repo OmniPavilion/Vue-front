@@ -1,4 +1,4 @@
-import {Document, Notebook, Headset, Platform, Reading} from '@element-plus/icons-vue'
+import {Notebook, Headset, Reading} from '@element-plus/icons-vue'
 import type {Component} from "vue";
 
 export interface Feature {
@@ -30,26 +30,5 @@ export const features: Feature[] = [
         icon: Reading,
         link: '/article',
         available: true
-    },
-    {
-        name: 'Ai阅读器',
-        desc: '支持PDF文档阅读、标注和书签功能，提升您的阅读体验。',
-        icon: Document,
-        link: '/bibliophile',
-        available: true
-    },
-    {
-        name: '音韵阁',
-        desc: '一个集智能词库、记忆训练、单词测试，AI辅助于一体的英语学习综合平台',
-        icon: Platform,
-        link: '/english',
-        available: true
-    },
-    {
-        name: '游戏盒子',
-        desc: '即将推出：集合多种经典小游戏，提供休闲娱乐体验。',
-        icon: Platform,
-        link: '/game',
-        available: false
     },
 ]

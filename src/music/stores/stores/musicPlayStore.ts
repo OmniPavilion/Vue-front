@@ -46,6 +46,7 @@ export const useMusicPlayStore = defineStore('play', () => {
             volume: audioService.volume,
             playDuration: playArg.value.playDuration + audioService._playTime
         };
+        audioService._playTime = 0;
 
         console.log("设置播放参数", playArg.value);
         const res = await playApi.setPlayArg(playArg.value);
@@ -66,6 +67,7 @@ export const useMusicPlayStore = defineStore('play', () => {
             currentMusic.value = music;
             isPlaying.value = true;
         }
+        await setPlayArg();
     };
 
     const pauseMusic = () => {

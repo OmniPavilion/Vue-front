@@ -1,12 +1,10 @@
 <script setup>
 import Background from '@/diary/components/Background.vue';
 import Bookmark from '@/diary/components/Bookmark.vue';
-import TipInfo from "@/diary/components/TipInfo.vue";
 import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <TipInfo />
   <Background
       theme="vintage"
       :showDecorativeEdge="true"

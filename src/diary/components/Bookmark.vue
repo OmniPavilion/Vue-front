@@ -7,10 +7,7 @@ import {
   ElTooltip
 } from 'element-plus';
 import {
-  HomeFilled,
   Notebook,
-  Calendar,
-  Document
 } from '@element-plus/icons-vue';
 
 const router = useRouter();
@@ -30,33 +27,12 @@ const props = defineProps({
     }>,
     default: () => [
       {
-        name: '首页',
-        routeName: 'home',
-        color: '#FF9AA2',
-        icon: HomeFilled,
-        tooltip: '返回首页'
-      },
-      {
         name: '日志',
         routeName: 'log',
         color: '#FFB7B2',
         icon: Notebook,
         tooltip: '查看日志'
       },
-      {
-        name: '计划',
-        routeName: 'plan',
-        color: '#FFDAC1',
-        icon: Calendar,
-        tooltip: '管理计划'
-      },
-      {
-        name: '代表事项',
-        routeName: 'note',
-        color: '#E2F0CB',
-        icon: Document,
-        tooltip: '编辑代办'
-      }
     ],
     validator: (value: any[]) => value.length > 0 && value.length <= 10
   },
