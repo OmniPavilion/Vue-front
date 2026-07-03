@@ -12,6 +12,16 @@ const aboutRoutes: RouteRecordRaw[] = [
                 name: 'log',
                 component: () => import('@/diary/views/log/index.vue'),
             },
+            {
+                path: '/diary/stats',
+                name: 'stats',
+                component: () => import('@/diary/views/stats/index.vue'),
+            },
+            {
+                path: '/diary/history',
+                name: 'history',
+                component: () => import('@/diary/views/history/index.vue'),
+            },
         ]
     },
      {

@@ -16,6 +16,7 @@
     "axios": "^1.9.0",
     "bootstrap-icons": "^1.13.1",
     "dompurify": "^3.2.6",
+    "echarts": "^6.1.0",
     "element-plus": "^2.9.9",
     "gsap": "^3.13.0",
     "html-to-md": "^0.8.8",

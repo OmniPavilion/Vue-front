@@ -8,6 +8,8 @@ import {
 } from 'element-plus';
 import {
   Notebook,
+  DataAnalysis,
+  List,
 } from '@element-plus/icons-vue';
 
 const router = useRouter();
@@ -32,6 +34,20 @@ const props = defineProps({
         color: '#FFB7B2',
         icon: Notebook,
         tooltip: '查看日志'
+      },
+      {
+        name: '统计',
+        routeName: 'stats',
+        color: '#B5EAD7',
+        icon: DataAnalysis,
+        tooltip: '日记统计'
+      },
+      {
+        name: '历史',
+        routeName: 'history',
+        color: '#C7CEEA',
+        icon: List,
+        tooltip: '日志历史'
       },
     ],
     validator: (value: any[]) => value.length > 0 && value.length <= 10

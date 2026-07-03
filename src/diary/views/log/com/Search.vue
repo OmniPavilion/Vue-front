@@ -119,10 +119,11 @@ onMounted(() => {
         <el-form-item label="数据量" class="form-item">
           <el-select
               v-model="formData.pageSize"
-              style="width: 90px;"
+              style="width: 95px;"
               placeholder="数据量"
-              clearable
-              @change="autoSearch"
+              filterable
+              allow-create
+              @change="(val: any) => { formData.pageSize = Number(val); autoSearch(); }"
               class="theme-select"
           >
             <el-option

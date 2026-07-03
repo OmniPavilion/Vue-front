@@ -6,9 +6,14 @@ import type {DailyLogVO} from "@/diary/types/vo/DailyLogVO";
 import {useLogStore} from "@/diary/stores";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {Plus, Delete, Edit, CloseBold} from '@element-plus/icons-vue'
-
+import SubcategorySelect from "@/diary/components/SubcategorySelect.vue";
 
 const logStore = useLogStore();
+
+const categoryToId = (cat: Category): number => {
+  const map: Record<string, number> = { Study: 1, Work: 2, Life: 3, Exercise: 4, Entertainment: 5, Social: 6 };
+  return map[cat] || 1;
+};
 
 const props = defineProps<{
   dailyLog: DailyLogVO;
@@ -73,11 +78,10 @@ const handleClick = () => {
 
 // 添加日志
 const handleAddLog = () => {
-  // 这里可以打开另一个对话框或直接添加默认日志
-  console.log('添加日志', props.dailyLog.id);
   props.dailyLog.logs.push({
     activity: '默认日志',
-    category: Category.STUDY
+    category: Category.STUDY,
+    subcategory: undefined
   });
 };
 
@@ -247,6 +251,11 @@ const changeCategory = (category: Category) => {
               {{ getCategoryName(log.category) }}
             </el-tag>
 
+            <SubcategorySelect
+                v-model="log.subcategory"
+                :category-id="categoryToId(log.category)"
+            />
+
             <div v-if="editingIndex !== index" class="activity-text">
               {{ log.activity }}
             </div>
@@ -322,6 +331,32 @@ const changeCategory = (category: Category) => {
 
 .delete-btn {
   color: #666;
+}
+
+
+.subcategory-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 12px;
+}
+
+.delete-subcategory-btn {
+  color: #b8a07a;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.subcategory-option:hover .delete-subcategory-btn {
+  opacity: 1;
+}
+
+.delete-subcategory-btn:hover {
+  color: #b85c5c;
 }
 
 .delete-btn:hover {
